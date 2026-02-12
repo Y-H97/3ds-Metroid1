@@ -74,20 +74,32 @@ struct TileRenderer {
     }
 
     void drawSlope(float x, float y, int tileIndex) const {
-        u32 col = C2D_Color32(160, 160, 235, 255);
+        u32 colMain = C2D_Color32(153, 153, 230, 255);
+        u32 colShade = C2D_Color32(118, 118, 188, 255);
+        u32 lineCol = C2D_Color32(198, 198, 250, 255);
         if (tileIndex == 32 || tileIndex == 33) {
-            col = C2D_Color32(118, 118, 190, 255);
+            colMain = C2D_Color32(122, 122, 194, 255);
+            colShade = C2D_Color32(94, 94, 156, 255);
+            lineCol = C2D_Color32(170, 170, 228, 255);
         }
         const float s = static_cast<float>(tileSize);
         C2D_DrawRectSolid(x, y, 0.0f, s, s, C2D_Color32(28, 34, 50, 255));
         if (tileIndex == 30) {
-            C2D_DrawTriangle(x, y + s, col, x + s, y + s, col, x + s, y, col, 0.05f);
+            C2D_DrawTriangle(x, y + s, colMain, x + s, y + s, colMain, x + s, y, colMain, 0.05f);
+            C2D_DrawTriangle(x + s * 0.5f, y + s, colShade, x + s, y + s, colShade, x + s, y + s * 0.5f, colShade, 0.06f);
+            C2D_DrawLine(x + s, y, lineCol, x, y + s, lineCol, 1.4f, 0.08f);
         } else if (tileIndex == 31) {
-            C2D_DrawTriangle(x, y, col, x, y + s, col, x + s, y + s, col, 0.05f);
+            C2D_DrawTriangle(x, y, colMain, x, y + s, colMain, x + s, y + s, colMain, 0.05f);
+            C2D_DrawTriangle(x, y + s * 0.5f, colShade, x, y + s, colShade, x + s * 0.5f, y + s, colShade, 0.06f);
+            C2D_DrawLine(x, y, lineCol, x + s, y + s, lineCol, 1.4f, 0.08f);
         } else if (tileIndex == 32) {
-            C2D_DrawTriangle(x, y, col, x + s, y, col, x + s, y + s, col, 0.05f);
+            C2D_DrawTriangle(x, y, colMain, x + s, y, colMain, x + s, y + s, colMain, 0.05f);
+            C2D_DrawTriangle(x + s * 0.5f, y, colShade, x + s, y, colShade, x + s, y + s * 0.5f, colShade, 0.06f);
+            C2D_DrawLine(x, y, lineCol, x + s, y + s, lineCol, 1.4f, 0.08f);
         } else if (tileIndex == 33) {
-            C2D_DrawTriangle(x, y, col, x + s, y, col, x, y + s, col, 0.05f);
+            C2D_DrawTriangle(x, y, colMain, x + s, y, colMain, x, y + s, colMain, 0.05f);
+            C2D_DrawTriangle(x, y, colShade, x + s * 0.5f, y, colShade, x, y + s * 0.5f, colShade, 0.06f);
+            C2D_DrawLine(x + s, y, lineCol, x, y + s, lineCol, 1.4f, 0.08f);
         }
     }
 
