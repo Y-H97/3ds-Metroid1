@@ -73,7 +73,29 @@ struct TileRenderer {
         return sheet != nullptr;
     }
 
+    void drawSlope(float x, float y, int tileIndex) const {
+        u32 col = C2D_Color32(160, 160, 235, 255);
+        if (tileIndex == 32 || tileIndex == 33) {
+            col = C2D_Color32(118, 118, 190, 255);
+        }
+        const float s = static_cast<float>(tileSize);
+        C2D_DrawRectSolid(x, y, 0.0f, s, s, C2D_Color32(28, 34, 50, 255));
+        if (tileIndex == 30) {
+            C2D_DrawTriangle(x, y + s, col, x + s, y + s, col, x + s, y, col, 0.05f);
+        } else if (tileIndex == 31) {
+            C2D_DrawTriangle(x, y, col, x, y + s, col, x + s, y + s, col, 0.05f);
+        } else if (tileIndex == 32) {
+            C2D_DrawTriangle(x, y, col, x + s, y, col, x + s, y + s, col, 0.05f);
+        } else if (tileIndex == 33) {
+            C2D_DrawTriangle(x, y, col, x + s, y, col, x, y + s, col, 0.05f);
+        }
+    }
+
     void drawTile(float x, float y, int tileIndex) const {
+        if (tileIndex == 30 || tileIndex == 31 || tileIndex == 32 || tileIndex == 33) {
+            drawSlope(x, y, tileIndex);
+            return;
+        }
         if (sheet) {
             C2D_Image img = C2D_SpriteSheetGetImage(sheet, tileIndex % C2D_SpriteSheetCount(sheet));
             C2D_DrawImageAt(img, x, y, 0.0f, nullptr, 1.0f, 1.0f);
@@ -172,6 +194,8 @@ static void renderBottomUI(
     const GameCore& core,
     int gridX,
     int gridY,
+    int currentGridX,
+    int currentGridY,
     int mode,
     bool debugEnabled,
     bool showFpsEnabled,
@@ -183,20 +207,13 @@ static void renderBottomUI(
 
     if (mode == TAB_MAP) {
         text.draw(12.0f, 12.0f, 0.48f, C2D_Color32(230, 230, 240, 255), "Karte");
-        text.draw(236.0f, 12.0f, 0.36f, C2D_Color32(170, 180, 205, 255), "GX:%d GY:%d", gridX, gridY);
+        text.draw(214.0f, 12.0f, 0.36f, C2D_Color32(170, 180, 205, 255), "GX:%d GY:%d", currentGridX, currentGridY);
 
-        const auto& cells = world.getCells();
-        if (!cells.empty()) {
-            int minX = cells[0].x;
-            int maxX = cells[0].x;
-            int minY = cells[0].y;
-            int maxY = cells[0].y;
-            for (const auto& c : cells) {
-                if (c.x < minX) minX = c.x;
-                if (c.x > maxX) maxX = c.x;
-                if (c.y < minY) minY = c.y;
-                if (c.y > maxY) maxY = c.y;
-            }
+        int minX = 0;
+        int minY = 0;
+        int maxX = 0;
+        int maxY = 0;
+        if (world.getSpatialBounds(minX, minY, maxX, maxY)) {
 
             int cols = (maxX - minX) + 1;
             int rows = (maxY - minY) + 1;
@@ -218,14 +235,22 @@ static void renderBottomUI(
 
             C2D_DrawRectSolid(originX - 2, originY - 2, 0.0f, drawW + 4, drawH + 4, C2D_Color32(36, 46, 62, 255));
 
-            for (const auto& c : cells) {
-                int cx = originX + (c.x - minX) * cellSize;
-                int cy = originY + (c.y - minY) * cellSize;
-                bool isCurrent = (c.x == gridX && c.y == gridY);
-                u32 color = isCurrent ? C2D_Color32(100, 220, 130, 255) : C2D_Color32(90, 130, 180, 255);
-                C2D_DrawRectSolid(cx, cy, 0.0f, cellSize - 1, cellSize - 1, color);
-                if (isCurrent) {
-                    C2D_DrawRectSolid(cx + 2, cy + 2, 0.1f, cellSize - 5, cellSize - 5, C2D_Color32(190, 255, 210, 255));
+            for (int gy = minY; gy <= maxY; ++gy) {
+                for (int gx = minX; gx <= maxX; ++gx) {
+                    const SpatialCell* sc = world.getCell(gx, gy);
+                    if (!sc) continue;
+
+                    int cx = originX + (gx - minX) * cellSize;
+                    int cy = originY + (gy - minY) * cellSize;
+                    bool isCurrent = (gx == currentGridX && gy == currentGridY);
+                    bool isOrigin = (gx == sc->originX && gy == sc->originY);
+                    u32 color = isCurrent ? C2D_Color32(100, 220, 130, 255) : (isOrigin ? C2D_Color32(102, 150, 210, 255) : C2D_Color32(76, 112, 164, 255));
+                    C2D_DrawRectSolid(cx, cy, 0.0f, cellSize - 1, cellSize - 1, color);
+                    if (isCurrent) {
+                        C2D_DrawRectSolid(cx + 2, cy + 2, 0.1f, cellSize - 5, cellSize - 5, C2D_Color32(190, 255, 210, 255));
+                    } else if (isOrigin && cellSize >= 8) {
+                        C2D_DrawRectSolid(cx + cellSize / 3, cy + cellSize / 3, 0.1f, 2, 2, C2D_Color32(210, 230, 255, 255));
+                    }
                 }
             }
         }
@@ -525,6 +550,10 @@ int main() {
 
         if (requestExit) break;
 
+        const Player& currentPlayer = core.getPlayer();
+        int currentGridX = gridX + static_cast<int>(std::floor(currentPlayer.x / 400.0f));
+        int currentGridY = gridY + static_cast<int>(std::floor(currentPlayer.y / 240.0f));
+
         const float dt = 1.0f / 60.0f;
         if (appState == APP_GAME) {
             InputState input;
@@ -659,7 +688,7 @@ int main() {
 
             C2D_TargetClear(bottom, BG_COLOR);
             C2D_SceneBegin(bottom);
-            renderBottomUI(text, world, core, gridX, gridY, bottomMode, debugInfoEnabled, showFpsEnabled, settingsSelection);
+            renderBottomUI(text, world, core, gridX, gridY, currentGridX, currentGridY, bottomMode, debugInfoEnabled, showFpsEnabled, settingsSelection);
         } else {
             C2D_TargetClear(top, CLEAR_COLOR);
             C2D_SceneBegin(top);

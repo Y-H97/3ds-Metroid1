@@ -143,6 +143,28 @@ const SpatialCell* WorldMap::getCell(int gridX, int gridY) const {
     return &it->second;
 }
 
+bool WorldMap::getSpatialBounds(int& minX, int& minY, int& maxX, int& maxY) const {
+    if (spatial.empty()) return false;
+
+    bool first = true;
+    for (const auto& it : spatial) {
+        int x = 0;
+        int y = 0;
+        if (std::sscanf(it.first.c_str(), "%d,%d", &x, &y) != 2) continue;
+        if (first) {
+            minX = maxX = x;
+            minY = maxY = y;
+            first = false;
+            continue;
+        }
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    }
+    return !first;
+}
+
 bool WorldMap::isCheckpoint(int gridX, int gridY) const {
     auto it = checkpoints.find(makeKey(gridX, gridY));
     return it != checkpoints.end();

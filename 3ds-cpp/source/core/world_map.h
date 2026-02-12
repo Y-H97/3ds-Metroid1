@@ -23,6 +23,7 @@ public:
 
     const std::vector<WorldCell>& getCells() const { return cells; }
     const SpatialCell* getCell(int gridX, int gridY) const;
+    bool getSpatialBounds(int& minX, int& minY, int& maxX, int& maxY) const;
 
     bool isCheckpoint(int gridX, int gridY) const;
 
