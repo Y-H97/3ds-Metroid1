@@ -33,7 +33,7 @@ include $(DEVKITARM)/3ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source source/core
+SOURCES		:=	source source/core source/menu/controllers source/menu/views source/gameplay source/gameplay/render source/ui
 DATA		:=	data
 INCLUDES	:=	include
 GRAPHICS	:=	gfx
@@ -162,7 +162,7 @@ endif
 
 #---------------------------------------------------------------------------------
 all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(MAKE) --no-print-directory -C $(BUILD) -f "$(TOPDIR)/Makefile"
 
 $(BUILD):
 	@mkdir -p $@
