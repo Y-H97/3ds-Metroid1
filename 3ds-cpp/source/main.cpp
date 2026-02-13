@@ -1,6 +1,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#include "core/app_settings.h"
 #include "gameplay/gameplay_scene.h"
 #include "menu/controllers/main_menu_controller.h"
 #include "ui/text_renderer.h"
@@ -36,6 +37,14 @@ int main() {
         return 1;
     }
 
+    AppSettingsData settings{};
+    AppSettings::load(settings);
+    menu.setDebugEnabled(settings.debugEnabled);
+    menu.setControlsSwapped(settings.controlsSwapped);
+    gameplay.setShowFpsEnabled(settings.showFps);
+
+    AppSettingsData savedSettings = settings;
+
     AppState appState = APP_MAIN_MENU;
 
     while (aptMainLoop()) {
@@ -46,6 +55,8 @@ int main() {
         if (kDown & KEY_START) break;
 
         if (appState == APP_MAIN_MENU) {
+            int selectedSlot = menu.getSelectedSaveSlot();
+            menu.setHasContinue(gameplay.hasPersistentSave(selectedSlot));
             menu.handleKeys(kDown);
             if (kDown & KEY_TOUCH) {
                 touchPosition tp;
@@ -56,10 +67,22 @@ int main() {
             MainMenuAction action = menu.consumeAction();
             if (action.exitGame) break;
             if (action.startGame) {
-                appState = APP_GAME;
-                gameplay.clearReturnToMenu();
+                if (gameplay.startNewGame(menu.getSelectedSaveSlot())) {
+                    appState = APP_GAME;
+                    gameplay.clearReturnToMenu();
+                }
+            }
+            if (action.loadCheckpoint) {
+                if (gameplay.loadFromCheckpoint(menu.getSelectedSaveSlot())) {
+                    appState = APP_GAME;
+                    gameplay.clearReturnToMenu();
+                }
+            }
+            if (action.resetMapProgress) {
+                gameplay.resetVisitedProgress(menu.getSelectedSaveSlot());
             }
         } else {
+            gameplay.setControlsSwapped(menu.getControlsSwapped());
             gameplay.handleInput(kDown, kHeld);
             gameplay.update(1.0f / 60.0f);
 
@@ -67,6 +90,18 @@ int main() {
             if (gameplay.shouldReturnToMenu()) {
                 appState = APP_MAIN_MENU;
                 gameplay.clearReturnToMenu();
+            }
+        }
+
+        AppSettingsData currentSettings{};
+        currentSettings.debugEnabled = menu.getDebugEnabled();
+        currentSettings.controlsSwapped = menu.getControlsSwapped();
+        currentSettings.showFps = gameplay.getShowFpsEnabled();
+        if (currentSettings.debugEnabled != savedSettings.debugEnabled ||
+            currentSettings.controlsSwapped != savedSettings.controlsSwapped ||
+            currentSettings.showFps != savedSettings.showFps) {
+            if (AppSettings::save(currentSettings)) {
+                savedSettings = currentSettings;
             }
         }
 

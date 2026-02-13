@@ -22,18 +22,14 @@ local State = {
 
     -- === Raum Editor Daten ===
     currentRoom = {}, -- 2D Array [y][x] für Tiles
-    currentObjects = {}, -- Liste von Objekten {x, y, w, h, type, shape}
     currentFilename = "level1",
     
     mapScreensW = 1, -- Breite in Screens
     mapScreensH = 1, -- Höhe in Screens
 
     -- Werkzeug-Einstellungen
-    currentTool = "tile", -- "tile" oder "object"
+    currentTool = "tile",
     currentTileType = 1, -- ID des aktuell gewählten Tiles
-    currentObjectType = 1, -- ID des Objekt-Typs (meist Farbe)
-    currentObjectShape = "rect", -- Form des Objekts ("rect", "slope_ur", etc.)
-    dragStart = nil, -- Speichert {x, y} Startpunkt beim Ziehen eines Objekts
 
     -- Custom Map Größe (temporär für UI)
     customMapW = 2,

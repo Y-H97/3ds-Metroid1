@@ -6,6 +6,18 @@ if "%SRC:~-1%"=="\" set "SRC=%SRC:~0,-1%"
 
 set "DST=%LOCALAPPDATA%\Temp\3ds-cpp-build"
 
+echo [0/4] Export LevelEditor maps...
+if exist "%SRC%\..\LevelEditor\run_export_maps.bat" (
+  call "%SRC%\..\LevelEditor\run_export_maps.bat" --no-pause
+  if errorlevel 1 (
+    echo ERROR: Map export failed
+    exit /b 1
+  )
+) else (
+  echo ERROR: Missing "%SRC%\..\LevelEditor\run_export_maps.bat"
+  exit /b 1
+)
+
 echo [1/4] Prepare local build folder...
 if exist "%DST%" rmdir /S /Q "%DST%"
 mkdir "%DST%" >nul 2>&1

@@ -1,4 +1,9 @@
 @echo off
+setlocal EnableExtensions
+
+set "NO_PAUSE="
+if /I "%~1"=="--no-pause" set "NO_PAUSE=1"
+
 echo Exportiere LevelEditor Maps nach 3ds-cpp\romfs\maps ...
 
 pushd "%~dp0"
@@ -9,11 +14,11 @@ popd
 if %ERR% neq 0 (
     echo.
     echo Export fehlgeschlagen (Fehlercode: %ERR%)
-    pause
+    if not defined NO_PAUSE pause
     exit /b %ERR%
 )
 
 echo.
 echo Export erfolgreich.
-pause
+if not defined NO_PAUSE pause
 exit /b 0

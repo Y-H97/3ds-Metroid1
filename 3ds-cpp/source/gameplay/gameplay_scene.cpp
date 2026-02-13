@@ -2,13 +2,40 @@
 
 #include <citro2d.h>
 #include <cmath>
+#include <cstring>
 #include <cstdio>
+#include <sys/stat.h>
 
 #include "../ui/text_renderer.h"
 #include "render/bottom_ui.h"
 
 constexpr u32 CLEAR_COLOR = C2D_Color32(16, 20, 32, 255);
 constexpr u32 BG_COLOR    = C2D_Color32(10, 14, 20, 255);
+constexpr const char* SAVE_DIR = "sdmc:/3ds/3ds-cpp";
+constexpr const char* SAVE_PATH_LEGACY = "sdmc:/3ds/3ds-cpp/savegame.dat";
+constexpr const char* VISITED_PATH_LEGACY = "sdmc:/3ds/3ds-cpp/visited.dat";
+
+static int normalizeSlot(int slot) {
+    if (slot < 1) return 1;
+    if (slot > GameplayScene::SAVE_SLOT_COUNT) return GameplayScene::SAVE_SLOT_COUNT;
+    return slot;
+}
+
+static std::string makeSavePath(int slot) {
+    char path[128];
+    std::snprintf(path, sizeof(path), "sdmc:/3ds/3ds-cpp/savegame_slot%d.dat", normalizeSlot(slot));
+    return path;
+}
+
+static std::string makeVisitedPath(int slot) {
+    char path[128];
+    std::snprintf(path, sizeof(path), "sdmc:/3ds/3ds-cpp/visited_slot%d.dat", normalizeSlot(slot));
+    return path;
+}
+
+static std::string makeVisitedKey(int x, int y) {
+    return std::to_string(x) + "," + std::to_string(y);
+}
 
 static float clampf(float v, float lo, float hi) {
     if (v < lo) return lo;
@@ -105,6 +132,7 @@ bool GameplayScene::loadInitialMap() {
     }
 
     if (!mapOk) return false;
+    currentLevelName = levelName;
     if (!core.setPlayerStartToFirstEmpty(16.0f)) {
         core.setPlayerStart(40.0f, 40.0f);
     }
@@ -115,6 +143,8 @@ bool GameplayScene::loadInitialMap() {
     checkpoint.gridY = gridY;
     checkpoint.x = core.getPlayer().x;
     checkpoint.y = core.getPlayer().y;
+    visitedCells.clear();
+    visitedCells.insert(makeVisitedKey(gridX, gridY));
 
     return true;
 }
@@ -127,26 +157,206 @@ bool GameplayScene::init() {
     fpsTimerMs = osGetTime();
     fpsFrameCounter = 0;
     fpsValue = 0;
+    debugScrollPx = 0;
+    debugMaxScrollPx = 0;
 
     renderer.init("romfs:/gfx/tiles.t3x", 16);
-    return loadInitialMap();
+    if (!loadInitialMap()) return false;
+    activeSaveSlot = 1;
+    loadPersistentSaveFromDisk(activeSaveSlot);
+    loadVisitedFromDisk(activeSaveSlot);
+    return true;
 }
 
 void GameplayScene::shutdown() {
+    if (!currentLevelName.empty()) {
+        Checkpoint currentSave{};
+        currentSave.valid = true;
+        currentSave.level = currentLevelName;
+        currentSave.gridX = gridX;
+        currentSave.gridY = gridY;
+        currentSave.x = core.getPlayer().x;
+        currentSave.y = core.getPlayer().y;
+        writePersistentSaveToDisk(currentSave, activeSaveSlot);
+        writeVisitedToDisk(activeSaveSlot);
+    }
     renderer.shutdown();
+}
+
+void GameplayScene::setActiveSaveSlot(int slot) {
+    activeSaveSlot = normalizeSlot(slot);
+}
+
+int GameplayScene::getActiveSaveSlot() const {
+    return activeSaveSlot;
+}
+
+bool GameplayScene::hasPersistentSave(int slot) {
+    PersistentSave temp{};
+    return loadPersistentSaveFromDisk(slot, &temp);
+}
+
+bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave) {
+    PersistentSave loaded{};
+
+    std::string savePath = makeSavePath(slot);
+    FILE* f = fopen(savePath.c_str(), "rb");
+    if (!f && normalizeSlot(slot) == 1) {
+        f = fopen(SAVE_PATH_LEGACY, "rb");
+    }
+
+    if (!f) return false;
+
+    char levelBuf[128] = {0};
+    char lineBuf[256] = {0};
+    int gx = 0;
+    int gy = 0;
+    float x = 0.0f;
+    float y = 0.0f;
+
+    bool parsed = false;
+
+    if (std::fgets(levelBuf, sizeof(levelBuf), f) && std::fgets(lineBuf, sizeof(lineBuf), f)) {
+        size_t len = std::strlen(levelBuf);
+        while (len > 0 && (levelBuf[len - 1] == '\n' || levelBuf[len - 1] == '\r')) {
+            levelBuf[len - 1] = '\0';
+            --len;
+        }
+        int got = std::sscanf(lineBuf, " %d %d %f %f", &gx, &gy, &x, &y);
+        if (len > 0 && got == 4) parsed = true;
+    }
+
+    if (!parsed) {
+        std::rewind(f);
+        int gotLegacy = std::fscanf(f, " %127s %d %d %f %f", levelBuf, &gx, &gy, &x, &y);
+        if (gotLegacy == 5) parsed = true;
+    }
+
+    fclose(f);
+    if (!parsed) return false;
+
+    loaded.valid = true;
+    loaded.level = levelBuf;
+    loaded.gridX = gx;
+    loaded.gridY = gy;
+    loaded.x = x;
+    loaded.y = y;
+
+    if (outSave) {
+        *outSave = loaded;
+    } else {
+        persistentSave = loaded;
+    }
+    return true;
+}
+
+bool GameplayScene::writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
+    if (!cp.valid || cp.level.empty()) return false;
+
+    mkdir("sdmc:/3ds", 0777);
+    mkdir(SAVE_DIR, 0777);
+
+    std::string savePath = makeSavePath(slot);
+    FILE* f = fopen(savePath.c_str(), "wb");
+    if (!f) return false;
+
+    std::fprintf(f, "%s\n%d %d %.3f %.3f\n", cp.level.c_str(), cp.gridX, cp.gridY, cp.x, cp.y);
+    fclose(f);
+
+    persistentSave.valid = true;
+    persistentSave.level = cp.level;
+    persistentSave.gridX = cp.gridX;
+    persistentSave.gridY = cp.gridY;
+    persistentSave.x = cp.x;
+    persistentSave.y = cp.y;
+    return true;
+}
+
+bool GameplayScene::loadVisitedFromDisk(int slot) {
+    std::string visitedPath = makeVisitedPath(slot);
+    FILE* f = fopen(visitedPath.c_str(), "rb");
+    if (!f && normalizeSlot(slot) == 1) {
+        f = fopen(VISITED_PATH_LEGACY, "rb");
+    }
+    if (!f) return false;
+
+    std::unordered_set<std::string> loaded;
+    int x = 0;
+    int y = 0;
+    while (std::fscanf(f, " %d,%d", &x, &y) == 2) {
+        loaded.insert(makeVisitedKey(x, y));
+    }
+    fclose(f);
+
+    if (!loaded.empty()) {
+        visitedCells = std::move(loaded);
+        return true;
+    }
+    return false;
+}
+
+bool GameplayScene::writeVisitedToDisk(int slot) const {
+    mkdir("sdmc:/3ds", 0777);
+    mkdir(SAVE_DIR, 0777);
+
+    std::string visitedPath = makeVisitedPath(slot);
+    FILE* f = fopen(visitedPath.c_str(), "wb");
+    if (!f) return false;
+
+    for (const auto& key : visitedCells) {
+        std::fprintf(f, "%s\n", key.c_str());
+    }
+    fclose(f);
+    return true;
+}
+
+bool GameplayScene::resetVisitedProgress(int slot) {
+    visitedCells.clear();
+    std::string visitedPath = makeVisitedPath(slot);
+    int rc = std::remove(visitedPath.c_str());
+    if (rc != 0 && normalizeSlot(slot) == 1) {
+        std::remove(VISITED_PATH_LEGACY);
+    }
+    return rc == 0 || rc == -1;
+}
+
+void GameplayScene::setControlsSwapped(bool swapped) {
+    controlsSwapped = swapped;
+}
+
+void GameplayScene::setShowFpsEnabled(bool enabled) {
+    showFpsEnabled = enabled;
+}
+
+bool GameplayScene::getShowFpsEnabled() const {
+    return showFpsEnabled;
 }
 
 void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
     (void)kHeld;
+    jumpPressed = false;
+
+    const u32 topLeft = controlsSwapped ? KEY_DLEFT : KEY_CPAD_LEFT;
+    const u32 topRight = controlsSwapped ? KEY_DRIGHT : KEY_CPAD_RIGHT;
+    const u32 topJump = KEY_A;
+
+    const u32 bottomLeft = controlsSwapped ? KEY_CPAD_LEFT : KEY_DLEFT;
+    const u32 bottomRight = controlsSwapped ? KEY_CPAD_RIGHT : KEY_DRIGHT;
+    const u32 bottomUp = controlsSwapped ? KEY_CPAD_UP : KEY_DUP;
+    const u32 bottomDown = controlsSwapped ? KEY_CPAD_DOWN : KEY_DDOWN;
+
+    moveLeftHeld = (kHeld & topLeft) != 0;
+    moveRightHeld = (kHeld & topRight) != 0;
+    jumpHeld = (kHeld & topJump) != 0;
+    jumpPressed = (kDown & topJump) != 0;
+
     if (kDown & KEY_SELECT) {
         requestMenu = true;
         return;
     }
 
-    if (kDown & KEY_X) bottomMode = TAB_MAP;
-    if (kDown & KEY_Y) bottomMode = TAB_INVENTORY;
-    if (kDown & KEY_L) bottomMode = TAB_SETTINGS;
-    if (kDown & KEY_R) bottomMode = TAB_DEBUG;
+    if (kDown & bottomLeft) bottomMode = (bottomMode + 3) % 4;
+    if (kDown & bottomRight) bottomMode = (bottomMode + 1) % 4;
 
     if (kDown & KEY_TOUCH) {
         touchPosition tp;
@@ -161,34 +371,58 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
                 showFpsEnabled = !showFpsEnabled;
             } else if (tp.py >= 104 && tp.py <= 146) {
                 settingsSelection = 1;
-                requestExit = true;
+                requestMenu = true;
             }
         }
     }
 
     if (bottomMode == TAB_SETTINGS) {
-        if (kDown & KEY_UP) settingsSelection = (settingsSelection + 1) % 2;
-        if (kDown & KEY_DOWN) settingsSelection = (settingsSelection + 1) % 2;
-        if (kDown & KEY_A) {
+        if (kDown & bottomUp) settingsSelection = (settingsSelection + 1) % 2;
+        if (kDown & bottomDown) settingsSelection = (settingsSelection + 1) % 2;
+        if (kDown & KEY_Y) {
             if (settingsSelection == 0) showFpsEnabled = !showFpsEnabled;
-            else requestExit = true;
+            else requestMenu = true;
         }
+    } else if (bottomMode == TAB_DEBUG) {
+        if (kDown & bottomUp) debugScrollPx -= 18;
+        if (kDown & bottomDown) debugScrollPx += 18;
+
+        if (kDown & KEY_TOUCH) {
+            touchPosition tp;
+            hidTouchRead(&tp);
+            if (tp.px >= 294 && tp.py >= 44 && tp.py <= 196 && debugMaxScrollPx > 0) {
+                float t = (tp.py - 44.0f) / (196.0f - 44.0f);
+                if (t < 0.0f) t = 0.0f;
+                if (t > 1.0f) t = 1.0f;
+                debugScrollPx = static_cast<int>(t * debugMaxScrollPx);
+            }
+        }
+
+        if (debugScrollPx < 0) debugScrollPx = 0;
+        if (debugScrollPx > debugMaxScrollPx) debugScrollPx = debugMaxScrollPx;
     }
 }
 
 void GameplayScene::update(float dt) {
     InputState input;
-    u32 kDown = hidKeysDown();
-    u32 kHeld = hidKeysHeld();
-    input.left = (kHeld & KEY_LEFT) != 0;
-    input.right = (kHeld & KEY_RIGHT) != 0;
-    input.jump = (kHeld & KEY_A) != 0;
-    input.jumpPressed = (kDown & KEY_A) != 0;
+    input.left = moveLeftHeld;
+    input.right = moveRightHeld;
+    input.jump = jumpHeld;
+    input.jumpPressed = jumpPressed;
     core.update(input, dt);
+    jumpPressed = false;
 
     const Player& currentPlayer = core.getPlayer();
     currentGridX = gridX + static_cast<int>(std::floor(currentPlayer.x / 400.0f));
     currentGridY = gridY + static_cast<int>(std::floor(currentPlayer.y / 240.0f));
+    if (world.getCell(currentGridX, currentGridY)) {
+        if (visitedCells.insert(makeVisitedKey(currentGridX, currentGridY)).second) {
+            writeVisitedToDisk(activeSaveSlot);
+        }
+    }
+    playerTileX = static_cast<int>(std::floor(currentPlayer.x / 16.0f));
+    playerTileY = static_cast<int>(std::floor(currentPlayer.y / 16.0f));
+    playerTileId = core.getMap().getTile(playerTileX, playerTileY);
 
     const auto& transitions = core.getMap().getTransitions();
     bool triggered = false;
@@ -230,6 +464,7 @@ void GameplayScene::update(float dt) {
                 if (core.loadMapJson(levelPath.c_str())) {
                     gridX = nextCell->originX;
                     gridY = nextCell->originY;
+                    currentLevelName = nextCell->level;
 
                     float offset = 24.0f;
                     float localTargetX = 0.0f;
@@ -263,6 +498,7 @@ void GameplayScene::update(float dt) {
                         checkpoint.x = localTargetX;
                         checkpoint.y = localTargetY;
                         core.setPlayerStart(localTargetX, localTargetY);
+                        writePersistentSaveToDisk(checkpoint, activeSaveSlot);
                     } else {
                         core.setPlayerPosition(localTargetX, localTargetY);
                     }
@@ -293,10 +529,66 @@ void GameplayScene::update(float dt) {
     }
 }
 
+bool GameplayScene::startNewGame(int slot) {
+    activeSaveSlot = normalizeSlot(slot);
+    requestMenu = false;
+    requestExit = false;
+    inTransition = false;
+    checkpoint = {};
+    persistentSave = {};
+    std::string savePath = makeSavePath(activeSaveSlot);
+    std::remove(savePath.c_str());
+    if (activeSaveSlot == 1) {
+        std::remove(SAVE_PATH_LEGACY);
+    }
+    resetVisitedProgress(activeSaveSlot);
+
+    if (!loadInitialMap()) return false;
+    writeVisitedToDisk(activeSaveSlot);
+    return true;
+}
+
+bool GameplayScene::loadFromCheckpoint(int slot) {
+    activeSaveSlot = normalizeSlot(slot);
+    persistentSave = {};
+    if (!loadPersistentSaveFromDisk(activeSaveSlot)) return false;
+    if (!persistentSave.valid || persistentSave.level.empty()) return false;
+
+    std::string cpPath = std::string("romfs:/maps/") + persistentSave.level + ".json";
+    if (!core.loadMapJson(cpPath.c_str())) return false;
+
+    gridX = persistentSave.gridX;
+    gridY = persistentSave.gridY;
+    currentLevelName = persistentSave.level;
+    core.setPlayerPosition(persistentSave.x, persistentSave.y);
+
+    checkpoint.valid = true;
+    checkpoint.level = persistentSave.level;
+    checkpoint.gridX = persistentSave.gridX;
+    checkpoint.gridY = persistentSave.gridY;
+    checkpoint.x = persistentSave.x;
+    checkpoint.y = persistentSave.y;
+
+    const Player& p = core.getPlayer();
+    currentGridX = gridX + static_cast<int>(std::floor(p.x / 400.0f));
+    currentGridY = gridY + static_cast<int>(std::floor(p.y / 240.0f));
+    playerTileX = static_cast<int>(std::floor(p.x / 16.0f));
+    playerTileY = static_cast<int>(std::floor(p.y / 16.0f));
+    playerTileId = core.getMap().getTile(playerTileX, playerTileY);
+    inTransition = false;
+    if (visitedCells.insert(makeVisitedKey(currentGridX, currentGridY)).second) {
+        writeVisitedToDisk(activeSaveSlot);
+    }
+
+    return true;
+}
+
 void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled) {
     float camX = 0.0f;
     float camY = 0.0f;
     computeCamera(core.getPlayer(), core.getMap(), 16.0f, 400.0f, 240.0f, camX, camY);
+    lastCamX = camX;
+    lastCamY = camY;
 
     C2D_TargetClear(top, CLEAR_COLOR);
     renderMap(top, -camX, -camY, 16.0f, renderer, core.getMap());
@@ -310,14 +602,46 @@ void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool de
         text.draw(6.0f, 6.0f, 0.36f, C2D_Color32(120, 255, 140, 255), "FPS: %d", fpsValue);
     }
     if (debugInfoEnabled) {
-        text.draw(6.0f, 22.0f, 0.30f, C2D_Color32(180, 210, 255, 255), "Grid: %d,%d", currentGridX, currentGridY);
+        const Player& p = core.getPlayer();
+        text.draw(6.0f, 22.0f, 0.30f, C2D_Color32(180, 210, 255, 255), "Lvl:%s Grid:%d,%d O:%d,%d", currentLevelName.c_str(), currentGridX, currentGridY, gridX, gridY);
+        text.draw(6.0f, 36.0f, 0.30f, C2D_Color32(180, 210, 255, 255), "Pos:%.1f/%.1f Vel:%.1f/%.1f", p.x, p.y, p.vx, p.vy);
+        text.draw(6.0f, 50.0f, 0.30f, C2D_Color32(180, 210, 255, 255), "Tile:%d,%d id:%d G:%s T:%s", playerTileX, playerTileY, playerTileId, p.grounded ? "Y" : "N", inTransition ? "Y" : "N");
     }
 }
 
 void GameplayScene::renderBottom(C3D_RenderTarget* bottom, TextRenderer& text, bool debugInfoEnabled) {
     C2D_TargetClear(bottom, BG_COLOR);
     C2D_SceneBegin(bottom);
-    renderGameplayBottomUI(text, world, core, bottomMode, settingsSelection, showFpsEnabled, debugInfoEnabled, currentGridX, currentGridY);
+    renderGameplayBottomUI(
+        text,
+        world,
+        visitedCells,
+        core,
+        bottomMode,
+        settingsSelection,
+        showFpsEnabled,
+        debugInfoEnabled,
+        currentGridX,
+        currentGridY,
+        gridX,
+        gridY,
+        fpsValue,
+        lastCamX,
+        lastCamY,
+        currentLevelName.c_str(),
+        inTransition,
+        checkpoint.valid,
+        checkpoint.gridX,
+        checkpoint.gridY,
+        playerTileX,
+        playerTileY,
+        playerTileId,
+        debugScrollPx,
+        debugMaxScrollPx
+    );
+
+    if (debugScrollPx < 0) debugScrollPx = 0;
+    if (debugScrollPx > debugMaxScrollPx) debugScrollPx = debugMaxScrollPx;
 }
 
 bool GameplayScene::shouldExitGame() const {

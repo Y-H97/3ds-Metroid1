@@ -9,7 +9,6 @@ function Actions.createMap(w, h)
     State.mapScreensW = w
     State.mapScreensH = h
     State.currentRoom = {}
-    State.currentObjects = {}
     
     local totalTilesX = w * Constants.TILES_X
     local totalTilesY = h * Constants.TILES_Y
@@ -40,16 +39,6 @@ function Actions.saveRoom(filename)
             content = content .. tile .. ","
         end
         content = content .. "},\n"
-    end
-    content = content .. "  },\n"
-    
-    -- Objekte speichern
-    content = content .. "  objects = {\n"
-    for _, obj in ipairs(State.currentObjects) do
-        local shapeStr = 'nil'
-        if obj.shape then shapeStr = '"' .. obj.shape .. '"' end
-        -- Formatierung mit 2 Nachkommastellen für Sauberkeit
-        content = content .. "    {x="..string.format("%.2f", obj.x)..", y="..string.format("%.2f", obj.y)..", w="..string.format("%.2f", obj.w)..", h="..string.format("%.2f", obj.h)..", type="..obj.type..", shape="..shapeStr.."},\n"
     end
     content = content .. "  }\n"
     

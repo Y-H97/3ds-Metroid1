@@ -116,24 +116,7 @@ function Views.drawRoomEditor()
     love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle("line", 0, 0, uiW, sh)
     
-    -- Tool Switcher Buttons
-    if UI.drawButton("Tiles", 10, 10, 80, 25, nil) then State.currentTool = "tile" end
-    if UI.drawButton("Objekte", 100, 10, 80, 25, nil) then State.currentTool = "object" end
-    
-    -- Tool Spezifische UI
-    if State.currentTool == "tile" then
-       love.graphics.print("Tiles:", 10, 45)
-    else
-       love.graphics.print("Objekt Typ:", 10, 45)
-       
-       love.graphics.print("Form: " .. State.currentObjectShape, 10, sh - 140)
-       if UI.drawButton("Rechteck", 10, sh - 120, 80, 20) then State.currentObjectShape = "rect" end
-       if UI.drawButton("Rampe /", 10, sh - 95, 80, 20) then State.currentObjectShape = "slope_ur" end
-       if UI.drawButton("Rampe \\", 100, sh - 95, 80, 20) then State.currentObjectShape = "slope_ul" end
-       
-       if UI.drawButton("Decke /", 10, sh - 70, 80, 20) then State.currentObjectShape = "slope_dl" end
-       if UI.drawButton("Decke \\", 100, sh - 70, 80, 20) then State.currentObjectShape = "slope_dr" end
-    end
+     love.graphics.print("Tiles:", 10, 45)
     
     -- Liste der Blöcke
     love.graphics.setScissor(0, 65, uiW, sh - 150)
@@ -218,49 +201,6 @@ function Views.drawRoomEditor()
         end
     end
     
-    -- Objekte Rendern
-    for _, obj in ipairs(State.currentObjects) do
-         local color = {1, 1, 1}
-         for _, b in ipairs(Constants.BLOCK_TYPES) do
-            if b.id == obj.type then color = b.color break end
-         end
-         
-         love.graphics.setColor(color[1], color[2], color[3], 0.5) -- Transparent
-         
-         local ox = mapOffsetX + obj.x
-         local oy = mapOffsetY + obj.y
-         
-         if not obj.shape or obj.shape == "rect" then
-             love.graphics.rectangle("fill", ox, oy, obj.w, obj.h)
-             love.graphics.setColor(color[1], color[2], color[3], 1)
-             love.graphics.rectangle("line", ox, oy, obj.w, obj.h)
-         else
-             drawShape(ox, oy, obj.w, obj.h, obj.shape, "fill")
-             love.graphics.setColor(color[1], color[2], color[3], 1)
-             drawShape(ox, oy, obj.w, obj.h, obj.shape, "line")
-             love.graphics.rectangle("line", ox, oy, obj.w, obj.h) -- Bounding Box
-         end
-    end
-    
-    -- Drag Vorschau
-    if State.currentTool == "object" and State.dragStart then
-         local mx, my = love.mouse.getPosition()
-         local worldMX = ((mx - rightPanelX) / State.zoom) + State.camX - mapOffsetX
-         local worldMY = ((my - 80) / State.zoom) + State.camY - mapOffsetY
-         
-         local x = math.min(State.dragStart.x, worldMX)
-         local y = math.min(State.dragStart.y, worldMY)
-         local w = math.abs(worldMX - State.dragStart.x)
-         local h = math.abs(worldMY - State.dragStart.y)
-         
-         love.graphics.setColor(1, 1, 1, 0.5)
-         love.graphics.rectangle("line", mapOffsetX + x, mapOffsetY + y, w, h)
-         
-         if State.currentObjectShape ~= "rect" then
-              love.graphics.print(State.currentObjectShape, mapOffsetX + x, mapOffsetY + y - 20)
-         end
-    end
-
     love.graphics.setColor(1,1,1)
     love.graphics.pop()
     love.graphics.setScissor()

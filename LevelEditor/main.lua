@@ -148,7 +148,6 @@ function handleRoomEditorInput()
             local idx = math.floor(relativeY / 40) + 1
             if Constants.BLOCK_TYPES[idx] then
                 State.currentTileType = Constants.BLOCK_TYPES[idx].id
-                State.currentObjectType = Constants.BLOCK_TYPES[idx].id
             end
         end
         
@@ -170,53 +169,15 @@ function handleRoomEditorInput()
         local worldMX = unscaledX + State.camX - 50 -- minus mapOffsetX (50) aus View
         local worldMY = unscaledY + State.camY - 50 -- minus mapOffsetY (50) aus View
         
-        -- Mapping/Painting
-        if State.currentTool == "tile" then
-            if love.mouse.isDown(1) or love.mouse.isDown(2) then
-                local tx = math.floor(worldMX / Constants.TILE_SIZE) + 1
-                local ty = math.floor(worldMY / Constants.TILE_SIZE) + 1
-                
-                if State.currentRoom[ty] and State.currentRoom[ty][tx] then
-                    if love.mouse.isDown(1) then State.currentRoom[ty][tx] = State.currentTileType end
-                    if love.mouse.isDown(2) then State.currentRoom[ty][tx] = 0 end -- Löschen
-                end
+        -- Mapping/Painting (Tile-only)
+        if love.mouse.isDown(1) or love.mouse.isDown(2) then
+            local tx = math.floor(worldMX / Constants.TILE_SIZE) + 1
+            local ty = math.floor(worldMY / Constants.TILE_SIZE) + 1
+
+            if State.currentRoom[ty] and State.currentRoom[ty][tx] then
+                if love.mouse.isDown(1) then State.currentRoom[ty][tx] = State.currentTileType end
+                if love.mouse.isDown(2) then State.currentRoom[ty][tx] = 0 end -- Löschen
             end
-            
-        elseif State.currentTool == "object" then
-             -- Drag Logic (Start)
-             if love.mouse.isDown(1) then
-                 if not State.dragStart then
-                     State.dragStart = {x = worldMX, y = worldMY}
-                 end
-             else
-                 -- Release (Objekt erstellen)
-                 if State.dragStart then
-                     local x = math.min(State.dragStart.x, worldMX)
-                     local y = math.min(State.dragStart.y, worldMY)
-                     local w = math.abs(worldMX - State.dragStart.x)
-                     local h = math.abs(worldMY - State.dragStart.y)
-                     
-                     if w > 2 and h > 2 then
-                        table.insert(State.currentObjects, {
-                            x=x, y=y, w=w, h=h, 
-                            type=State.currentObjectType,
-                            shape=State.currentObjectShape
-                        })
-                     end
-                     State.dragStart = nil
-                 end
-             end
-             
-             -- Löschen
-             if love.mouse.isDown(2) then
-                 for i=#State.currentObjects, 1, -1 do
-                     local o = State.currentObjects[i]
-                     if worldMX >= o.x and worldMX <= o.x + o.w and worldMY >= o.y and worldMY <= o.y + o.h then
-                         table.remove(State.currentObjects, i)
-                         break -- Nur einen löschen
-                     end
-                 end
-             end
         end
     end
 end
@@ -289,7 +250,6 @@ function love.mousepressed(x, y, button)
             local idx = math.floor(relativeY / 40) + 1
             if Constants.BLOCK_TYPES[idx] then
                 State.currentTileType = Constants.BLOCK_TYPES[idx].id
-                State.currentObjectType = Constants.BLOCK_TYPES[idx].id
             end
         end
 
@@ -374,10 +334,8 @@ function love.keypressed(key)
                         if result then
                             if result.grid then
                                 State.currentRoom = result.grid
-                                State.currentObjects = result.objects or {}
                             else
                                 State.currentRoom = result
-                                State.currentObjects = {}
                             end
                             State.currentFilename = path:match("([^\\]+)$") or path
                             Actions.setMessage("Geladen!", 3)
