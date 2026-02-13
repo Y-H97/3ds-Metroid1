@@ -8,12 +8,84 @@ local Views = require "views"
 local Actions = require "editor_actions"
 local IOUtils = require "io_utils"
 local UI = require "ui_components"
+local MapExporter = require "map_exporter"
 
 -- Layout Konstanten (müssen mit Views übereinstimmen)
 local UI_WIDTH = 200
 local PANEL_X = 220 
 
-function love.load()
+local function findRoomFileByName(name)
+    for _, fileData in ipairs(State.worldFiles) do
+        if fileData.name == name then return fileData end
+    end
+    return nil
+end
+
+local function worldCellFromMouse(mx, my)
+    local gridOffsetX = 220
+    local gridOffsetY = 50
+    local cellSize = 100
+
+    if mx < gridOffsetX then return nil, nil end
+
+    local worldMX = ((mx - gridOffsetX) / State.zoom) + State.camX
+    local worldMY = ((my - gridOffsetY) / State.zoom) + State.camY
+
+    local gx = math.floor(worldMX / cellSize)
+    local gy = math.floor(worldMY / cellSize)
+    return gx, gy
+end
+
+local function findPlacedRoomAt(gx, gy)
+    for key, roomName in pairs(State.worldGrid) do
+        local ox, oy = key:match("(%-?%d+),(%-?%d+)")
+        if ox and oy then
+            ox, oy = tonumber(ox), tonumber(oy)
+            local meta = State.roomCache[roomName] or {w = 1, h = 1}
+            if gx >= ox and gx < (ox + meta.w) and gy >= oy and gy < (oy + meta.h) then
+                return key, roomName, ox, oy, meta.w, meta.h
+            end
+        end
+    end
+    return nil
+end
+
+local function canPlaceRoom(roomName, gx, gy)
+    local meta = State.roomCache[roomName] or {w = 1, h = 1}
+    local w, h = meta.w, meta.h
+
+    if gx < 0 or gy < 0 or gx + w > State.worldGridSize or gy + h > State.worldGridSize then
+        return false
+    end
+
+    for key, otherName in pairs(State.worldGrid) do
+        local ox, oy = key:match("(%-?%d+),(%-?%d+)")
+        if ox and oy then
+            ox, oy = tonumber(ox), tonumber(oy)
+            local other = State.roomCache[otherName] or {w = 1, h = 1}
+            local noOverlap = (gx + w <= ox) or (gx >= ox + other.w) or (gy + h <= oy) or (gy >= oy + other.h)
+            if not noOverlap then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+function love.load(args)
+    if args and args[1] == "--export-json" then
+        local ok, message = MapExporter.exportAll()
+        if ok then
+            print(message)
+            love.event.quit(0)
+        else
+            print("Export Fehler: " .. tostring(message))
+            love.event.quit(1)
+        end
+        return
+    end
+
     love.window.setTitle("Metroidvania Level Editor (Refactored)")
     love.window.setMode(1280, 720, {resizable=true})
     
@@ -191,11 +263,78 @@ function love.mousepressed(x, y, button)
             end
         end
         
-        -- Die Custom Controls sind jetzt via drawButton in View angebunden.
-        -- Durch die Re-Implementierung in Views.lua mit UI.drawButton werden sie dort gehandled!
-        -- UI.drawButton gibt true zurück SOWOHL beim Drücken als auch Halten.
-        -- State.customMapW wird also rasend schnell hochzählen.
-        -- FIX: Wir brauchen eine "clicked" Logic.
+        -- Custom + / - und Erstellen
+        if y >= customY + 30 and y <= customY + 60 then
+            if x >= 50 and x <= 80 then State.customMapW = math.max(1, State.customMapW - 1); return end
+            if x >= 90 and x <= 120 then State.customMapW = math.min(20, State.customMapW + 1); return end
+            if x >= 150 and x <= 180 then State.customMapH = math.max(1, State.customMapH - 1); return end
+            if x >= 190 and x <= 220 then State.customMapH = math.min(20, State.customMapH + 1); return end
+        end
+
+        if x >= 250 and x <= 450 and y >= customY + 25 and y <= customY + 65 then
+            Actions.createMap(State.customMapW, State.customMapH)
+            State.currentState = Constants.STATE.ROOM_EDIT
+            Actions.setMessage("Neuer Raum erstellt: " .. State.customMapW .. "x" .. State.customMapH, 3)
+            return
+        end
+
+        if x >= 50 and x <= 250 and y >= customY + 100 and y <= customY + 150 then
+            State.currentState = Constants.STATE.MENU
+            return
+        end
+
+    elseif State.currentState == Constants.STATE.ROOM_EDIT then
+        if button == 1 and x < UI_WIDTH and y > 65 then
+            local relativeY = y - 70 + State.listScroll
+            local idx = math.floor(relativeY / 40) + 1
+            if Constants.BLOCK_TYPES[idx] then
+                State.currentTileType = Constants.BLOCK_TYPES[idx].id
+                State.currentObjectType = Constants.BLOCK_TYPES[idx].id
+            end
+        end
+
+    elseif State.currentState == Constants.STATE.WORLD_EDIT then
+        local listX, listY, listW = 10, 50, 200
+
+        if button == 1 and x >= listX and x <= listX + listW and y >= listY then
+            local idx = math.floor((y - 80) / 20) + 1
+            if idx >= 1 and idx <= #State.worldFiles then
+                State.selectedWorldFile = State.worldFiles[idx]
+                Actions.setMessage("Ausgewaehlt: " .. State.selectedWorldFile.name, 1.5)
+            end
+            return
+        end
+
+        local gx, gy = worldCellFromMouse(x, y)
+        if not gx or not gy then return end
+        if gx < 0 or gx >= State.worldGridSize or gy < 0 or gy >= State.worldGridSize then return end
+
+        if button == 1 then
+            if State.selectedWorldFile then
+                if canPlaceRoom(State.selectedWorldFile.name, gx, gy) then
+                    local keyCoord = gx .. "," .. gy
+                    State.worldGrid[keyCoord] = State.selectedWorldFile.name
+                    Actions.setMessage("Raum platziert: " .. State.selectedWorldFile.name, 1.5)
+                else
+                    Actions.setMessage("Kann dort nicht platziert werden", 1.5)
+                end
+            else
+                local hitKey, hitName = findPlacedRoomAt(gx, gy)
+                if hitKey and hitName then
+                    State.worldGrid[hitKey] = nil
+                    State.worldCheckpoints[hitKey] = nil
+                    State.selectedWorldFile = findRoomFileByName(hitName) or {name = hitName, w = 1, h = 1}
+                    Actions.setMessage("Raum aufgenommen: " .. hitName .. " (neu platzieren)", 2)
+                end
+            end
+        elseif button == 2 then
+            local hitKey, hitName = findPlacedRoomAt(gx, gy)
+            if hitKey then
+                State.worldGrid[hitKey] = nil
+                State.worldCheckpoints[hitKey] = nil
+                Actions.setMessage("Raum entfernt: " .. hitName, 1.5)
+            end
+        end
     end
 end
 
