@@ -11,6 +11,12 @@
 
 class TextRenderer;
 
+// Zentrale Gameplay-Orchestrierung.
+// Verantwortlich für:
+// - Laden/Wechseln von Kartenräumen
+// - Player-Input -> GameCore
+// - Persistenz (Save-Slots + Fog-of-War/visited)
+// - Render-Aufbereitung für Top/Bottom Screen
 class GameplayScene {
 public:
     static constexpr int SAVE_SLOT_COUNT = 3;
@@ -38,6 +44,7 @@ public:
     void clearReturnToMenu();
 
 private:
+    // Laufzeit-Checkpoint für Respawn + persistentes Speichern.
     struct Checkpoint {
         bool valid = false;
         std::string level;
@@ -63,6 +70,7 @@ private:
         TAB_DEBUG = 3,
     };
 
+    // Interne Hilfsfunktionen für Welt-Start und Persistenz pro Save-Slot.
     bool loadInitialMap();
     bool loadPersistentSaveFromDisk(int slot, PersistentSave* outSave = nullptr);
     bool writePersistentSaveToDisk(const Checkpoint& cp, int slot);
@@ -104,6 +112,7 @@ private:
     bool moveRightHeld = false;
     bool jumpHeld = false;
     bool jumpPressed = false;
+    // Aktiver Save-Slot (1..SAVE_SLOT_COUNT), bestimmt Save/Visited-Dateien.
     int activeSaveSlot = 1;
     std::unordered_set<std::string> visitedCells;
 };

@@ -4,10 +4,15 @@
 
 class TextRenderer;
 
+// Zustände des Hauptmenüs.
+// HOME: Kategorien, PLAY: Spielaktionen, OPTIONS: Einstellungen,
+// MANUAL_LIST: Themenübersicht, MANUAL_PAGE: scrollbare Detailseite.
 enum MainMenuState {
     MENU_HOME = 0,
     MENU_PLAY = 1,
     MENU_OPTIONS = 2,
+    MENU_MANUAL_LIST = 3,
+    MENU_MANUAL_PAGE = 4,
 };
 
 struct MainMenuAction {
@@ -38,10 +43,28 @@ public:
     void renderBottom(TextRenderer& text) const;
 
 private:
+    // Bestimmt die Scrollgrenze für die aktuelle Handbuchseite
+    // bei der aktuellen Textfensterhöhe auf dem Top-Screen.
+    int getManualMaxScroll() const;
+
+    void handleHomeKeys(u32 kDown);
+    void handlePlayKeys(u32 kDown);
+    void handleOptionsKeys(u32 kDown);
+    void handleManualListKeys(u32 kDown);
+    void handleManualPageKeys(u32 kDown);
+
+    void handleHomeTouch(const touchPosition& tp);
+    void handlePlayTouch(const touchPosition& tp);
+    void handleOptionsTouch(const touchPosition& tp);
+    void handleManualListTouch(const touchPosition& tp);
+    void handleManualPageTouch(const touchPosition& tp);
+
     MainMenuState state = MENU_HOME;
     int homeSelection = 0;
     int playSelection = 0;
     int optionsSelection = 0;
+    int manualSelection = 0;
+    int manualScroll = 0;
     int selectedSaveSlot = 1;
     bool hasContinue = false;
     bool debugEnabled = true;

@@ -1,0 +1,27 @@
+# Laufzeitfluss
+
+## Start
+1. Init von 3DS/GFX/romfs.
+2. `MainMenuController` und `GameplayScene` werden initialisiert.
+3. Persistente Settings werden geladen und auf Menü/Gameplay angewandt.
+
+## Hauptloop
+- Input lesen (`hidScanInput`).
+- Wenn `APP_MAIN_MENU`:
+  - Menü verarbeiten.
+  - Aktionen abrufen (`consumeAction`).
+  - Aktionen in Gameplay-Operationen übersetzen:
+    - Neues Spiel
+    - Fortsetzen
+    - Kartenfortschritt zurücksetzen
+- Wenn `APP_GAME`:
+  - Gameplay Input/Update.
+  - Rückkehr ins Menü oder Exit prüfen.
+
+## Render
+- Menüzustand: `menu.renderTop` + `menu.renderBottom`
+- Gameplayzustand: `gameplay.renderTop` + `gameplay.renderBottom`
+
+## Shutdown
+- Gameplay persistiert aktuellen Stand.
+- Renderer/Subsysteme werden sauber beendet.
