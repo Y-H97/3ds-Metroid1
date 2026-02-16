@@ -1,0 +1,12 @@
+{
+  // Setze Terminal‑Profile für Windows auf PowerShell — sorgt dafür, dass Tasks standardmäßig PowerShell verwenden.
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    }
+  },
+  // Nützliche Einstellung: öffne Tasks im Workspace-Ordner (robuster bei UNC/Netzlaufwerken)
+  "terminal.integrated.cwd": "${workspaceFolder}"
+}

@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Check: Deutsche Kommentare",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "ByPass",
+        "-File",
+        "${workspaceFolder}\\scripts\\check_german_comments.ps1"
+      ],
+      "group": { "kind": "test", "isDefault": false },
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: Obsidian Wiki‑Links",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "ByPass",
+        "-File",
+        "${workspaceFolder}\\scripts\\check_wiki_links.ps1"
+      ],
+      "group": { "kind": "verification", "isDefault": false },
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: LevelEditor → Export (wrapping)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "ByPass",
+        "-Command",
+        "& { python '${workspaceFolder}\\LevelEditor\\export_maps.py' }"
+      ],
+      "group": "build",
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    }
+  ]
+}
