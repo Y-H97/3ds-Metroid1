@@ -1,4 +1,4 @@
-# Laufzeitfluss
+# Game-Laufzeitfluss
 
 ## Start
 1. Init von 3DS/GFX/romfs.
@@ -23,5 +23,5 @@
 - Gameplayzustand: `gameplay.renderTop` + `gameplay.renderBottom`
 
 ## Shutdown
-- Gameplay persistiert aktuellen Stand.
+- Gameplay persistiert aktuellen Stand (Checkpoint/Fallback).
 - Renderer/Subsysteme werden sauber beendet.

@@ -15,10 +15,10 @@
 
 #define DESKTOP_SIMULATOR 1
 #include "compat/desktop_3ds_compat.h"
-#include "../source/core/game_core.h"
-#include "../source/core/world_map.h"
-#include "../source/menu/controllers/main_menu_controller.h"
-#include "../source/menu/views/manual_content.h"
+#include "../3ds-cpp/source/core/game_core.h"
+#include "../3ds-cpp/source/core/world_map.h"
+#include "../3ds-cpp/source/menu/controllers/main_menu_controller.h"
+#include "../3ds-cpp/source/menu/views/manual_content.h"
 
 namespace {
 

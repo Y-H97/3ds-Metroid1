@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef DESKTOP_SIMULATOR
-#include "../../../simulator/compat/desktop_3ds_compat.h"
+#include "../../../../simulator/compat/desktop_3ds_compat.h"
 #else
 #include <3ds.h>
 #endif

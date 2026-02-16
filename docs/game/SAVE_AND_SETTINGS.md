@@ -1,4 +1,4 @@
-# Save-, Slot- und Settings-System
+# Game: Save-, Slot- und Settings-System
 
 ## Save-Slots
 - Anzahl: 3 (`SAVE_SLOT_COUNT`).
@@ -8,6 +8,11 @@
   - `sdmc:/3ds/3ds-cpp/savegame_slot3.dat`
 - Legacy-Fallback für Slot 1:
   - `savegame.dat`
+
+## Continue/Checkpoint-Verhalten
+- Continue lädt den persistierten Checkpoint pro Slot.
+- Checkpoints werden beim Betreten von Checkpoint-Zellen und bei Raumwechseln entsprechend aktualisiert.
+- Beim Shutdown wird bevorzugt der letzte valide Checkpoint gespeichert (Fallback: aktuelle Position, falls kein Checkpoint gesetzt).
 
 ## Fog-of-War / Discovery
 - Pro Slot getrennte Dateien:

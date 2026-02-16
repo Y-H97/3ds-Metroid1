@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-#include "../source/core/game_core.h"
+#include "../3ds-cpp/source/core/game_core.h"
 
 namespace {
 

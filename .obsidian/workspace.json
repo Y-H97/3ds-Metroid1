@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "3ds-cpp/docs/ARCHITECTURE.md",
+                "file": "docs/game/ARCHITECTURE.md",
                 "mode": "source",
                 "source": false
               },
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "3ds-cpp/docs/ARCHITECTURE.md",
+                "file": "docs/game/ARCHITECTURE.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +113,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "3ds-cpp/docs/ARCHITECTURE.md",
+                "file": "docs/game/ARCHITECTURE.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -156,7 +156,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "3ds-cpp/docs/ARCHITECTURE.md",
+                "file": "docs/game/ARCHITECTURE.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -185,12 +185,12 @@
   },
   "active": "0cb2d259f5651f5d",
   "lastOpenFiles": [
-    "3ds-cpp/docs/SAVE_AND_SETTINGS.md",
-    "3ds-cpp/docs/RUNTIME_FLOW.md",
-    "3ds-cpp/docs/REFACTORING_ASSESSMENT.md",
-    "3ds-cpp/docs/README.md",
-    "3ds-cpp/docs/COMPONENT_STRUCTURE.md",
-    "3ds-cpp/docs/ARCHITECTURE.md",
+    "docs/game/SAVE_AND_SETTINGS.md",
+    "docs/game/RUNTIME_FLOW.md",
+    "docs/REFACTORING_ASSESSMENT.md",
+    "docs/README.md",
+    "docs/workspace/README.md",
+    "docs/game/ARCHITECTURE.md",
     "DesingDokumente/LUA_TO_CPP_GAP_ANALYSIS.md"
   ]
 }

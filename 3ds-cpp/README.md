@@ -42,12 +42,12 @@ Voraussetzung:
 
 Build + Start:
 ```
-run_simulator.bat
+..\simulator\run_simulator_console.bat
 ```
 
 Optional mit bestimmter Map:
 ```
-run_simulator.bat romfs/maps/0.json
+..\simulator\run_simulator_console.bat ..\3ds-cpp\romfs\maps\0.json
 ```
 
 Wichtige Befehle im Simulator:
@@ -62,12 +62,12 @@ Für schnelles Testen mit Spiel-Fenster statt Konsole.
 
 Start:
 ```
-run_simulator_window.bat
+..\simulator\run_simulator_window.bat
 ```
 
 Optional mit Map:
 ```
-run_simulator_window.bat romfs/maps/0.json
+..\simulator\run_simulator_window.bat ..\3ds-cpp\romfs\maps\0.json
 ```
 
 Steuerung:
@@ -95,3 +95,5 @@ Steuerung:
 - `source/` 3DS‑Entry + Rendering
 - `source/core/` Plattform‑unabhängiger Core (Input/Physics/Map)
 - `../pc-sdl/` PC‑Test‑Build mit SDL2
+- `../simulator/` Desktop‑Simulator (Window + Console)
+- `../docs/` zentrale Projektdokumentation
