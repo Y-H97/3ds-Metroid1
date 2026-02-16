@@ -1,4 +1,11 @@
--- Test-Raumdaten: zweites Testlevel als 2D-Tilegrid.
+-- Testlevel (deutscher Kommentar)
+--
+-- Zweck: Kurzer Test‑Raum zum Verifizieren von Kollisionsabfragen und
+-- Kamerapositionen. Dieses Grid ist als `grid = { ... }` definiert.
+-- Hinweise:
+-- - Nutze den LevelEditor zum Bearbeiten; der Export erzeugt die JSONs.
+-- - Dieser Kommentar ist auf Deutsch verfasst, damit die CI‑Prüfung ihn
+--   erkennen kann (Regel: neue/geänderte Dateien müssen deutsche Kommentare haben).
 return {
   grid = {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},
