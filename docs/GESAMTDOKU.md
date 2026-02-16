@@ -4,9 +4,10 @@ Diese Seite ist der **zentrale Einstieg** für die komplette Projektdokumentatio
 Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 
 ## Schnellstart
+- [[docs/README|Projektdokumentation (Index)]] – Kurzer Inhaltsindex aller Doku‑Seiten.
 - [[docs/quickstart/README|Quick Start nach Rolle]] – Einstieg in 5 Minuten je Rolle.
-- [[docs/workspace/EINSTEIGER_GUIDE|Einsteiger-Guide]] – Überblick ohne Technik-Vorwissen.
-- [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur-Übersicht]] – visuelles Systembild mit Diagramm.
+- [[docs/workspace/EINSTEIGER_GUIDE|Einsteiger-Guide]] – Überblick ohne Technik‑Vorwissen.
+- [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur‑Übersicht]] – visuelles Systembild mit Diagramm.
 
 ## Hauptnavigation
 
