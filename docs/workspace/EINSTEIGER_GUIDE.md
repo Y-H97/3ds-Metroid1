@@ -42,6 +42,7 @@ Diese Seite erklärt den Workspace so, dass auch Nicht-Programmierer verstehen, 
   - Installation: `python -m pip install -r requirements-dev.txt` (oder `pip install pre-commit`).
   - Aktivieren: `pre-commit install` → Hooks laufen vor jedem Commit.
   - Voller Lauf: `pre-commit run --all-files`.
+  - Hinweis für Netzlaufwerke (UNC): Falls VS Code/CMD Probleme beim Ausführen von Skripten auf Netzlaufwerken meldet, nutze die PowerShell‑Wrapper `scripts/*.ps1` oder mappe das Netzlaufwerk auf ein Laufwerkbuchstaben (z. B. `net use X: \\fs1\...`).
 - Automatische Prüfungen (CI):
   - CI validiert `LevelEditor/export_maps.py` (Export/JSON) und prüft neue/geänderte Quelldateien auf deutsche Kommentare.
   - CI prüft außerdem Obsidian‑Wiki‑Links und erkennt fehlende oder nicht verlinkte Doku‑Seiten (`docs/`).

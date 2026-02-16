@@ -21,6 +21,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Repository root (Script-Ort verwenden, nicht CWD — repariert UNC/CMD‑Problem)
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 # Dateiendungen, für die die Kommentarpflicht gilt
 CHECK_EXTENSIONS = {".c", ".cpp", ".h", ".hpp", ".lua", ".py"}
 # Ausschluss‑Pfadmuster (Build / generierte Dateien etc.)
@@ -37,10 +40,10 @@ PY_COMMENT_RE = re.compile(r"#.*|(?:'''[\s\S]*?'''|\"\"\"[\s\S]*?\"\"\")")
 
 
 def git_changed_files():
-    """Versucht geänderte Dateien gegenüber origin/main zu ermitteln."""
+    """Versucht geänderte Dateien gegenüber origin/main zu ermitteln (arbeitet im Repo‑Root)."""
     try:
-        subprocess.run(["git", "fetch", "origin", "main", "--depth=1"], check=False, stdout=subprocess.DEVNULL)
-        out = subprocess.check_output(["git", "diff", "--name-only", "origin/main...HEAD"]).decode("utf-8")
+        subprocess.run(["git", "fetch", "origin", "main", "--depth=1"], check=False, stdout=subprocess.DEVNULL, cwd=REPO_ROOT)
+        out = subprocess.check_output(["git", "diff", "--name-only", "origin/main...HEAD"], cwd=REPO_ROOT).decode("utf-8")
         files = [l.strip() for l in out.splitlines() if l.strip()]
         return files
     except Exception:
@@ -49,7 +52,7 @@ def git_changed_files():
 
 def git_all_files():
     try:
-        out = subprocess.check_output(["git", "ls-files"]).decode("utf-8")
+        out = subprocess.check_output(["git", "ls-files"], cwd=REPO_ROOT).decode("utf-8")
         return [l.strip() for l in out.splitlines() if l.strip()]
     except Exception:
         return []
@@ -116,21 +119,35 @@ def main():
         # Fallback: überprüfe alle getrackten Dateien (nicht ideal, aber nützlich lokal)
         files = git_all_files()
 
-    files = [f for f in files if f and should_check(Path(f))]
+    # Normalisiere angegebenen Dateipfade zu absoluten Paths (Repository‑Root als Basis).
+    normalized_paths = []
+    for f in files:
+        if not f:
+            continue
+        p = Path(f)
+        if not p.is_absolute():
+            p = (REPO_ROOT / p).resolve()
+        normalized_paths.append(p)
 
-    if not files:
+    # Filtere nur relevante Dateitypen
+    paths_to_check = [p for p in normalized_paths if should_check(p)]
+
+
+    if not paths_to_check:
         print("Keine relevanten Quelldateien zum Prüfen gefunden — Prüfung übersprungen.")
         return 0
 
     failed = []
-    for f in sorted(set(files)):
-        p = Path(f)
+    for p in sorted(set(paths_to_check)):
         if not p.exists():
             # Datei evtl. gelöscht/umbenannt — ignoriere
             continue
         ok = check_file(p)
         if not ok:
-            failed.append(f)
+            try:
+                failed.append(str(p.relative_to(REPO_ROOT)))
+            except Exception:
+                failed.append(str(p))
 
     if failed:
         print("FEHLER: Die folgenden Dateien enthalten keine deutschen Kommentare (erforderlich):")
