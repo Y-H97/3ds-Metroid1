@@ -9,6 +9,7 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - `SETUP.md` – Build-Setup für Windows und Linux.
 
 ## Relevante Quellpfade
+- `3ds-cpp/README.md` — Projekt‑README für den 3DS‑Core (Build/Run‑Hinweise, Simulator)
 - `3ds-cpp/source/main.cpp`
 - `3ds-cpp/source/core/*`
 - `3ds-cpp/source/gameplay/*`
