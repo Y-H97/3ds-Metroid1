@@ -17,11 +17,12 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur-Übersicht]] – Gesamtfluss Editor → Export → Runtime/Simulator.
 
 ### Game (3DS Runtime)
-- [[docs/game/README|Game Überblick]] – Einstieg in die Runtime-Dokumente.
+- [`3ds-cpp/README.md`](../3ds-cpp/README.md) – `3ds-cpp` Projekt‑README (Build, Simulator, Start‑Anweisungen).
+- [[docs/game/README|Game Überblick]] – Einstieg in die Runtime‑Dokumente.
 - [[docs/game/ARCHITECTURE|Game-Architektur]] – Modulaufbau und Verantwortlichkeiten.
 - [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]] – Main-Loop, Zustände, Renderpfad.
-- [[docs/game/SAVE_AND_SETTINGS|Save & Settings]] – Slots, Checkpoints, Fog-of-War, Einstellungen.
-- [[docs/game/SETUP|Game Setup]] – Build-Voraussetzungen und Build-Abläufe.
+- [[docs/game/SAVE_AND_SETTINGS|Save & Settings]] – Slots, Checkpoints, Fog‑of‑War, Einstellungen.
+- [[docs/game/SETUP|Game Setup]] – Build‑Voraussetzungen und Build‑Abläufe.
 
 ### Simulator
 - [[docs/simulator/README|Simulator Überblick]] – Komponenten und Startpunkte.
