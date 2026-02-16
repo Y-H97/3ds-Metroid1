@@ -1,5 +1,6 @@
 local MapExporter = {}
 
+-- Prüft, ob eine Lua-Tabelle ein dichtes 1..N-Array ist.
 local function isArray(tbl)
     if type(tbl) ~= "table" then return false end
     local count = 0
@@ -16,6 +17,7 @@ local function isArray(tbl)
 end
 
 local function escapeJsonString(value)
+    -- Escaped Sonderzeichen für gültigen JSON-String.
     value = value:gsub("\\", "\\\\")
     value = value:gsub('"', '\\"')
     value = value:gsub("\n", "\\n")
@@ -25,6 +27,7 @@ local function escapeJsonString(value)
 end
 
 local function jsonEncode(value)
+    -- Minimaler JSON-Encoder für die benötigten Datentypen.
     local t = type(value)
     if t == "nil" then
         return "null"
@@ -55,6 +58,7 @@ local function jsonEncode(value)
 end
 
 local function readLuaTable(path)
+    -- Lädt eine Lua-Datei und führt sie sicher via pcall aus.
     local f, err = io.open(path, "rb")
     if not f then return nil, err end
     local content = f:read("*a")
@@ -69,6 +73,7 @@ local function readLuaTable(path)
 end
 
 local function writeText(path, content)
+    -- Schreibt Textdatei vollständig (UTF-8 als Raw-Bytes).
     local f, err = io.open(path, "wb")
     if not f then return false, err end
     f:write(content)
@@ -77,6 +82,7 @@ local function writeText(path, content)
 end
 
 local function flattenTiles(grid)
+    -- Wandelt 2D-Grid in flaches Tile-Array für JSON um.
     local tiles = {}
     local height = #grid
     local width = 0
@@ -95,6 +101,7 @@ local function flattenTiles(grid)
 end
 
 local function exportRoom(levelPath, outPath, levelName)
+    -- Exportiert eine Raum-Lua-Datei als Raum-JSON.
     local data, err = readLuaTable(levelPath)
     if not data then return false, "Load failed: " .. tostring(err) end
 
@@ -117,6 +124,7 @@ local function exportRoom(levelPath, outPath, levelName)
 end
 
 local function exportWorld(worldPath, outPath)
+    -- Exportiert world.lua als world.json mit Cells + Checkpoints.
     local data, err = readLuaTable(worldPath)
     if not data then return false, "Load failed: " .. tostring(err) end
 
@@ -156,6 +164,7 @@ local function exportWorld(worldPath, outPath)
 end
 
 function MapExporter.exportAll()
+    -- Hauptfunktion: exportiert alle .lua-Leveldateien in romfs/maps.
     local editorRoot = love.filesystem.getSource():gsub("/", "\\")
     local levelDir = editorRoot .. "\\level"
     local mapsDir = editorRoot .. "\\..\\3ds-cpp\\romfs\\maps"

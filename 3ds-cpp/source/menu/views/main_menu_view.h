@@ -2,7 +2,9 @@
 
 class TextRenderer;
 
+// Top-View für Kontextinfos und Hilfe zum aktuellen Menüzustand.
 void drawMainMenuTopView(TextRenderer& text, int state, int activeSelection, int selectedSaveSlot, bool hasContinue, bool debugEnabled, bool controlsSwapped, int manualScroll);
+// Bottom-Views für konkrete Auswahl/Interaktion.
 void drawMainMenuHomeView(TextRenderer& text, int selection);
 void drawMainMenuPlayView(TextRenderer& text, int selection, int selectedSaveSlot, bool hasContinue);
 void drawMainMenuManualListView(TextRenderer& text, int selection);

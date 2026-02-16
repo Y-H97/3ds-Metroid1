@@ -10,6 +10,7 @@
 namespace {
 
 struct SimulatorState {
+    // Vollständiger Laufzeitzustand der Konsolen-Simulation.
     GameCore core;
     std::string mapPath;
     float dt = 1.0f / 60.0f;
@@ -21,6 +22,7 @@ struct SimulatorState {
 };
 
 std::string trim(const std::string& value) {
+    // Entfernt Leerzeichen am Anfang/Ende einer Eingabezeile.
     size_t start = 0;
     while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start]))) {
         ++start;
@@ -33,6 +35,7 @@ std::string trim(const std::string& value) {
 }
 
 char tileToChar(int tile) {
+    // ASCII-Darstellung der wichtigsten Tile-Typen.
     switch (tile) {
         case 1:
             return '#';
@@ -54,6 +57,7 @@ char tileToChar(int tile) {
 }
 
 bool loadMap(SimulatorState& state, const std::string& path) {
+    // Lädt eine JSON-Karte und setzt einen sinnvollen Spawnpunkt.
     if (!state.core.loadMapJson(path.c_str())) {
         std::cout << "Konnte Karte nicht laden: " << path << "\n";
         return false;
@@ -72,6 +76,7 @@ bool loadMap(SimulatorState& state, const std::string& path) {
 }
 
 void printStatus(const SimulatorState& state) {
+    // Gibt Position, Geschwindigkeit und gehaltene Inputs aus.
     const Player& p = state.core.getPlayer();
     std::cout << "Pos(" << p.x << ", " << p.y << ") "
               << "Vel(" << p.vx << ", " << p.vy << ") "
@@ -82,6 +87,7 @@ void printStatus(const SimulatorState& state) {
 }
 
 void printViewport(const SimulatorState& state, int viewW = 40, int viewH = 20) {
+    // Zeichnet einen ASCII-Ausschnitt um den Spieler herum.
     const TileMap& map = state.core.getMap();
     const Player& p = state.core.getPlayer();
 
@@ -123,6 +129,7 @@ void runFrames(SimulatorState& state,
                bool stepLeft,
                bool stepRight,
                bool stepJump) {
+    // Simuliert N Frames mit optionalen einmaligen Schritt-Inputs.
     if (frames < 1) frames = 1;
 
     for (int i = 0; i < frames; ++i) {
@@ -141,6 +148,7 @@ void runFrames(SimulatorState& state,
 }
 
 void printHelp() {
+    // Befehlsübersicht für die interaktive Konsole.
     std::cout
         << "\nBefehle:\n"
         << "  help                     Hilfe anzeigen\n"
@@ -157,6 +165,7 @@ void printHelp() {
 }  // namespace
 
 int main(int argc, char** argv) {
+    // CLI-Einstiegspunkt der textbasierten Simulator-Variante.
     SimulatorState state;
     std::string initialMap = "romfs/maps/test.json";
     if (argc >= 2) {
@@ -190,6 +199,7 @@ int main(int argc, char** argv) {
         std::string cmd;
         iss >> cmd;
 
+        // Kommando-Dispatcher: verarbeitet Benutzerbefehle zeilenweise.
         if (cmd == "quit" || cmd == "exit" || cmd == "q") {
             break;
         }

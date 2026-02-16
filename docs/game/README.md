@@ -14,3 +14,10 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - `3ds-cpp/source/gameplay/*`
 - `3ds-cpp/source/menu/*`
 - `3ds-cpp/source/ui/*`
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/ARCHITECTURE|Game-Architektur]]
+- [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
+- [[docs/game/SAVE_AND_SETTINGS|Save-, Slot- und Settings-System]]
+- [[docs/game/SETUP|Game Setup]]

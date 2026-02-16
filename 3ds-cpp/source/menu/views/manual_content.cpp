@@ -102,15 +102,18 @@ bool validTopic(int topic) {
 } // namespace
 
 int manualTopicCount() {
+    // Anzahl verfügbarer Handbuchthemen.
     return kTopicCount;
 }
 
 const char* manualTopicName(int topic) {
+    // Titel eines Themas anhand seines Index.
     if (!validTopic(topic)) return "";
     return kManualTopics[topic];
 }
 
 int manualLineCount(int topic) {
+    // Zählt Zeilen bis zum nullptr-Sentinel.
     if (!validTopic(topic)) return 0;
     int count = 0;
     while (count < 16 && kManualPages[topic][count] != nullptr) {
@@ -120,6 +123,7 @@ int manualLineCount(int topic) {
 }
 
 const char* manualPageLine(int topic, int line) {
+    // Liefert eine konkrete Zeile einer Handbuchseite.
     if (!validTopic(topic)) return "";
     if (line < 0 || line >= 16) return "";
     const char* value = kManualPages[topic][line];
@@ -127,6 +131,7 @@ const char* manualPageLine(int topic, int line) {
 }
 
 int manualMaxScrollForViewport(int topic, int viewportLines) {
+    // Wie weit kann gescrollt werden, damit alle Zeilen sichtbar werden.
     int count = manualLineCount(topic);
     if (viewportLines <= 0) return 0;
     int maxScroll = count - viewportLines;

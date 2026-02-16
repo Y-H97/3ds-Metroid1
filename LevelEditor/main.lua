@@ -14,6 +14,7 @@ local MapExporter = require "map_exporter"
 local UI_WIDTH = 200
 local PANEL_X = 220 
 
+-- Sucht in der Raumliste nach einem Eintrag über den Dateinamen.
 local function findRoomFileByName(name)
     for _, fileData in ipairs(State.worldFiles) do
         if fileData.name == name then return fileData end
@@ -22,6 +23,7 @@ local function findRoomFileByName(name)
 end
 
 local function worldCellFromMouse(mx, my)
+    -- Wandelt Mauskoordinaten in Welt-Grid-Koordinaten um.
     local gridOffsetX = 220
     local gridOffsetY = 50
     local cellSize = 100
@@ -37,6 +39,7 @@ local function worldCellFromMouse(mx, my)
 end
 
 local function findPlacedRoomAt(gx, gy)
+    -- Prüft, ob auf der Weltzelle bereits ein (ggf. mehrzelliger) Raum liegt.
     for key, roomName in pairs(State.worldGrid) do
         local ox, oy = key:match("(%-?%d+),(%-?%d+)")
         if ox and oy then
@@ -51,6 +54,7 @@ local function findPlacedRoomAt(gx, gy)
 end
 
 local function canPlaceRoom(roomName, gx, gy)
+    -- Validiert Platzierung: innerhalb der Grenzen und ohne Überlappung.
     local meta = State.roomCache[roomName] or {w = 1, h = 1}
     local w, h = meta.w, meta.h
 
@@ -74,6 +78,7 @@ local function canPlaceRoom(roomName, gx, gy)
 end
 
 function love.load(args)
+    -- Startpunkt der App; optionaler Headless-Export mit --export-json.
     if args and args[1] == "--export-json" then
         local ok, message = MapExporter.exportAll()
         if ok then
@@ -94,6 +99,7 @@ function love.load(args)
 end
 
 function love.update(dt)
+    -- Zyklisches Update für Timer, Kamera und Editor-Eingaben.
     -- 1. Fullscreen Restore Hack
     if State.pendingFullscreen then
         love.window.setFullscreen(true)
@@ -121,6 +127,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    -- Zeichnet je nach App-Modus die passende Ansicht.
     love.graphics.push()
     
     if State.currentState == Constants.STATE.MENU then
@@ -183,6 +190,7 @@ function handleRoomEditorInput()
 end
 
 function love.mousepressed(x, y, button)
+    -- Behandelt Einmalklicks (Buttons, Auswahl, Weltplatzierung).
     -- Menü-Buttons und "Einmalklicks"
     if State.currentState == Constants.STATE.MENU then
         -- Logik ist jetzt in Views.drawMenu via drawButton (state change sofort)
@@ -299,6 +307,7 @@ function love.mousepressed(x, y, button)
 end
 
 function love.keypressed(key)
+    -- Tastaturkürzel für Moduswechsel, Save/Load und Editor-Aktionen.
     if key == "f11" then
         love.window.setFullscreen(not love.window.getFullscreen())
     end
@@ -381,6 +390,7 @@ function love.keypressed(key)
 end
 
 function love.wheelmoved(x, y)
+    -- Mausrad für Listen-Scroll und Zoomsteuerung.
     local mx, my = love.mouse.getPosition()
     
     if State.currentState == Constants.STATE.ROOM_EDIT then

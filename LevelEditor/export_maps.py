@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Exportiert Lua-Leveldaten des Editors nach JSON für das C++-Spiel.
 import argparse
 import json
 import re
@@ -7,6 +8,7 @@ from pathlib import Path
 
 
 def parse_room_lua(path: Path):
+    # Liest Raum-Lua-Datei und extrahiert ein rechteckiges Tile-Grid.
     content = path.read_text(encoding="utf-8")
     lines = content.splitlines()
 
@@ -60,6 +62,7 @@ def parse_room_lua(path: Path):
 
 
 def parse_world_lua(path: Path):
+    # Liest world.lua und extrahiert Raumzellen + Checkpoint-Flags.
     content = path.read_text(encoding="utf-8")
 
     cell_matches = re.finditer(r"\['(-?\d+),(-?\d+)'\]\s*=\s*'([^']+)'", content)
@@ -76,6 +79,7 @@ def parse_world_lua(path: Path):
 
 
 def validate_room_json(room_obj: dict, source: Path):
+    # Sicherstellt, dass width*height exakt zur Tile-Anzahl passt.
     expected = int(room_obj["width"]) * int(room_obj["height"])
     actual = len(room_obj["tiles"])
     if actual != expected:
@@ -83,6 +87,7 @@ def validate_room_json(room_obj: dict, source: Path):
 
 
 def validate_world_json(world_obj: dict, available_rooms: set, source: Path):
+    # Prüft, ob alle in world.lua referenzierten Räume tatsächlich exportiert wurden.
     for cell in world_obj.get("cells", []):
         level = str(cell.get("level", ""))
         if level not in available_rooms:
@@ -90,10 +95,12 @@ def validate_world_json(world_obj: dict, available_rooms: set, source: Path):
 
 
 def write_json(path: Path, obj: dict):
+    # Schreibt kompaktes JSON (ohne unnötige Leerzeichen).
     path.write_text(json.dumps(obj, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 def main():
+    # End-to-End Export: Räume + Welt laden, validieren und schreiben.
     parser = argparse.ArgumentParser(description="Exportiert LevelEditor Lua-Dateien nach JSON")
     parser.add_argument("--level-dir", default=str(Path(__file__).parent / "level"))
     parser.add_argument("--maps-dir", default=str(Path(__file__).parent.parent / "3ds-cpp" / "romfs" / "maps"))

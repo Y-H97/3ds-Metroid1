@@ -39,3 +39,10 @@
 2. `LevelEditor/run_export_maps.bat`
 3. `simulator/run_simulator_window.bat`
 4. `3ds-cpp/build_local.bat` oder direkt `make` in `3ds-cpp`
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/PROGRAMS|Programme und Startskripte]]
+- [[docs/game/SETUP|Game Setup]]
+- [[docs/simulator/SETUP|Simulator Setup]]
+- [[docs/level-editor/SETUP|LevelEditor Setup]]

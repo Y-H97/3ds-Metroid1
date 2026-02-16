@@ -4,6 +4,7 @@
 #include <vector>
 
 struct InputState {
+    // Bewegungs- und Sprungwünsche für ein einzelnes Update-Frame.
     bool left = false;
     bool right = false;
     bool jump = false;
@@ -11,6 +12,7 @@ struct InputState {
 };
 
 struct Player {
+    // Physik-Zustand des Spielers in Pixel-Koordinaten.
     float x = 40.0f;
     float y = 40.0f;
     float vx = 0.0f;
@@ -22,6 +24,7 @@ struct Player {
 };
 
 struct Rect {
+    // Einfache Rechteck-Struktur, z. B. für Trigger/Transitions.
     float x = 0.0f;
     float y = 0.0f;
     float w = 0.0f;
@@ -30,16 +33,24 @@ struct Rect {
 
 class TileMap {
 public:
+    // Kacheln horizontal/vertikal.
     int width = 0;
     int height = 0;
+    // Lineares Feld aller Tiles (Index: y * width + x).
     std::vector<uint8_t> tiles;
 
+    // Lädt eine alte Text-Kartenrepräsentation.
     bool loadText(const char* path);
+    // Lädt das aktuelle JSON-Kartenformat.
     bool loadJson(const char* path);
+    // Prüft, ob eine Kachel als "fest" gilt (Kollision).
     bool isSolid(int tx, int ty) const;
+    // Liefert die Tile-ID an Gitterposition tx/ty.
     int getTile(int tx, int ty) const;
+    // Gibt alle Übergangs-Rechtecke (Tile-ID 3) zurück.
     const std::vector<Rect>& getTransitions() const { return transitions; }
 
+    // Sucht in der Tilemap alle Übergangs-Tiles und baut Trigger-Rechtecke auf.
     void buildTransitions(int tileSize);
 
 private:
@@ -48,9 +59,11 @@ private:
 
 class GameCore {
 public:
+    // Karte laden (JSON / Legacy-Text).
     bool loadMapJson(const char* path);
     bool loadMapText(const char* path);
 
+    // Führt ein Physik- und Kollisions-Update aus.
     void update(const InputState& input, float dt);
 
     const Player& getPlayer() const { return player; }
@@ -59,9 +72,13 @@ public:
     const TileMap& getMap() const { return map; }
     TileMap& getMap() { return map; }
 
+    // Setzt den Respawn-Startpunkt (Checkpoint-ähnlich).
     void setPlayerStart(float x, float y);
+    // Sucht die erste begehbare Kachel und setzt dort den Startpunkt.
     bool setPlayerStartToFirstEmpty(float tileSize);
+    // Versetzt den Spieler direkt (ohne Respawnpunkt zu ändern).
     void setPlayerPosition(float x, float y);
+    // Liefert einmalig den "tot"-Zustand und setzt ihn zurück.
     bool consumeDeath();
 
 private:

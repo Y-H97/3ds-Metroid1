@@ -2,10 +2,13 @@
 
 #include <cstdint>
 
+// Desktop-Kompatibilitätsschicht:
+// Stellt zentrale 3DS-Typen und Tasten-Flags für den Win32-Simulator bereit.
 using u32 = std::uint32_t;
 using u64 = std::uint64_t;
 
 struct touchPosition {
+    // Touch-Koordinaten (pixelbasiert, analog zur 3DS-API).
     std::uint16_t px = 0;
     std::uint16_t py = 0;
 };

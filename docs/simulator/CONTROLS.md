@@ -37,3 +37,9 @@
 - `reset` – zum Spawn zurück
 - `map <pfad>` – andere Map laden
 - `quit` – beenden
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/simulator/README|Simulator Überblick]]
+- [[docs/simulator/SETUP|Simulator Setup]]
+- [[docs/quickstart/tester|Quick Start – Tester]]

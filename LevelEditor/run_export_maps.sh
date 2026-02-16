@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Exportiert alle LevelEditor-Lua-Dateien nach 3ds-cpp/romfs/maps (Linux/macOS).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"

@@ -1,3 +1,4 @@
+-- Test-Raumdaten: 2D-Tilegrid für Experimente/Prototypen.
 return {
   grid = {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},

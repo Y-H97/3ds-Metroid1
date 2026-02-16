@@ -25,3 +25,10 @@
 ## Shutdown
 - Gameplay persistiert aktuellen Stand (Checkpoint/Fallback).
 - Renderer/Subsysteme werden sauber beendet.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/README|Game Überblick]]
+- [[docs/game/ARCHITECTURE|Game-Architektur]]
+- [[docs/game/SAVE_AND_SETTINGS|Save-, Slot- und Settings-System]]
+- [[docs/simulator/README|Simulator Überblick]]

@@ -1,4 +1,6 @@
 @echo off
+REM Lokaler Build-Workflow: exportiert Maps, spiegelt Projekt in Temp,
+REM baut dort und kopiert Artefakte zurück ins Workspace.
 setlocal EnableExtensions
 
 set "SRC=%~dp0"

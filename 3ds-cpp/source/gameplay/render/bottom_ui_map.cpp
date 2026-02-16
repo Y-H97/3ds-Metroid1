@@ -7,6 +7,7 @@
 namespace {
 
 std::string makeVisitedKey(int x, int y) {
+    // Einheitlicher Schlüssel für besuchte Kartenzellen.
     return std::to_string(x) + "," + std::to_string(y);
 }
 
@@ -19,6 +20,7 @@ void drawBottomMapTab(
     int currentGridX,
     int currentGridY
 ) {
+    // Zeichnet eine abstrahierte Weltkarte: besucht, aktuell, Ursprung je Segment.
     text.draw(12.0f, 12.0f, 0.48f, C2D_Color32(230, 230, 240, 255), "Karte");
     text.draw(214.0f, 12.0f, 0.36f, C2D_Color32(170, 180, 205, 255), "GX:%d GY:%d", currentGridX, currentGridY);
 

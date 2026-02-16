@@ -6,6 +6,7 @@
 #include <string>
 
 bool TileMap::loadText(const char* path) {
+    // Legacy-Textformat laden: zuerst width/height, dann alle Tile-Werte.
     FILE* f = fopen(path, "r");
     if (!f) return false;
 
@@ -30,6 +31,8 @@ bool TileMap::loadText(const char* path) {
 }
 
 bool TileMap::loadJson(const char* path) {
+    // Sehr einfacher JSON-Reader (ohne externe Bibliothek),
+    // ausreichend für das erwartete Kartenformat.
     FILE* f = fopen(path, "r");
     if (!f) return false;
     std::string s;
@@ -80,6 +83,7 @@ bool TileMap::loadJson(const char* path) {
 }
 
 bool TileMap::isSolid(int tx, int ty) const {
+    // Außerhalb der Karte zählt als "fest", damit man nicht aus der Welt fällt.
     if (tx < 0 || ty < 0 || tx >= width || ty >= height) return true;
     uint8_t t = tiles[static_cast<size_t>(ty * width + tx)];
     return t == 1 || t == 30 || t == 31 || t == 32 || t == 33;
@@ -91,6 +95,7 @@ int TileMap::getTile(int tx, int ty) const {
 }
 
 void TileMap::buildTransitions(int tileSize) {
+    // Tile-ID 3 markiert Raumübergänge; daraus entstehen Trigger-Rechtecke.
     transitions.clear();
     if (width <= 0 || height <= 0) return;
     for (int y = 0; y < height; ++y) {
@@ -109,6 +114,7 @@ void TileMap::buildTransitions(int tileSize) {
 }
 
 void GameCore::setPlayerStart(float x, float y) {
+    // Startpunkt setzen + Bewegungszustand zurücksetzen.
     player.x = x;
     player.y = y;
     spawnX = x;
@@ -121,6 +127,7 @@ void GameCore::setPlayerStart(float x, float y) {
 }
 
 void GameCore::setPlayerPosition(float x, float y) {
+    // Direkte Teleport-Position ohne Änderung des Respawn-Startpunkts.
     player.x = x;
     player.y = y;
     dead = false;
@@ -131,12 +138,14 @@ void GameCore::setPlayerPosition(float x, float y) {
 }
 
 bool GameCore::consumeDeath() {
+    // "Einmal-Event": War der Spieler tot, wird das hier abgeholt und zurückgesetzt.
     bool wasDead = dead;
     dead = false;
     return wasDead;
 }
 
 bool GameCore::setPlayerStartToFirstEmpty(float tileSize) {
+    // Sucht die erste begehbare Kachel (nicht solid, kein Danger, keine Transition).
     if (map.width <= 0 || map.height <= 0 || map.tiles.empty()) return false;
     for (int y = 0; y < map.height; ++y) {
         for (int x = 0; x < map.width; ++x) {
@@ -159,24 +168,29 @@ bool GameCore::loadMapText(const char* path) {
 }
 
 void GameCore::update(const InputState& input, float dt) {
+    // Zentrale Physik: Eingaben, Gravitation, Kollisionen (X/Y), Sonderflächen, Tod.
     const float speed = 150.0f;
     const float jumpVel = -420.0f;
     const float gravity = 900.0f;
     const float tileSize = 16.0f;
 
+    // 1) Horizontalinput in Geschwindigkeit umsetzen.
     float inputX = 0.0f;
     if (input.left) inputX -= 1.0f;
     if (input.right) inputX += 1.0f;
     player.vx = inputX * speed;
 
+    // 2) Springen erlaubt bei Bodenkontakt oder kurzer "Coyote-Time".
     if (input.jumpPressed && (player.grounded || player.coyoteTimer > 0.0f)) {
         player.vy = jumpVel;
         player.grounded = false;
         player.coyoteTimer = 0.0f;
     }
 
+    // 3) Gravitation beschleunigt den Spieler nach unten.
     player.vy += gravity * dt;
 
+    // 4) X-Kollisionen gegen volle Blöcke inkl. kleiner Step-Up-Hilfe.
     float newX = player.x + player.vx * dt;
     float x0 = std::floor((std::min(player.x, newX)) / tileSize);
     float x1 = std::floor((std::max(player.x + player.w, newX + player.w)) / tileSize);
@@ -216,6 +230,7 @@ void GameCore::update(const InputState& input, float dt) {
     player.x = newX;
     if (hitX) player.vx = 0.0f;
 
+    // 5) Y-Kollisionen gegen volle Blöcke und schräge Flächen.
     float newY = player.y + player.vy * dt;
     x0 = std::floor(player.x / tileSize);
     x1 = std::floor((player.x + player.w - 1.0f) / tileSize);
@@ -271,7 +286,7 @@ void GameCore::update(const InputState& input, float dt) {
     if (player.grounded) {
         player.coyoteTimer = 0.1f;
     } else if (wasGrounded && !player.grounded && player.vy >= 0.0f) {
-        // slope snap
+        // 6) Slope-Snap: verhindert, dass man beim Laufen über Schräge kurz "schwebt".
         float centerX = player.x + player.w * 0.5f;
         int baseTx = static_cast<int>(std::floor(centerX / tileSize));
         int ty = static_cast<int>(std::floor((player.y + player.h + 12.0f) / tileSize));
@@ -298,7 +313,7 @@ void GameCore::update(const InputState& input, float dt) {
         if (player.coyoteTimer < 0.0f) player.coyoteTimer = 0.0f;
     }
 
-    // Danger tiles (2) => flag death
+    // 7) Gefahrenkacheln (Tile-ID 2) markieren den Spieler als tot.
     int tx0 = static_cast<int>(std::floor(player.x / tileSize));
     int tx1 = static_cast<int>(std::floor((player.x + player.w - 1.0f) / tileSize));
     int ty0 = static_cast<int>(std::floor(player.y / tileSize));

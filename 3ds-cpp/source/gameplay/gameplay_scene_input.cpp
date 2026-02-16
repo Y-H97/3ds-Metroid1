@@ -1,10 +1,12 @@
 #include "gameplay_scene.h"
 
 void GameplayScene::setControlsSwapped(bool swapped) {
+    // Tauscht Steuerungsschema zwischen Top- und Bottom-Eingaben.
     controlsSwapped = swapped;
 }
 
 void GameplayScene::setShowFpsEnabled(bool enabled) {
+    // Schaltet FPS-Anzeige im Top-Screen ein/aus.
     showFpsEnabled = enabled;
 }
 
@@ -13,9 +15,11 @@ bool GameplayScene::getShowFpsEnabled() const {
 }
 
 void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
+    // Übersetzt Roh-Buttons in interne Bewegungs-/Menüzustände.
     (void)kHeld;
     jumpPressed = false;
 
+    // Je nach Option werden Steuerquellen vertauscht.
     const u32 topLeft = controlsSwapped ? KEY_DLEFT : KEY_CPAD_LEFT;
     const u32 topRight = controlsSwapped ? KEY_DRIGHT : KEY_CPAD_RIGHT;
     const u32 topJump = KEY_A;
@@ -30,6 +34,7 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
     jumpHeld = (kHeld & topJump) != 0;
     jumpPressed = (kDown & topJump) != 0;
 
+    // SELECT kehrt immer ins Hauptmenü zurück.
     if (kDown & KEY_SELECT) {
         requestMenu = true;
         return;
@@ -38,6 +43,7 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
     if (kDown & bottomLeft) bottomMode = (bottomMode + 3) % 4;
     if (kDown & bottomRight) bottomMode = (bottomMode + 1) % 4;
 
+    // Touch steuert Tabs und Settings-Auswahl.
     if (kDown & KEY_TOUCH) {
         touchPosition tp;
         hidTouchRead(&tp);
@@ -56,6 +62,7 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
         }
     }
 
+    // Tab-spezifische Eingabe: Settings/Debug haben Sonderlogik.
     if (bottomMode == TAB_SETTINGS) {
         if (kDown & bottomUp) settingsSelection = (settingsSelection + 1) % 2;
         if (kDown & bottomDown) settingsSelection = (settingsSelection + 1) % 2;

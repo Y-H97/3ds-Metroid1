@@ -5,6 +5,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Konvertiert eine einzelne Raum-Lua-Datei in das JSON-Raumformat.
 function Convert-RoomLuaToJson {
     param(
         [string]$Path,
@@ -82,6 +83,7 @@ function Convert-RoomLuaToJson {
 }
 
 function Convert-WorldLuaToJson {
+    # Konvertiert world.lua in world.json (cells + checkpoints).
     param(
         [string]$Path,
         [string]$OutPath
@@ -117,6 +119,7 @@ function Convert-WorldLuaToJson {
 }
 
 function Validate-RoomJson {
+    # Prüft, ob width*height zur Anzahl der Tiles passt.
     param(
         [string]$Path
     )
@@ -130,6 +133,7 @@ function Validate-RoomJson {
 }
 
 function Validate-WorldJson {
+    # Prüft, dass world.json nur vorhandene Räume referenziert.
     param(
         [string]$Path,
         [hashtable]$AvailableRooms
@@ -144,6 +148,7 @@ function Validate-WorldJson {
 }
 
 if (-not (Test-Path $LevelDir)) {
+    # Export-Voraussetzungen prüfen und Zielordner anlegen.
     throw "Level-Verzeichnis nicht gefunden: $LevelDir"
 }
 

@@ -27,6 +27,7 @@ void drawBottomDebugTab(
     int debugScrollPx,
     int& outDebugMaxScrollPx
 ) {
+    // Zeigt technische Laufzeitdaten; nützlich für Entwicklung und Fehlersuche.
     text.draw(12.0f, 12.0f, 0.48f, C2D_Color32(230, 230, 240, 255), "Debug");
     C2D_DrawRectSolid(16, 38, 0.0f, 288, 166, C2D_Color32(24, 30, 42, 255));
     if (!debugInfoEnabled) {
@@ -56,6 +57,7 @@ void drawBottomDebugTab(
     int mapPixelsW = map.width * 16;
     int mapPixelsH = map.height * 16;
 
+    // Zeichnet nur Zeilen, die im sichtbaren Scrollfenster liegen.
     auto drawIfVisible = [&](float y, const char* fmt, auto... vals) {
         if (y < viewportTop || y > viewportBottom) return;
         text.draw(24.0f, y, 0.34f, C2D_Color32(190, 210, 235, 255), fmt, vals...);
@@ -81,6 +83,7 @@ void drawBottomDebugTab(
     drawIfVisible(y, "Transition:%s  Count:%d", inTransition ? "Y" : "N", transitions); y += lineHeight;
     drawIfVisible(y, "Checkpoint:%s (%d,%d)", checkpointValid ? "Y" : "N", checkpointGridX, checkpointGridY);
 
+    // Bei langem Inhalt eine vertikale Scrollbar anzeigen.
     if (maxScroll > 0) {
         const float trackX = 296.0f;
         const float trackY = 44.0f;

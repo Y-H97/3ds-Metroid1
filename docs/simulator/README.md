@@ -42,3 +42,10 @@ Dieser Bereich dokumentiert die Desktop-Simulatoren im Root-Ordner `simulator/`.
 ## Build-Ausgaben
 - `3ds-cpp/build/simulator/metroid_sim_window.exe`
 - `3ds-cpp/build/simulator/metroid_sim_console.exe`
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/simulator/SETUP|Simulator Setup]]
+- [[docs/simulator/CONTROLS|Simulator Steuerung]]
+- [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
+- [[docs/level-editor/SETUP|LevelEditor Setup]]

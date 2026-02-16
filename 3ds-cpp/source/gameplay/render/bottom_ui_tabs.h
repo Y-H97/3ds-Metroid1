@@ -8,6 +8,7 @@
 
 class TextRenderer;
 
+// Tab 0: Mini-Weltkarte mit Fog-of-War/visited-Status.
 void drawBottomMapTab(
     TextRenderer& text,
     const WorldMap& world,
@@ -16,14 +17,17 @@ void drawBottomMapTab(
     int currentGridY
 );
 
+// Tab 1: Platzhalter für Inventar.
 void drawBottomInventoryTab(TextRenderer& text);
 
+// Tab 2: Laufzeit-Einstellungen (z. B. FPS-Anzeige).
 void drawBottomSettingsTab(
     TextRenderer& text,
     int settingsSelection,
     bool showFpsEnabled
 );
 
+// Tab 3: Technische Runtime-Diagnosewerte.
 void drawBottomDebugTab(
     TextRenderer& text,
     const WorldMap& world,

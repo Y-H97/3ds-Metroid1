@@ -9,6 +9,8 @@
 
 class TextRenderer;
 
+// Zentraler Renderer für den Bottom-Screen während des Gameplays.
+// Wählt anhand von "bottomMode" den passenden Tab-Renderer aus.
 void renderGameplayBottomUI(
     TextRenderer& text,
     const WorldMap& world,

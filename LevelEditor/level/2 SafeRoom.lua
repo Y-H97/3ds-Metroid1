@@ -1,3 +1,4 @@
+-- Raumdaten: SafeRoom (Checkpoint-naher Bereich) als 2D-Tilegrid.
 return {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,},

@@ -1,31 +1,21 @@
 # Projektdokumentation
 
-Die Dokumentation ist nach Bereichen aufgeteilt.
+Zentraler Einstieg:
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 
 ## Bereiche
-- `game/`
-	- `game/README.md`
-	- `game/ARCHITECTURE.md`
-	- `game/RUNTIME_FLOW.md`
-	- `game/SAVE_AND_SETTINGS.md`
-	- `game/SETUP.md`
-- `simulator/`
-	- `simulator/README.md`
-	- `simulator/SETUP.md`
-	- `simulator/CONTROLS.md`
-- `level-editor/`
-	- `level-editor/README.md`
-	- `level-editor/SETUP.md`
-- `tooling/`
-	- `tooling/README.md`
-- `workspace/`
-	- `workspace/README.md`
+- [[docs/workspace/README|Workspace]]
+- [[docs/game/README|Game (3DS Runtime)]]
+- [[docs/simulator/README|Simulator]]
+- [[docs/level-editor/README|LevelEditor]]
+- [[docs/tooling/README|Tooling]]
+
+## Weitere Übersichten
+- [[docs/PROGRAMS|Programme und Startskripte]]
+- [[docs/REFACTORING_ASSESSMENT|Refactoring-Bewertung]]
 
 ## Quick Start (5 Minuten)
-- `quickstart/README.md`
-- `quickstart/developer.md`
-- `quickstart/level-designer.md`
-- `quickstart/tester.md`
-
-## Hinweis
-Die inhaltliche Fachdoku liegt ausschließlich in den Bereichsordnern.
+- [[docs/quickstart/README|Quick Start nach Rolle]]
+- [[docs/quickstart/developer|Entwickler]]
+- [[docs/quickstart/level-designer|Level Designer]]
+- [[docs/quickstart/tester|Tester]]

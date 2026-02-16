@@ -51,3 +51,10 @@ Optional ausführbar machen:
 - `3ds-cpp/build/simulator/metroid_sim_window.exe`
 - `3ds-cpp/build/simulator/metroid_sim_console.exe` (Windows)
 - `3ds-cpp/build/simulator/metroid_sim_console` (Linux)
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/simulator/README|Simulator Überblick]]
+- [[docs/simulator/CONTROLS|Simulator Steuerung]]
+- [[docs/tooling/README|Tooling, Build und Skripte]]
+- [[docs/game/SETUP|Game Setup]]

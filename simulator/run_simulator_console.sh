@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Baut und startet den textbasierten Console-Simulator (Linux/macOS).
 set -euo pipefail
 
 SIM_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"

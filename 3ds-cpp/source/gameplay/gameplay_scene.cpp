@@ -11,16 +11,19 @@ constexpr u32 CLEAR_COLOR = C2D_Color32(16, 20, 32, 255);
 constexpr u32 BG_COLOR    = C2D_Color32(10, 14, 20, 255);
 
 static std::string makeVisitedKey(int x, int y) {
+    // Eindeutiger Schlüssel für besuchte Weltzellen.
     return std::to_string(x) + "," + std::to_string(y);
 }
 
 static float clampf(float v, float lo, float hi) {
+    // Begrenzt einen Wert auf ein Intervall [lo, hi].
     if (v < lo) return lo;
     if (v > hi) return hi;
     return v;
 }
 
 static void computeCamera(const Player& p, const TileMap& map, float tileSize, float viewW, float viewH, float& outCamX, float& outCamY) {
+    // Kamera folgt dem Spieler, bleibt aber innerhalb der Kartenränder.
     float scale = tileSize / 16.0f;
     float px = p.x * scale;
     float py = p.y * scale;
@@ -45,6 +48,7 @@ static void computeCamera(const Player& p, const TileMap& map, float tileSize, f
 }
 
 static std::string pickFirstLevelFromWorld(const char* path) {
+    // Fallback-Helfer: nimmt den ersten "level"-Eintrag aus world.json.
     FILE* f = fopen(path, "r");
     if (!f) return {};
     std::string s;
@@ -62,6 +66,7 @@ static std::string pickFirstLevelFromWorld(const char* path) {
 }
 
 static void renderMap(C3D_RenderTarget* target, float originX, float originY, float tileSize, const TileRenderer& renderer, const TileMap& map) {
+    // Zeichnet alle nicht-leeren Kacheln der aktuellen Karte.
     C2D_SceneBegin(target);
     for (int y = 0; y < map.height; ++y) {
         for (int x = 0; x < map.width; ++x) {
@@ -75,6 +80,7 @@ static void renderMap(C3D_RenderTarget* target, float originX, float originY, fl
 }
 
 bool GameplayScene::loadInitialMap() {
+    // Startlogik: Welt laden, Start-Cell bestimmen, Karte laden, Spieler setzen.
     std::string levelName = pickFirstLevelFromWorld("romfs:/maps/world.json");
     bool mapOk = false;
 
@@ -127,6 +133,7 @@ bool GameplayScene::loadInitialMap() {
 }
 
 bool GameplayScene::init() {
+    // Szene auf definierten Anfangszustand setzen.
     requestExit = false;
     requestMenu = false;
     inTransition = false;
@@ -146,6 +153,7 @@ bool GameplayScene::init() {
 }
 
 void GameplayScene::shutdown() {
+    // Beim Beenden letzten sinnvollen Stand persistieren.
     if (!currentLevelName.empty()) {
         Checkpoint saveToPersist{};
         if (checkpoint.valid && !checkpoint.level.empty()) {
@@ -165,6 +173,7 @@ void GameplayScene::shutdown() {
 }
 
 void GameplayScene::update(float dt) {
+    // Haupt-Update: Eingabe anwenden, Raumwechsel prüfen, Tod/Respawn, FPS zählen.
     InputState input;
     input.left = moveLeftHeld;
     input.right = moveRightHeld;
@@ -185,6 +194,7 @@ void GameplayScene::update(float dt) {
     playerTileY = static_cast<int>(std::floor(currentPlayer.y / 16.0f));
     playerTileId = core.getMap().getTile(playerTileX, playerTileY);
 
+    // Prüfen, ob der Spieler einen Übergangstrigger berührt.
     const auto& transitions = core.getMap().getTransitions();
     bool triggered = false;
     Rect hit{};
@@ -197,6 +207,7 @@ void GameplayScene::update(float dt) {
         }
     }
     if (!triggered) inTransition = false;
+    // Bei neuem Übergang Zielraum bestimmen und ggf. laden.
     if (triggered && !inTransition && world.getCell(gridX, gridY)) {
         inTransition = true;
         float txCenter = hit.x + hit.w * 0.5f;
@@ -251,6 +262,7 @@ void GameplayScene::update(float dt) {
                         localTargetX = (std::floor(targetGX / 400.0f) - gridX) * 400.0f + screenRelX;
                     }
 
+                    // Checkpoint-Räume aktualisieren Spawnpunkt und speichern sofort.
                     if (world.isCheckpoint(nextGX, nextGY)) {
                         checkpoint.valid = true;
                         checkpoint.level = nextCell->level;
@@ -268,6 +280,7 @@ void GameplayScene::update(float dt) {
         }
     }
 
+    // Tod führt zum Respawn am letzten gültigen Checkpoint.
     if (core.consumeDeath()) {
         if (checkpoint.valid && !checkpoint.level.empty()) {
             std::string cpPath = std::string("romfs:/maps/") + checkpoint.level + ".json";
@@ -291,6 +304,7 @@ void GameplayScene::update(float dt) {
 }
 
 void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled) {
+    // Top-Screen: Karte, Spieler, Trigger und optionale Debug-/FPS-Texte.
     float camX = 0.0f;
     float camY = 0.0f;
     computeCamera(core.getPlayer(), core.getMap(), 16.0f, 400.0f, 240.0f, camX, camY);
@@ -317,6 +331,7 @@ void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool de
 }
 
 void GameplayScene::renderBottom(C3D_RenderTarget* bottom, TextRenderer& text, bool debugInfoEnabled) {
+    // Bottom-Screen: delegiert an Tab-Renderer (Map/Inventar/Settings/Debug).
     C2D_TargetClear(bottom, BG_COLOR);
     C2D_SceneBegin(bottom);
     renderGameplayBottomUI(

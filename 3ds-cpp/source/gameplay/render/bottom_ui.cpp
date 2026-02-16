@@ -32,10 +32,12 @@ void renderGameplayBottomUI(
     int debugScrollPx,
     int& outDebugMaxScrollPx
 ) {
+    // Wird vom aktiven Tab gesetzt, falls Scrollbereich existiert (Debug-Tab).
     outDebugMaxScrollPx = 0;
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(20, 20, 30, 255));
     C2D_DrawRectSolid(6, 8, 0.0f, 308, 208, C2D_Color32(18, 24, 34, 255));
 
+    // Inhalt je nach aktivem Tab zeichnen.
     if (bottomMode == 0) {
         drawBottomMapTab(text, world, visitedCells, currentGridX, currentGridY);
     } else if (bottomMode == 1) {
@@ -68,6 +70,7 @@ void renderGameplayBottomUI(
         );
     }
 
+    // Untere Tab-Leiste (Map/Inv/Set/Dbg).
     u32 tabBg = C2D_Color32(30, 30, 45, 255);
     C2D_DrawRectSolid(0, 220, 0.0f, 320, 20, tabBg);
     const char* tabNames[4] = {"Map", "Inv", "Set", "Dbg"};

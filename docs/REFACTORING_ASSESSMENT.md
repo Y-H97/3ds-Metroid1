@@ -38,3 +38,9 @@
 1. Optional: Gameplay-Transitions auslagern.
 2. Optional: UI-Konstanten zentralisieren.
 3. Danach nur noch bei konkretem Feature-Druck weiter aufteilen.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/ARCHITECTURE|Game-Architektur]]
+- [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
+- [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Gesamtarchitektur]]

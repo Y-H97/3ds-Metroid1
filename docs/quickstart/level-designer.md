@@ -19,3 +19,10 @@
 - `world.lua` steuert Raumplatzierung/Verbindungen.
 - Wenn Export fehlschlägt, zuerst Konsole auf Validierungsfehler prüfen.
 - Der Simulator lädt Karten aus `3ds-cpp/romfs/maps`.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/level-editor/README|LevelEditor Überblick]]
+- [[docs/level-editor/SETUP|LevelEditor Setup]]
+- [[docs/simulator/README|Simulator Überblick]]
+- [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Gesamtarchitektur]]

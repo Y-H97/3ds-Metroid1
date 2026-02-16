@@ -1,4 +1,5 @@
 @echo off
+REM Weiterleitung auf den eigentlichen Simulator-Launcher im /simulator Ordner.
 setlocal
 
 set "FORWARD=%~dp0..\simulator\run_simulator_window.bat"

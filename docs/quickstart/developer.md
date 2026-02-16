@@ -25,3 +25,10 @@
 - Gameplay: `3ds-cpp/source/gameplay/*`
 - Core: `3ds-cpp/source/core/*`
 - Simulator: `simulator/window_main_win32.cpp`
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/README|Game Überblick]]
+- [[docs/game/SETUP|Game Setup]]
+- [[docs/simulator/SETUP|Simulator Setup]]
+- [[docs/tooling/README|Tooling, Build und Skripte]]

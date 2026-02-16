@@ -7,6 +7,7 @@
 #include "game_core.h"
 
 static std::string makeKey(int x, int y) {
+    // Einheitlicher Schlüssel für Hash-Maps: "x,y".
     return std::to_string(x) + "," + std::to_string(y);
 }
 
@@ -26,6 +27,9 @@ static int findIntInObject(const std::string& obj, const char* key, bool& ok) {
 }
 
 bool WorldMap::loadWorldJson(const char* path) {
+    // Liest world.json und extrahiert:
+    // - cells: welche Level liegen auf welchen Weltkoordinaten
+    // - checkpoints: welche Weltzellen als Checkpoint zählen
     cells.clear();
     checkpoints.clear();
 
@@ -105,6 +109,8 @@ bool WorldMap::loadWorldJson(const char* path) {
 }
 
 bool WorldMap::buildSpatialMap(const char* mapsRoot, int tileSize, int screenW, int screenH) {
+    // Große Level können mehrere Bildschirmsegmente belegen.
+    // Diese Funktion füllt jedes Segment als eigene Grid-Zelle in "spatial".
     spatial.clear();
     if (cells.empty()) return false;
 
@@ -138,12 +144,14 @@ bool WorldMap::buildSpatialMap(const char* mapsRoot, int tileSize, int screenW, 
 }
 
 const SpatialCell* WorldMap::getCell(int gridX, int gridY) const {
+    // Direkter Lookup einer Weltzelle.
     auto it = spatial.find(makeKey(gridX, gridY));
     if (it == spatial.end()) return nullptr;
     return &it->second;
 }
 
 bool WorldMap::getSpatialBounds(int& minX, int& minY, int& maxX, int& maxY) const {
+    // Berechnet das umschließende Rechteck aller Weltzellen.
     if (spatial.empty()) return false;
 
     bool first = true;
@@ -166,6 +174,7 @@ bool WorldMap::getSpatialBounds(int& minX, int& minY, int& maxX, int& maxY) cons
 }
 
 bool WorldMap::isCheckpoint(int gridX, int gridY) const {
+    // Checkpoint-Status stammt aus world.json -> checkpoints.
     auto it = checkpoints.find(makeKey(gridX, gridY));
     return it != checkpoints.end();
 }

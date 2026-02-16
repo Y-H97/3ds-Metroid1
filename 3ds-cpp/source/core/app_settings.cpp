@@ -7,6 +7,7 @@ constexpr const char* SETTINGS_DIR = "sdmc:/3ds/3ds-cpp";
 constexpr const char* SETTINGS_PATH = "sdmc:/3ds/3ds-cpp/settings.dat";
 
 bool AppSettings::load(AppSettingsData& out) {
+    // Erwartetes Dateiformat: "debug controls fps" als 0/1-Werte.
     FILE* f = fopen(SETTINGS_PATH, "rb");
     if (!f) return false;
 
@@ -24,6 +25,7 @@ bool AppSettings::load(AppSettingsData& out) {
 }
 
 bool AppSettings::save(const AppSettingsData& data) {
+    // Zielverzeichnisse sicherstellen und dann Werte als Zeile schreiben.
     mkdir("sdmc:/3ds", 0777);
     mkdir(SETTINGS_DIR, 0777);
 

@@ -11,3 +11,13 @@
 - Editor-Quellen: `LevelEditor/level/*.lua`
 - Exportziel: `3ds-cpp/romfs/maps/*.json`
 - Nutzung: Runtime (`3ds-cpp/source`) und Simulator (`simulator/`)
+
+## Einstieg ohne Vorwissen
+- `EINSTEIGER_GUIDE.md` – einfache Modulübersicht, Datenfluss und typische Abläufe.
+- `ARCHITEKTUR_UEBERSICHT.md` – visuelle Gesamtarchitektur mit Diagramm.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/workspace/EINSTEIGER_GUIDE|Einsteiger-Guide]]
+- [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur-Übersicht]]
+- [[docs/quickstart/README|Quick Start nach Rolle]]

@@ -60,3 +60,10 @@ flowchart TD
 - Controller und View sind getrennt.
 - Gameplay-Logik ist vom Menü getrennt.
 - Persistenz liegt im Gameplay/Settings-Bereich, nicht in UI-Code.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/README|Game Überblick]]
+- [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
+- [[docs/game/SAVE_AND_SETTINGS|Save-, Slot- und Settings-System]]
+- [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Gesamtarchitektur]]

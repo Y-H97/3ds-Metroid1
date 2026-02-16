@@ -1,3 +1,4 @@
+-- Weltlayout: Zuordnung von Grid-Zellen zu Raumdateien + Checkpoint-Zellen.
 return {
   grid = {
     ['0,4'] = '0',

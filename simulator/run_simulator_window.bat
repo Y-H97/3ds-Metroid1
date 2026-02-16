@@ -1,4 +1,5 @@
 @echo off
+REM Baut und startet den grafischen Win32-Simulator (Windows).
 setlocal EnableExtensions
 
 set "SIM_ROOT=%~dp0"

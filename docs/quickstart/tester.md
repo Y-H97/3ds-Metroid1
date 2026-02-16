@@ -27,3 +27,10 @@
 ## Zusätzlicher Konsolentest (optional)
 - `simulator\run_simulator_console.bat`
 - Für schnelle Core-Verifikation ohne Fenster-UI.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/simulator/CONTROLS|Simulator Steuerung]]
+- [[docs/simulator/SETUP|Simulator Setup]]
+- [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
+- [[docs/quickstart/README|Quick Start nach Rolle]]

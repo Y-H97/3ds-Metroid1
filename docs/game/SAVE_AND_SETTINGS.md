@@ -32,3 +32,10 @@
 - `GameplayScene::hasPersistentSave(slot)`
 - `GameplayScene::resetVisitedProgress(slot)`
 - `AppSettings::load/save`
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/README|Game Überblick]]
+- [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
+- [[docs/game/ARCHITECTURE|Game-Architektur]]
+- [[docs/simulator/README|Simulator Überblick]]

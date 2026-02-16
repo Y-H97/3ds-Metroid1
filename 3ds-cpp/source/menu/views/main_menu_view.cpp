@@ -15,6 +15,7 @@ constexpr float kManualTopEmptyLineStep = 8.0f;
 
 static void drawPanel(float x, float y, float w, float h, u32 bg) {
     C2D_DrawRectSolid(x, y, 0.0f, w, h, bg);
+        // Kleiner Helfer für einfarbige UI-Panels.
 }
 
 static void drawTopCategories(TextRenderer& text, int state, int activeSelection) {
@@ -23,6 +24,7 @@ static void drawTopCategories(TextRenderer& text, int state, int activeSelection
     else if (state == 1) categorySelection = 0;
     else if (state == 2) categorySelection = 2;
     else categorySelection = 1;
+        // Linke Kategorienleiste auf dem Top-Screen.
 
     const char* categories[4] = {"Spielen", "Handbuch", "Optionen", "Beenden"};
     for (int i = 0; i < 4; ++i) {
@@ -35,8 +37,10 @@ static void drawTopCategories(TextRenderer& text, int state, int activeSelection
 
 static void drawTopManualTextOnly(TextRenderer& text, int activeSelection, int manualScroll, bool useScroll) {
     C2D_DrawRectSolid(0, 0, 0.0f, 400, 240, C2D_Color32(18, 22, 34, 255));
+        // Vollbild-Handbuchansicht auf dem Top-Screen mit optionalem Scroll.
 
     int topic = activeSelection;
+        // Rechte Informationsspalte für eine konkrete Handbuchseite.
     if (topic < 0) topic = 0;
     if (topic >= manualTopicCount()) topic = manualTopicCount() - 1;
 
@@ -91,6 +95,7 @@ static void drawTopManualPage(TextRenderer& text, int activeSelection, int manua
 
 static void drawTopManualList(TextRenderer& text, int activeSelection) {
     int idx = activeSelection;
+        // Rechte Informationsspalte für die Handbuch-Themenliste.
     if (idx < 0) idx = 0;
     if (idx > manualTopicCount()) idx = manualTopicCount();
     text.draw(176.0f, 72.0f, 0.36f, C2D_Color32(238, 242, 250, 255), "Handbuch");
@@ -107,6 +112,7 @@ static void drawTopManualList(TextRenderer& text, int activeSelection) {
 
 static void drawTopOptions(TextRenderer& text, int activeSelection, bool debugEnabled, bool controlsSwapped) {
     text.draw(176.0f, 72.0f, 0.36f, C2D_Color32(238, 242, 250, 255), "Einstellungs-Hilfe");
+        // Kontext-Hilfe zu den einzelnen Optionen.
     if (activeSelection == 0) {
         text.draw(176.0f, 96.0f, 0.34f, C2D_Color32(208, 220, 244, 255), "Ingame Debug Info");
         text.draw(176.0f, 118.0f, 0.33f, C2D_Color32(182, 198, 230, 255), "Zeigt technische Werte ingame an.");
@@ -128,12 +134,14 @@ static void drawTopOptions(TextRenderer& text, int activeSelection, bool debugEn
 
 static void drawTopStatus(TextRenderer& text, int selectedSaveSlot, bool hasContinue) {
     text.draw(176.0f, 72.0f, 0.36f, C2D_Color32(238, 242, 250, 255), "Status");
+        // Kleiner Statusblock (Slot + Continue-Verfügbarkeit).
     text.draw(176.0f, 96.0f, 0.34f, C2D_Color32(190, 206, 236, 255), "Aktiver Slot: %d", selectedSaveSlot);
     text.draw(176.0f, 120.0f, 0.34f, hasContinue ? C2D_Color32(136, 240, 170, 255) : C2D_Color32(220, 170, 170, 255), hasContinue ? "Fortsetzen verfuegbar" : "Kein Save im Slot");
 }
 
 static void drawTopContextLabels(TextRenderer& text, int state, int activeSelection) {
     if (state == 0) {
+            // Kontextzeile passend zur aktuellen Auswahl.
         const char* labels[4] = {"Kategorie Spielen", "Kategorie Handbuch", "Kategorie Optionen", "Spiel beenden"};
         int idx = activeSelection;
         if (idx < 0) idx = 0;
@@ -150,6 +158,7 @@ static void drawTopContextLabels(TextRenderer& text, int state, int activeSelect
 
 void drawMainMenuTopView(TextRenderer& text, int state, int activeSelection, int selectedSaveSlot, bool hasContinue, bool debugEnabled, bool controlsSwapped, int manualScroll) {
     if (state == 3 || state == 4) {
+            // Zentrale Top-View-Komposition abhängig vom Menüzustand.
         drawTopManualTextOnly(text, activeSelection, manualScroll, state == 4);
         return;
     }
@@ -182,6 +191,7 @@ void drawMainMenuTopView(TextRenderer& text, int state, int activeSelection, int
 
 void drawMainMenuHomeView(TextRenderer& text, int selection) {
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(26, 28, 38, 255));
+        // Home-Kategorien als große Touch-/Button-Flächen.
 
     const char* labels[4] = {"Spielen", "Handbuch", "Optionen", "Spiel beenden"};
     for (int i = 0; i < 4; ++i) {
@@ -193,6 +203,7 @@ void drawMainMenuHomeView(TextRenderer& text, int selection) {
 
 void drawMainMenuPlayView(TextRenderer& text, int selection, int selectedSaveSlot, bool hasContinue) {
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(26, 28, 38, 255));
+        // Play-Menü mit Slot-Wechsel und Start-/Continue-Aktionen.
 
     C2D_DrawRectSolid(44, 8, 0.0f, 40, 28, C2D_Color32(56, 72, 104, 255));
     C2D_DrawRectSolid(236, 8, 0.0f, 40, 28, C2D_Color32(56, 72, 104, 255));
@@ -216,6 +227,7 @@ void drawMainMenuPlayView(TextRenderer& text, int selection, int selectedSaveSlo
 
 void drawMainMenuManualListView(TextRenderer& text, int selection) {
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(26, 28, 38, 255));
+        // Liste aller Handbuchthemen plus Zurück-Eintrag.
 
     for (int i = 0; i < manualTopicCount(); ++i) {
         u32 c = selection == i ? C2D_Color32(84, 140, 220, 255) : C2D_Color32(56, 72, 104, 255);
@@ -230,6 +242,7 @@ void drawMainMenuManualListView(TextRenderer& text, int selection) {
 
 void drawMainMenuManualPageControlsView(TextRenderer& text, int topicSelection, int scroll, int maxScroll) {
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(26, 28, 38, 255));
+        // Steuer-Hinweise für Scrollen/Zurück im Handbuchmodus.
     int topic = topicSelection;
     if (topic < 0) topic = 0;
     if (topic >= manualTopicCount()) topic = manualTopicCount() - 1;
@@ -254,6 +267,7 @@ void drawMainMenuManualPageControlsView(TextRenderer& text, int topicSelection, 
 
 void drawMainMenuOptionsView(TextRenderer& text, int selection, bool debugEnabled, bool controlsSwapped) {
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(26, 28, 38, 255));
+        // Optionen-Menü als interaktive Schaltflächen.
     u32 c0 = selection == 0 ? C2D_Color32(84, 140, 220, 255) : C2D_Color32(56, 72, 104, 255);
     u32 c1 = selection == 1 ? C2D_Color32(84, 140, 220, 255) : C2D_Color32(56, 72, 104, 255);
     u32 c2 = selection == 2 ? C2D_Color32(186, 116, 74, 255) : C2D_Color32(108, 72, 48, 255);

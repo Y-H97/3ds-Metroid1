@@ -1,4 +1,5 @@
 @echo off
+REM Startet den LevelEditor mit lokaler LÖVE-Installation unter Windows.
 echo Starte Level Editor...
 
 REM Nutze den absoluten Pfad zur LÖVE Installation

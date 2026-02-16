@@ -1,4 +1,5 @@
 @echo off
+REM Exportiert alle LevelEditor-Lua-Dateien nach 3ds-cpp/romfs/maps (Windows).
 setlocal EnableExtensions
 
 set "NO_PAUSE="

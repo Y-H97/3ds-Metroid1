@@ -21,19 +21,30 @@ class GameplayScene {
 public:
     static constexpr int SAVE_SLOT_COUNT = 3;
 
+    // Initialisiert Renderer, Welt und Startzustände.
     bool init();
+    // Gibt Ressourcen frei und persistiert den letzten Zustand.
     void shutdown();
+    // Eingabeschema zwischen CirclePad und DPad tauschen.
     void setControlsSwapped(bool swapped);
+    // FPS-Overlay ein-/ausschalten.
     void setShowFpsEnabled(bool enabled);
     bool getShowFpsEnabled() const;
+    // Aktiven Save-Slot setzen/lesen.
     void setActiveSaveSlot(int slot);
     int getActiveSaveSlot() const;
 
+    // Roh-Eingaben entgegennehmen und in Szenen-Zustand überführen.
     void handleInput(u32 kDown, u32 kHeld);
+    // Spiellogik für ein Frame fortschreiben.
     void update(float dt);
+    // Neues Spiel für Slot starten.
     bool startNewGame(int slot);
+    // Letzten Checkpoint eines Slots laden.
     bool loadFromCheckpoint(int slot);
+    // Prüft, ob für Slot ein Spielstand existiert.
     bool hasPersistentSave(int slot);
+    // Setzt nur den Kartenfortschritt eines Slots zurück.
     bool resetVisitedProgress(int slot);
 
     void renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled);

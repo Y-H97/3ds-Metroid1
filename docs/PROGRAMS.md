@@ -56,3 +56,10 @@ Dieses Dokument listet die ausführbaren Programme/Skripte im Workspace und dere
 2. Mit `run_export_maps.bat` in `3ds-cpp/romfs/maps` exportieren.
 3. Testen im `simulator/run_simulator_window.bat`.
 4. 3DS-Build über `3ds-cpp/Makefile`.
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/tooling/README|Tooling, Build und Skripte]]
+- [[docs/workspace/README|Workspace-Struktur]]
+- [[docs/simulator/README|Simulator Überblick]]
+- [[docs/level-editor/README|LevelEditor Überblick]]

@@ -20,6 +20,7 @@ enum MainMenuState {
 };
 
 struct MainMenuAction {
+    // Vom Menü ausgelöste Aktionen, die außerhalb ausgeführt werden.
     bool startGame = false;
     bool loadCheckpoint = false;
     bool resetMapProgress = false;
@@ -30,19 +31,25 @@ class MainMenuController {
 public:
     static constexpr int SAVE_SLOT_COUNT = 3;
 
+    // Setzt Menü in den Startzustand zurück.
     void reset();
+    // Information, ob im aktuellen Slot ein Continue möglich ist.
     void setHasContinue(bool enabled);
     bool hasContinueAvailable() const;
     int getSelectedSaveSlot() const;
+    // Persistente Optionen auslesen/schreiben.
     void setDebugEnabled(bool enabled);
     bool getDebugEnabled() const;
     void setControlsSwapped(bool enabled);
     bool getControlsSwapped() const;
 
+    // Eingaben aus Tastatur/Touch in Zustandsübergänge umsetzen.
     void handleKeys(u32 kDown);
     void handleTouch(const touchPosition& tp);
+    // Liefert ausgelöste Aktionen und leert sie danach.
     MainMenuAction consumeAction();
 
+    // Menüdarstellung für Top- und Bottom-Screen.
     void renderTop(TextRenderer& text) const;
     void renderBottom(TextRenderer& text) const;
 

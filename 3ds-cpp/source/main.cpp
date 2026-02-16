@@ -6,13 +6,15 @@
 #include "menu/controllers/main_menu_controller.h"
 #include "ui/text_renderer.h"
 
+// Hauptmodus der Anwendung:
+// Entweder befindet sich der Spieler im Hauptmenü oder im eigentlichen Spiel.
 enum AppState {
     APP_MAIN_MENU = 0,
     APP_GAME = 1,
 };
 
 int main() {
-    // 3DS + Rendering Initialisierung.
+    // 3DS-System, Dateisystem (romfs) und 2D-Renderer starten.
     gfxInitDefault();
     romfsInit();
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -46,7 +48,7 @@ int main() {
 
     AppSettingsData savedSettings = settings;
 
-    // Laufzeit-Zustand: Hauptmenü <-> Gameplay.
+    // Laufzeit-Zustand: Wir wechseln während des Spiels zwischen Menü und Gameplay.
     AppState appState = APP_MAIN_MENU;
 
     while (aptMainLoop()) {
@@ -57,7 +59,7 @@ int main() {
         if (kDown & KEY_START) break;
 
         if (appState == APP_MAIN_MENU) {
-            // Menü verarbeitet Navigation + Aktionen und entscheidet über Zustandswechsel.
+            // Menü verarbeitet Eingaben und liefert Aktionen zurück (Starten, Laden, Beenden ...).
             int selectedSlot = menu.getSelectedSaveSlot();
             menu.setHasContinue(gameplay.hasPersistentSave(selectedSlot));
             menu.handleKeys(kDown);
@@ -85,7 +87,7 @@ int main() {
                 gameplay.resetVisitedProgress(menu.getSelectedSaveSlot());
             }
         } else {
-            // Gameplay-Phase: Eingabe, Update, Return-to-Menu/Exit prüfen.
+            // Gameplay-Phase: Eingaben anwenden, Spielwelt fortschreiben, Sonderfälle prüfen.
             gameplay.setControlsSwapped(menu.getControlsSwapped());
             gameplay.handleInput(kDown, kHeld);
             gameplay.update(1.0f / 60.0f);
@@ -97,7 +99,8 @@ int main() {
             }
         }
 
-        // Persistente Menü/Game-Einstellungen auf SD synchron halten.
+        // Einstellungen werden bei Änderungen auf SD gespeichert,
+        // damit sie beim nächsten Start wieder verfügbar sind.
         AppSettingsData currentSettings{};
         currentSettings.debugEnabled = menu.getDebugEnabled();
         currentSettings.controlsSwapped = menu.getControlsSwapped();
@@ -114,7 +117,7 @@ int main() {
         text.beginFrame();
 
         if (appState == APP_MAIN_MENU) {
-            // Menü rendert beide Screens.
+            // Darstellung des Menüs auf Top- und Bottom-Screen.
             C2D_TargetClear(top, C2D_Color32(16, 20, 32, 255));
             C2D_SceneBegin(top);
             menu.renderTop(text);
@@ -123,7 +126,7 @@ int main() {
             C2D_SceneBegin(bottom);
             menu.renderBottom(text);
         } else {
-            // Gameplay rendert Top (World) + Bottom (Tabs/UI).
+            // Darstellung des Spiels: oben Welt, unten Tabs/UI.
             gameplay.renderTop(top, text, menu.getDebugEnabled());
             gameplay.renderBottom(bottom, text, menu.getDebugEnabled());
         }

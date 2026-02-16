@@ -3,12 +3,14 @@
 constexpr u32 TILE_COLOR  = C2D_Color32(90, 180, 220, 255);
 
 bool TileRenderer::init(const char* t3xPath, int size) {
+    // SpriteSheet laden; bei Fehlschlag wird später auf Farbflächen zurückgefallen.
     tileSize = size;
     sheet = C2D_SpriteSheetLoad(t3xPath);
     return sheet != nullptr;
 }
 
 void TileRenderer::drawSlope(float x, float y, int tileIndex) const {
+    // Schräge Kacheln werden geometrisch per Dreiecken gezeichnet.
     u32 colMain = C2D_Color32(153, 153, 230, 255);
     u32 colShade = C2D_Color32(118, 118, 188, 255);
     u32 lineCol = C2D_Color32(198, 198, 250, 255);
@@ -39,15 +41,18 @@ void TileRenderer::drawSlope(float x, float y, int tileIndex) const {
 }
 
 void TileRenderer::drawTile(float x, float y, int tileIndex) const {
+    // Schräge haben ein eigenes Zeichnungsverhalten.
     if (tileIndex == 30 || tileIndex == 31 || tileIndex == 32 || tileIndex == 33) {
         drawSlope(x, y, tileIndex);
         return;
     }
 
+    // Primär: aus SpriteSheet zeichnen.
     if (sheet) {
         C2D_Image img = C2D_SpriteSheetGetImage(sheet, tileIndex % C2D_SpriteSheetCount(sheet));
         C2D_DrawImageAt(img, x, y, 0.0f, nullptr, 1.0f, 1.0f);
     } else {
+        // Fallback ohne SpriteSheet: farbige Rechtecke nach Tile-Typ.
         u32 col = TILE_COLOR;
         if (tileIndex == 1) col = C2D_Color32(128, 128, 204, 255);
         else if (tileIndex == 2) col = C2D_Color32(230, 51, 51, 255);
@@ -82,6 +87,7 @@ void TileRenderer::drawTile(float x, float y, int tileIndex) const {
 }
 
 void TileRenderer::shutdown() {
+    // Grafikressourcen freigeben.
     if (sheet) {
         C2D_SpriteSheetFree(sheet);
         sheet = nullptr;

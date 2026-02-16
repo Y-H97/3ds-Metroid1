@@ -33,3 +33,10 @@ Ablauf:
 ## Artefakte
 - `3ds-cpp/3ds-cpp.3dsx`
 - `3ds-cpp/3ds-cpp.smdh`
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/game/README|Game Überblick]]
+- [[docs/tooling/README|Tooling, Build und Skripte]]
+- [[docs/PROGRAMS|Programme und Startskripte]]
+- [[docs/simulator/SETUP|Simulator Setup]]

@@ -1,3 +1,4 @@
+-- Raumdaten: 2D-Tilegrid für Level "0" (wird als Lua-Tabelle zurückgegeben).
 return {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},

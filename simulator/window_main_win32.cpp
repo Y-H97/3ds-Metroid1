@@ -22,6 +22,7 @@
 
 namespace {
 
+// Hauptzustände der Anwendung: Menü oder aktives Gameplay.
 enum AppState {
     APP_MAIN_MENU = 0,
     APP_GAME = 1,
@@ -60,6 +61,7 @@ struct RectI {
 };
 
 struct App {
+    // Zentraler Laufzeitzustand des Desktop-Simulators.
     HWND hwnd = nullptr;
     AppState appState = APP_MAIN_MENU;
 
@@ -139,10 +141,12 @@ void fillRect(HDC hdc, int x, int y, int w, int h, COLORREF color);
 bool ensureBackBuffer(HDC referenceDc, int width, int height);
 
 u64 nowMs() {
+    // Aktuelle Zeit in Millisekunden (für FPS-Messung etc.).
     return static_cast<u64>(GetTickCount64());
 }
 
 std::string makeCellKey(int x, int y) {
+    // Einheitlicher Schlüssel für Weltzellen: "x,y".
     return std::to_string(x) + "," + std::to_string(y);
 }
 
@@ -160,6 +164,7 @@ std::string parentDir(const std::string& path) {
 }
 
 void ensureDirRecursive(const std::string& inPath) {
+    // Erstellt alle Verzeichnisse im Pfad (mkdir -p Verhalten).
     std::string path = normalizeSlashes(inPath);
     if (path.empty()) return;
 
@@ -213,6 +218,7 @@ std::string settingsPath() {
 }
 
 bool loadSettingsFromDisk(bool& outDebugEnabled, bool& outControlsSwapped, bool& outShowFps) {
+    // Lädt persistente Einstellungen aus Datei.
     FILE* f = std::fopen(settingsPath().c_str(), "rb");
     if (!f) return false;
 
@@ -230,6 +236,7 @@ bool loadSettingsFromDisk(bool& outDebugEnabled, bool& outControlsSwapped, bool&
 }
 
 bool saveSettingsToDisk(bool debugEnabled, bool controlsSwapped, bool showFps) {
+    // Speichert persistente Einstellungen als drei 0/1-Werte.
     ensureSaveDir();
     FILE* f = std::fopen(settingsPath().c_str(), "wb");
     if (!f) return false;
@@ -240,6 +247,7 @@ bool saveSettingsToDisk(bool debugEnabled, bool controlsSwapped, bool showFps) {
 }
 
 void syncSettingsToDiskIfChanged() {
+    // Nur schreiben, wenn sich Werte seit letztem bekannten Zustand geändert haben.
     bool debugEnabled = g.menu.getDebugEnabled();
     bool controlsSwapped = g.menu.getControlsSwapped();
     bool showFps = g.showFpsEnabled;
@@ -263,6 +271,7 @@ bool hasPersistentSave(int slot) {
 }
 
 bool loadPersistentSaveFromDisk(int slot, PersistentSave& outSave) {
+    // Lädt Savegame eines Slots (unterstützt neues und Legacy-Format).
     FILE* f = std::fopen(savePathForSlot(slot).c_str(), "rb");
     if (!f) return false;
 
@@ -307,6 +316,7 @@ bool loadPersistentSaveFromDisk(int slot, PersistentSave& outSave) {
 }
 
 bool writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
+    // Schreibt den aktuellen Checkpoint als Slot-Spielstand.
     if (!cp.valid || cp.level.empty()) return false;
     ensureSaveDir();
 
@@ -318,6 +328,7 @@ bool writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
 }
 
 bool loadVisitedFromDisk(int slot) {
+    // Lädt besuchte Weltzellen (Fog-of-War) für den Slot.
     FILE* f = std::fopen(visitedPathForSlot(slot).c_str(), "rb");
     if (!f) return false;
     std::unordered_set<std::string> loaded;
@@ -333,6 +344,7 @@ bool loadVisitedFromDisk(int slot) {
 }
 
 bool writeVisitedToDisk(int slot) {
+    // Persistiert besuchte Weltzellen für den Slot.
     ensureSaveDir();
     FILE* f = std::fopen(visitedPathForSlot(slot).c_str(), "wb");
     if (!f) return false;
@@ -349,6 +361,7 @@ void resetVisitedProgress(int slot) {
 }
 
 void persistRuntimeState() {
+    // Sichert beim Verlassen den letzten sinnvollen Stand.
     if (g.currentLevelName.empty()) return;
 
     Checkpoint saveToPersist{};
@@ -368,6 +381,7 @@ void persistRuntimeState() {
 }
 
 void updateCheckpointFromCurrentCell() {
+    // Aktualisiert Checkpoint, wenn aktuelle Weltzelle als Checkpoint markiert ist.
     if (!g.world.isCheckpoint(g.currentGridX, g.currentGridY)) {
         return;
     }
@@ -538,6 +552,7 @@ void drawSlopeTileToCache(HDC hdc, int x, int y, int tileIndex) {
 }
 
 bool rebuildMapCache() {
+    // Rendert die aktuelle Tilemap in ein Offscreen-Bitmap für schnelle Ausgabe.
     const TileMap& map = g.core.getMap();
     if (map.width <= 0 || map.height <= 0) {
         releaseMapCache();
@@ -583,6 +598,7 @@ bool rebuildMapCache() {
 }
 
 void updateCamera() {
+    // Kamera folgt dem Spieler und bleibt in Karten-Grenzen.
     const TileMap& map = g.core.getMap();
     const Player& player = g.core.getPlayer();
 
@@ -596,6 +612,7 @@ void updateCamera() {
 }
 
 bool loadLevel(const std::string& level, int originGX, int originGY, float spawnX, float spawnY, bool setSpawn) {
+    // Lädt einen Raum und setzt Position/Spawn je nach Übergangskontext.
     std::string mapPath = g.mapsRoot + "/" + level + ".json";
     if (!g.core.loadMapJson(mapPath.c_str())) return false;
 
@@ -619,6 +636,7 @@ bool loadLevel(const std::string& level, int originGX, int originGY, float spawn
 }
 
 bool loadInitialWorldAndMap() {
+    // Initialisierung von Welt + Startmap beim Spielstart.
     std::string worldPath = g.mapsRoot + "/world.json";
     if (!g.world.loadWorldJson(worldPath.c_str())) {
         return false;
@@ -669,6 +687,7 @@ bool loadInitialWorldAndMap() {
 }
 
 bool startNewGame(int slot) {
+    // Startet einen frischen Slot: alte Daten löschen, Startwelt neu laden.
     g.activeSaveSlot = std::max(1, std::min(slot, MainMenuController::SAVE_SLOT_COUNT));
     g.checkpoint = {};
     g.persistentSave = {};
@@ -685,6 +704,7 @@ bool startNewGame(int slot) {
 }
 
 bool loadFromCheckpoint(int slot) {
+    // Lädt den letzten gespeicherten Checkpoint eines Slots.
     g.activeSaveSlot = std::max(1, std::min(slot, MainMenuController::SAVE_SLOT_COUNT));
 
     PersistentSave loaded{};
@@ -712,6 +732,7 @@ bool loadFromCheckpoint(int slot) {
 }
 
 void handleTransitionIfNeeded() {
+    // Prüft Raumübergangs-Tiles und führt bei Treffer den Kartenwechsel aus.
     const auto& transitions = g.core.getMap().getTransitions();
     const Player& player = g.core.getPlayer();
 
@@ -813,6 +834,7 @@ void handleTransitionIfNeeded() {
 }
 
 void updateGameplay(float dt) {
+    // Zentrales Gameplay-Update: Input -> Physik -> Transition -> Respawn -> FPS.
     InputState input;
     input.left = g.moveLeftHeld;
     input.right = g.moveRightHeld;
@@ -869,6 +891,7 @@ void queueTouchFromMouse(int screenX, int screenY) {
 }
 
 void handleMenuLogic() {
+    // Verarbeitet Menüeingaben und ausgelöste Aktionen.
     u32 kDown = g.keyDown;
     g.keyDown = 0;
 
@@ -905,6 +928,7 @@ void handleMenuLogic() {
 }
 
 void handleGameplayInput() {
+    // Übersetzt Keybits/Touch in Bewegungs-, Tab- und Menüaktionen.
     const u32 kDown = g.keyDown;
     const u32 kHeld = g.keyHeld;
     g.keyDown = 0;
@@ -983,6 +1007,7 @@ void handleGameplayInput() {
 }
 
 void mapVKeyToKeys(UINT vk, bool down) {
+    // Mappt Tastatur-Events auf 3DS-nahe Input-Bits.
     auto setBit = [down](u32& mask, u32 bit) {
         if (down) mask |= bit;
         else mask &= ~bit;
@@ -1052,6 +1077,7 @@ void drawText(HDC hdc, int x, int y, COLORREF color, const char* text) {
 }
 
 void drawTopGameplay(HDC hdc) {
+    // Zeichnet Top-Screen-Inhalte im Gameplay (Welt, Spieler, Debug/FPS).
     fillRect(hdc, g.topView.x, g.topView.y, g.topView.w, g.topView.h, RGB(16, 20, 32));
 
     const TileMap& map = g.core.getMap();
@@ -1126,6 +1152,7 @@ void drawBottomTabs(HDC hdc) {
 }
 
 void drawBottomGameplay(HDC hdc) {
+    // Zeichnet Bottom-Tabs und deren Inhalte (Map/Inv/Settings/Debug).
     fillRect(hdc, g.bottomView.x, g.bottomView.y, g.bottomView.w, g.bottomView.h, RGB(20, 20, 30));
     fillRect(hdc, g.bottomView.x + 6, g.bottomView.y + 8, 308, 208, RGB(18, 24, 34));
     g.debugMaxScrollPx = 0;
@@ -1261,6 +1288,7 @@ void drawBottomGameplay(HDC hdc) {
 }
 
 void drawTopMenu(HDC hdc) {
+    // Zeichnet Top-Screen des Hauptmenüs inkl. Kontext/Hinweise.
     fillRect(hdc, g.topView.x, g.topView.y, 400, 240, RGB(16, 20, 32));
     fillRect(hdc, g.topView.x + 16, g.topView.y + 14, 368, 34, RGB(30, 40, 62));
     drawText(hdc, g.topView.x + 26, g.topView.y + 24, RGB(244, 248, 255), "Metroidvania 3DS");
@@ -1349,6 +1377,7 @@ void drawTopMenu(HDC hdc) {
 }
 
 void drawBottomMenu(HDC hdc) {
+    // Zeichnet Bottom-Screen des Hauptmenüs inkl. interaktiver Listen.
     fillRect(hdc, g.bottomView.x, g.bottomView.y, 320, 240, RGB(26, 28, 38));
 
     MainMenuState state = g.menu.getState();
@@ -1431,6 +1460,7 @@ void drawBottomMenu(HDC hdc) {
 }
 
 void renderFrame(HDC hdc) {
+    // Zeichnet ein komplettes Frame abhängig vom App-Zustand.
     RECT full{};
     GetClientRect(g.hwnd, &full);
     fillRect(hdc, full.left, full.top, full.right - full.left, full.bottom - full.top, RGB(16, 20, 32));
@@ -1508,6 +1538,7 @@ bool ensureBackBuffer(HDC referenceDc, int width, int height) {
 }
 
 void tick() {
+    // Simulations-Takt: je nach Zustand Menü- oder Gameplaylogik ausführen.
     if (g.appState == APP_MAIN_MENU) {
         handleMenuLogic();
     } else {
@@ -1579,6 +1610,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }  // namespace
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int showCmd) {
+    // Win32-Einstiegspunkt: Initialisierung, Message Loop, 60Hz Taktung.
     timeBeginPeriod(1);
 
     const char* mapsRootEnv = std::getenv("METROID_MAPS_ROOT");

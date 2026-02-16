@@ -44,3 +44,10 @@ Falls das Script nicht ausführbar ist:
 Beim Export werden geprüft:
 - konsistente Raumzeilenbreiten (`width`, `height`, `tiles`)
 - dass `world.lua` nur auf existierende Raumdateien verweist
+
+## Verwandte Dokus (Obsidian)
+- [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
+- [[docs/level-editor/README|LevelEditor Überblick]]
+- [[docs/simulator/SETUP|Simulator Setup]]
+- [[docs/quickstart/level-designer|Quick Start – Level Designer]]
+- [[docs/tooling/README|Tooling, Build und Skripte]]

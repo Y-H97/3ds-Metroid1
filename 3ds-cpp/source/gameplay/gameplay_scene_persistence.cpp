@@ -12,18 +12,21 @@ constexpr const char* SAVE_PATH_LEGACY = "sdmc:/3ds/3ds-cpp/savegame.dat";
 constexpr const char* VISITED_PATH_LEGACY = "sdmc:/3ds/3ds-cpp/visited.dat";
 
 int normalizeSlot(int slot) {
+    // Erlaubt nur gültige Save-Slots (1..SAVE_SLOT_COUNT).
     if (slot < 1) return 1;
     if (slot > GameplayScene::SAVE_SLOT_COUNT) return GameplayScene::SAVE_SLOT_COUNT;
     return slot;
 }
 
 std::string makeSavePath(int slot) {
+    // Dateiname für Slot-spezifischen Spielstand.
     char path[128];
     std::snprintf(path, sizeof(path), "sdmc:/3ds/3ds-cpp/savegame_slot%d.dat", normalizeSlot(slot));
     return path;
 }
 
 std::string makeVisitedPath(int slot) {
+    // Dateiname für Slot-spezifische besuchte Kartenzellen.
     char path[128];
     std::snprintf(path, sizeof(path), "sdmc:/3ds/3ds-cpp/visited_slot%d.dat", normalizeSlot(slot));
     return path;
@@ -36,6 +39,7 @@ std::string makeVisitedKey(int x, int y) {
 } // namespace
 
 void GameplayScene::setActiveSaveSlot(int slot) {
+    // Aktiven Slot robust setzen (inkl. Begrenzung).
     activeSaveSlot = normalizeSlot(slot);
 }
 
@@ -49,6 +53,7 @@ bool GameplayScene::hasPersistentSave(int slot) {
 }
 
 bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave) {
+    // Lädt Save-Daten; unterstützt neues und altes Dateiformat.
     PersistentSave loaded{};
 
     std::string savePath = makeSavePath(slot);
@@ -103,6 +108,7 @@ bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave
 }
 
 bool GameplayScene::writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
+    // Schreibt Checkpoint als persistenten Slot-Spielstand.
     if (!cp.valid || cp.level.empty()) return false;
 
     mkdir("sdmc:/3ds", 0777);
@@ -125,6 +131,7 @@ bool GameplayScene::writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
 }
 
 bool GameplayScene::loadVisitedFromDisk(int slot) {
+    // Lädt Fog-of-War-Zustand (besuchte Weltzellen).
     std::string visitedPath = makeVisitedPath(slot);
     FILE* f = fopen(visitedPath.c_str(), "rb");
     if (!f && normalizeSlot(slot) == 1) {
@@ -148,6 +155,7 @@ bool GameplayScene::loadVisitedFromDisk(int slot) {
 }
 
 bool GameplayScene::writeVisitedToDisk(int slot) const {
+    // Speichert alle besuchten Zellen zeilenweise als "x,y".
     mkdir("sdmc:/3ds", 0777);
     mkdir(SAVE_DIR, 0777);
 
@@ -163,6 +171,7 @@ bool GameplayScene::writeVisitedToDisk(int slot) const {
 }
 
 bool GameplayScene::resetVisitedProgress(int slot) {
+    // Löscht den Kartenfortschritt des Slots (Datei + RAM-Zustand).
     visitedCells.clear();
     std::string visitedPath = makeVisitedPath(slot);
     int rc = std::remove(visitedPath.c_str());
@@ -173,6 +182,7 @@ bool GameplayScene::resetVisitedProgress(int slot) {
 }
 
 bool GameplayScene::startNewGame(int slot) {
+    // Startet wirklich neu: Save löschen, Visited löschen, Initialmap laden.
     activeSaveSlot = normalizeSlot(slot);
     requestMenu = false;
     requestExit = false;
@@ -192,6 +202,7 @@ bool GameplayScene::startNewGame(int slot) {
 }
 
 bool GameplayScene::loadFromCheckpoint(int slot) {
+    // Lädt den letzten persistierten Stand eines Slots.
     activeSaveSlot = normalizeSlot(slot);
     persistentSave = {};
     if (!loadPersistentSaveFromDisk(activeSaveSlot)) return false;
