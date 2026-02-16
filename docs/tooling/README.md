@@ -40,6 +40,13 @@
 3. `simulator/run_simulator_window.bat`
 4. `3ds-cpp/build_local.bat` oder direkt `make` in `3ds-cpp`
 
+## Muss-Checkliste vor Abschluss
+- [ ] Antworten/Änderungstexte auf Deutsch
+- [ ] Neuer/geänderter Code ausführlich auf Deutsch kommentiert
+- [ ] Betroffene Doku angepasst
+- [ ] Obsidian-Querverweise ergänzt
+- [ ] Build/Test kurz validiert oder begründet ausgelassen
+
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/PROGRAMS|Programme und Startskripte]]

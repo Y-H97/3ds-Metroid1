@@ -43,6 +43,13 @@ Dieser Bereich dokumentiert die Desktop-Simulatoren im Root-Ordner `simulator/`.
 - `3ds-cpp/build/simulator/metroid_sim_window.exe`
 - `3ds-cpp/build/simulator/metroid_sim_console.exe`
 
+## Muss-Checkliste vor Abschluss
+- [ ] Antworten/Änderungstexte auf Deutsch
+- [ ] Neuer/geänderter Code ausführlich auf Deutsch kommentiert
+- [ ] Betroffene Doku angepasst
+- [ ] Obsidian-Querverweise ergänzt
+- [ ] Build/Test kurz validiert oder begründet ausgelassen
+
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/simulator/SETUP|Simulator Setup]]

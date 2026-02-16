@@ -43,6 +43,13 @@ Dieser Bereich dokumentiert den Lua/LÖVE-basierten Level-Editor in `LevelEditor
 - `run_editor.bat` enthält aktuell einen festen LÖVE-Pfad (`C:\Program Files\LOVE\love.exe`).
   Bei abweichender Installation muss dieser Pfad angepasst werden.
 
+## Muss-Checkliste vor Abschluss
+- [ ] Antworten/Änderungstexte auf Deutsch
+- [ ] Neuer/geänderter Code ausführlich auf Deutsch kommentiert
+- [ ] Betroffene Doku angepasst
+- [ ] Obsidian-Querverweise ergänzt
+- [ ] Build/Test kurz validiert oder begründet ausgelassen
+
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/level-editor/SETUP|LevelEditor Setup]]

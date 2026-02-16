@@ -15,6 +15,13 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - `3ds-cpp/source/menu/*`
 - `3ds-cpp/source/ui/*`
 
+## Muss-Checkliste vor Abschluss
+- [ ] Antworten/Änderungstexte auf Deutsch
+- [ ] Neuer/geänderter Code ausführlich auf Deutsch kommentiert
+- [ ] Betroffene Doku angepasst
+- [ ] Obsidian-Querverweise ergänzt
+- [ ] Build/Test kurz validiert oder begründet ausgelassen
+
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/game/ARCHITECTURE|Game-Architektur]]

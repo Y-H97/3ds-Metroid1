@@ -37,6 +37,19 @@ Diese Seite erklärt den Workspace so, dass auch Nicht-Programmierer verstehen, 
 - **„Was ändere ich, wenn nur UI anders aussehen soll?“**
   Meist in [3ds-cpp/source/menu/views](../../3ds-cpp/source/menu/views) oder [3ds-cpp/source/gameplay/render](../../3ds-cpp/source/gameplay/render).
 
+## 6) Entwickler‑Workflow & Regeln 🔧
+- pre-commit (lokal):
+  - Installation: `python -m pip install -r requirements-dev.txt` (oder `pip install pre-commit`).
+  - Aktivieren: `pre-commit install` → Hooks laufen vor jedem Commit.
+  - Voller Lauf: `pre-commit run --all-files`.
+- Automatische Prüfungen (CI):
+  - CI validiert `LevelEditor/export_maps.py` (Export/JSON) und prüft neue/geänderte Quelldateien auf deutsche Kommentare.
+  - PRs müssen die Checkliste im Template erfüllen und CI‑grün sein, bevor sie gemerged werden.
+- Kurzregel für Commits/PRs:
+  1. Neuer/geänderter Code: kurz und verständlich auf **Deutsch** kommentieren.
+  2. Dokumentation aktualisieren, wenn sich Verhalten/Öffentliche API ändert.
+  3. Level‑Änderungen: Editor → Export → Simulator testen.
+
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur-Übersicht]]

@@ -16,6 +16,13 @@
 - `EINSTEIGER_GUIDE.md` – einfache Modulübersicht, Datenfluss und typische Abläufe.
 - `ARCHITEKTUR_UEBERSICHT.md` – visuelle Gesamtarchitektur mit Diagramm.
 
+## Muss-Checkliste vor Abschluss
+- [ ] Antworten/Änderungstexte auf Deutsch
+- [ ] Neuer/geänderter Code ausführlich auf Deutsch kommentiert
+- [ ] Betroffene Doku angepasst
+- [ ] Obsidian-Querverweise ergänzt
+- [ ] Build/Test kurz validiert oder begründet ausgelassen
+
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/workspace/EINSTEIGER_GUIDE|Einsteiger-Guide]]

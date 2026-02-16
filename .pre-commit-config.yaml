@@ -1,0 +1,26 @@
+# Pre-commit Konfiguration für lokale Code‑Qualität und unsere Kommentarregel
+# Hinweise:
+# - Installiere mit: `pip install pre-commit` und `pre-commit install`
+# - Hooks laufen automatisch vor jedem Commit.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: check-german-comments
+        name: Prüfe deutsche Kommentare (projektregel)
+        entry: python scripts/check_german_comments.py
+        language: system
+        files: '.*\\.(c|cpp|h|hpp|lua|py)$'
+      - id: clang-format-check
+        name: clang-format (nur Prüfung)
+        entry: clang-format --dry-run --Werror
+        language: system
+        files: '.*\\.(c|cpp|h|hpp)$'
