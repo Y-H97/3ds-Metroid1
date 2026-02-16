@@ -115,9 +115,9 @@ REM Optional: eigenes Save-Verzeichnis setzen (sonst %LOCALAPPDATA%\MetroidDeskt
 REM set "METROID_SAVE_ROOT=%CPP_ROOT%\sim_saves"
 
 if "%~1"=="" (
-  "%OUT%"
+  start "" /wait "%OUT%"
 ) else (
-  "%OUT%" %*
+  start "" /wait "%OUT%" %*
 )
 set "SIM_EXIT=%ERRORLEVEL%"
 

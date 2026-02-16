@@ -16,8 +16,19 @@
               "icon": "lucide-git-fork",
               "title": "Graph-Ansicht"
             }
+          },
+          {
+            "id": "7cc656a1247bbb05",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph-Ansicht"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -179,20 +190,24 @@
       "bases:Neue Base erstellen": false
     }
   },
-  "active": "52d708d338bd07c2",
+  "active": "7cc656a1247bbb05",
   "lastOpenFiles": [
-    "scripts/check_german_comments.bat",
-    "CHANGELOG.md",
+    "LevelEditor/views/world_editor.lua",
+    "LevelEditor/views/room_editor.lua",
+    "LevelEditor/views/menu.lua",
+    "LevelEditor/views",
+    "scripts/fix_bat_assoc.reg",
+    "scripts/fix_bat_assoc.ps1",
+    "3ds-cpp/README.md",
     "changelog/v0.1.0.md",
     "changelog",
+    "CHANGELOG.md",
+    "scripts/check_german_comments.bat",
     "DesingDokumente/LUA_TO_CPP_GAP_ANALYSIS.md",
     "docs/workspace/EINSTEIGER_GUIDE.md",
     "scripts/check_docs_links.py",
     "simulator/window_main_win32.cpp",
     "simulator/run_simulator_window.bat",
-    "simulator/run_simulator_console.bat",
-    "simulator/main.cpp",
-    "simulator/compat/desktop_3ds_compat.h",
     "docs/workspace/README.md",
     "docs/workspace/ARCHITEKTUR_UEBERSICHT.md",
     "docs/tooling/README.md",
@@ -211,10 +226,6 @@
     "docs/game/README.md",
     "docs/PROGRAMS.md",
     "docs/GESAMTDOKU.md",
-    "LevelEditor/views.lua",
-    "LevelEditor/ui_components.lua",
-    "LevelEditor/state.lua",
-    "3ds-cpp/README.md",
     "docs/game/ARCHITECTURE.md",
     "docs/REFACTORING_ASSESSMENT.md"
   ]

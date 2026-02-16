@@ -8,5 +8,11 @@
     }
   },
   // Nützliche Einstellung: öffne Tasks im Workspace-Ordner (robuster bei UNC/Netzlaufwerken)
-  "terminal.integrated.cwd": "${workspaceFolder}"
+  "terminal.integrated.cwd": "${workspaceFolder}",
+
+  // Code Runner: wenn du ▶ in einer Lua‑Datei drückst, starte den Editor‑Wrapper (wartet auf Fenster‑Schließen)
+  "code-runner.runInTerminal": true,
+  "code-runner.executorMap": {
+    "lua": "cmd /c \"${workspaceFolder}\\LevelEditor\\run_editor.bat\""
+  }
 }

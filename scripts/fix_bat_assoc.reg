@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+; Repariert die Zuordnung für .bat-Dateien
+[HKEY_CLASSES_ROOT\.bat]
+@="batfile"
+
+[HKEY_CLASSES_ROOT\batfile\shell\open\command]
+@="\"%1\" %*"
