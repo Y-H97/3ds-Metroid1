@@ -181,13 +181,19 @@
   },
   "active": "52d708d338bd07c2",
   "lastOpenFiles": [
+    "scripts/check_german_comments.bat",
+    "CHANGELOG.md",
+    "changelog/v0.1.0.md",
+    "changelog",
+    "DesingDokumente/LUA_TO_CPP_GAP_ANALYSIS.md",
+    "docs/workspace/EINSTEIGER_GUIDE.md",
+    "scripts/check_docs_links.py",
     "simulator/window_main_win32.cpp",
     "simulator/run_simulator_window.bat",
     "simulator/run_simulator_console.bat",
     "simulator/main.cpp",
     "simulator/compat/desktop_3ds_compat.h",
     "docs/workspace/README.md",
-    "docs/workspace/EINSTEIGER_GUIDE.md",
     "docs/workspace/ARCHITEKTUR_UEBERSICHT.md",
     "docs/tooling/README.md",
     "docs/simulator/SETUP.md",
@@ -208,13 +214,8 @@
     "LevelEditor/views.lua",
     "LevelEditor/ui_components.lua",
     "LevelEditor/state.lua",
-    "LevelEditor/run_export_maps.bat",
-    "LevelEditor/map_exporter.lua",
-    "LevelEditor/io_utils.lua",
-    "DesingDokumente/LUA_TO_CPP_GAP_ANALYSIS.md",
     "3ds-cpp/README.md",
     "docs/game/ARCHITECTURE.md",
-    "docs/REFACTORING_ASSESSMENT.md",
-    "docs/README.md"
+    "docs/REFACTORING_ASSESSMENT.md"
   ]
 }
