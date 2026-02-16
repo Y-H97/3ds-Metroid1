@@ -44,6 +44,7 @@ Diese Seite erklärt den Workspace so, dass auch Nicht-Programmierer verstehen, 
   - Voller Lauf: `pre-commit run --all-files`.
 - Automatische Prüfungen (CI):
   - CI validiert `LevelEditor/export_maps.py` (Export/JSON) und prüft neue/geänderte Quelldateien auf deutsche Kommentare.
+  - CI prüft außerdem Obsidian‑Wiki‑Links und erkennt fehlende oder nicht verlinkte Doku‑Seiten (`docs/`).
   - PRs müssen die Checkliste im Template erfüllen und CI‑grün sein, bevor sie gemerged werden.
 - Kurzregel für Commits/PRs:
   1. Neuer/geänderter Code: kurz und verständlich auf **Deutsch** kommentieren.

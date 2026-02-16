@@ -1,0 +1,25 @@
+name: Docs — Obsidian‑Link‑Konsistenz
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+  pull_request:
+    paths:
+      - 'docs/**'
+
+jobs:
+  docs-check:
+    name: Prüfe Obsidian‑Wiki‑Links & Orphan‑Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Prüfe Wiki‑Links in Markdown (docs/)
+        run: |
+          python scripts/check_wiki_links.py

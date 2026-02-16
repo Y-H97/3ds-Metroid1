@@ -24,3 +24,8 @@ repos:
         entry: clang-format --dry-run --Werror
         language: system
         files: '.*\\.(c|cpp|h|hpp)$'
+      - id: check-wiki-links
+        name: Prüfe Obsidian‑Wiki‑Links (Docs‑Konsistenz)
+        entry: python scripts/check_wiki_links.py
+        language: system
+        files: '^docs/.*\\.md$'    
