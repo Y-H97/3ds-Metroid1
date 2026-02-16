@@ -1,11 +1,13 @@
 #include "main_menu_controller.h"
 
+#ifndef DESKTOP_SIMULATOR
 #include "../../ui/text_renderer.h"
-#include "../views/manual_content.h"
 #include "../views/main_menu_view.h"
+#endif
+#include "../views/manual_content.h"
 
 int MainMenuController::getManualMaxScroll() const {
-    return manualMaxScrollForViewport(manualSelection, 7);
+    return manualMaxScrollForViewport(manualSelection, 12);
 }
 
 void MainMenuController::reset() {
@@ -273,18 +275,50 @@ MainMenuAction MainMenuController::consumeAction() {
 }
 
 void MainMenuController::renderTop(TextRenderer& text) const {
+#ifndef DESKTOP_SIMULATOR
     int activeSelection = 0;
     if (state == MENU_HOME) activeSelection = homeSelection;
     else if (state == MENU_PLAY) activeSelection = playSelection;
     else if (state == MENU_MANUAL_LIST || state == MENU_MANUAL_PAGE) activeSelection = manualSelection;
     else activeSelection = optionsSelection;
     drawMainMenuTopView(text, static_cast<int>(state), activeSelection, selectedSaveSlot, hasContinue, debugEnabled, controlsSwapped, manualScroll);
+#else
+    (void)text;
+#endif
 }
 
 void MainMenuController::renderBottom(TextRenderer& text) const {
+#ifndef DESKTOP_SIMULATOR
     if (state == MENU_HOME) drawMainMenuHomeView(text, homeSelection);
     else if (state == MENU_PLAY) drawMainMenuPlayView(text, playSelection, selectedSaveSlot, hasContinue);
     else if (state == MENU_MANUAL_LIST) drawMainMenuManualListView(text, manualSelection);
     else if (state == MENU_MANUAL_PAGE) drawMainMenuManualPageControlsView(text, manualSelection, manualScroll, getManualMaxScroll());
     else drawMainMenuOptionsView(text, optionsSelection, debugEnabled, controlsSwapped);
+#else
+    (void)text;
+#endif
+}
+
+MainMenuState MainMenuController::getState() const {
+    return state;
+}
+
+int MainMenuController::getHomeSelection() const {
+    return homeSelection;
+}
+
+int MainMenuController::getPlaySelection() const {
+    return playSelection;
+}
+
+int MainMenuController::getOptionsSelection() const {
+    return optionsSelection;
+}
+
+int MainMenuController::getManualSelection() const {
+    return manualSelection;
+}
+
+int MainMenuController::getManualScroll() const {
+    return manualScroll;
 }

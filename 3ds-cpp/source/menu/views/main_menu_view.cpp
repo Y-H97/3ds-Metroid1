@@ -6,6 +6,13 @@
 
 #include "../../ui/text_renderer.h"
 
+namespace {
+constexpr int kManualTopVisibleLines = 12;
+constexpr float kManualTopStartY = 8.0f;
+constexpr float kManualTopLineStep = 18.0f;
+constexpr float kManualTopEmptyLineStep = 8.0f;
+}
+
 static void drawPanel(float x, float y, float w, float h, u32 bg) {
     C2D_DrawRectSolid(x, y, 0.0f, w, h, bg);
 }
@@ -34,13 +41,13 @@ static void drawTopManualTextOnly(TextRenderer& text, int activeSelection, int m
     if (topic >= manualTopicCount()) topic = manualTopicCount() - 1;
 
     int lineCount = manualLineCount(topic);
-    int maxScroll = manualMaxScrollForViewport(topic, 8);
+    int maxScroll = manualMaxScrollForViewport(topic, kManualTopVisibleLines);
     int scroll = useScroll ? manualScroll : 0;
     if (scroll < 0) scroll = 0;
     if (scroll > maxScroll) scroll = maxScroll;
 
-    float y = 24.0f;
-    for (int i = 0; i < 8; ++i) {
+    float y = kManualTopStartY;
+    for (int i = 0; i < kManualTopVisibleLines; ++i) {
         int idx = i + scroll;
         if (idx >= lineCount) break;
         const char* line = manualPageLine(topic, idx);
@@ -53,9 +60,9 @@ static void drawTopManualTextOnly(TextRenderer& text, int activeSelection, int m
                 textColor = C2D_Color32(140, 235, 150, 255);
             }
             text.draw(20.0f, y, 0.38f, textColor, "%s", line);
-            y += 24.0f;
+            y += kManualTopLineStep;
         } else {
-            y += 10.0f;
+            y += kManualTopEmptyLineStep;
         }
     }
 }
@@ -65,14 +72,14 @@ static void drawTopManualPage(TextRenderer& text, int activeSelection, int manua
     if (topic < 0) topic = 0;
     if (topic >= manualTopicCount()) topic = manualTopicCount() - 1;
     int lineCount = manualLineCount(topic);
-    int maxScroll = manualMaxScrollForViewport(topic, 7);
+    int maxScroll = manualMaxScrollForViewport(topic, kManualTopVisibleLines);
     int scroll = manualScroll;
     if (scroll < 0) scroll = 0;
     if (scroll > maxScroll) scroll = maxScroll;
 
     text.draw(176.0f, 72.0f, 0.36f, C2D_Color32(238, 242, 250, 255), "%s", manualTopicName(topic));
     float y = 94.0f;
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < kManualTopVisibleLines; ++i) {
         int idx = i + scroll;
         if (idx >= lineCount) break;
         text.draw(176.0f, y, 0.29f, C2D_Color32(208, 220, 244, 255), "%s", manualPageLine(topic, idx));

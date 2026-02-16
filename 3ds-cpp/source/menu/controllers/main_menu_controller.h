@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef DESKTOP_SIMULATOR
+#include "../../../simulator/compat/desktop_3ds_compat.h"
+#else
 #include <3ds.h>
+#endif
 
 class TextRenderer;
 
@@ -41,6 +45,13 @@ public:
 
     void renderTop(TextRenderer& text) const;
     void renderBottom(TextRenderer& text) const;
+
+    MainMenuState getState() const;
+    int getHomeSelection() const;
+    int getPlaySelection() const;
+    int getOptionsSelection() const;
+    int getManualSelection() const;
+    int getManualScroll() const;
 
 private:
     // Bestimmt die Scrollgrenze für die aktuelle Handbuchseite

@@ -147,14 +147,18 @@ bool GameplayScene::init() {
 
 void GameplayScene::shutdown() {
     if (!currentLevelName.empty()) {
-        Checkpoint currentSave{};
-        currentSave.valid = true;
-        currentSave.level = currentLevelName;
-        currentSave.gridX = gridX;
-        currentSave.gridY = gridY;
-        currentSave.x = core.getPlayer().x;
-        currentSave.y = core.getPlayer().y;
-        writePersistentSaveToDisk(currentSave, activeSaveSlot);
+        Checkpoint saveToPersist{};
+        if (checkpoint.valid && !checkpoint.level.empty()) {
+            saveToPersist = checkpoint;
+        } else {
+            saveToPersist.valid = true;
+            saveToPersist.level = currentLevelName;
+            saveToPersist.gridX = gridX;
+            saveToPersist.gridY = gridY;
+            saveToPersist.x = core.getPlayer().x;
+            saveToPersist.y = core.getPlayer().y;
+        }
+        writePersistentSaveToDisk(saveToPersist, activeSaveSlot);
         writeVisitedToDisk(activeSaveSlot);
     }
     renderer.shutdown();
