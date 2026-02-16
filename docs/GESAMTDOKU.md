@@ -36,8 +36,7 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/tooling/README|Tooling, Build und Skripte]] – alle Build-/Run- und Export-Pfade.
 - [[docs/PROGRAMS|Programme und Startskripte]] – ausführbare Programme und typische Workflows.
 - [[docs/REFACTORING_ASSESSMENT|Refactoring-Bewertung]] – Architekturstand und nächste Refactor-Schritte.
-- [[docs/AI_REGELN|AI-Regeln]] – Projektregeln für Sprache, Doku-Fortführung und Linkstandard.
-
+- [[docs/AI_REGELN|AI-Regeln]] – Projektregeln für Sprache, Doku-Fortführung und Linkstandard.- [CHANGELOG](../CHANGELOG.md) – Übersicht über Versions‑Änderungen (verlinkt zu `changelog/`).
 ### Rollenbasierte Quickstarts
 - [[docs/quickstart/README|Quickstart Überblick]] – Einstieg nach Rolle.
 - [[docs/quickstart/developer|Quick Start – Entwickler]] – Code ändern, testen, builden.
