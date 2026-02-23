@@ -63,7 +63,13 @@ function M.drawNewMapMenu()
     UI.drawButton("+", 190, customY + 30, 30, 30)
 
     UI.drawButton("Erstellen ("..State.customMapW.."x"..State.customMapH..")", 250, customY + 25, 200, 40)
-    UI.drawButton("Zurück", 50, customY + 100, 200, 50, nil)
+
+    -- Zurück oben rechts statt in der Mitte
+    local sw, sh = love.graphics.getDimensions()
+    local backW, backH = 200, 50
+    if UI.drawButton("Zurück", sw - backW - 10, 10, backW, backH, nil) then
+        State.currentState = Constants.STATE.MENU
+    end
 end
 
 return M

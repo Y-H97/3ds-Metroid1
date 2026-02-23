@@ -229,59 +229,59 @@ function handleRoomEditorInput()
                             local dist = math.sqrt(dx*dx + dy*dy)
                             if dist > (r + 0.0001) then useTile = false end
                         end
-                        if not useTile then goto continue_tile end
 
-                        -- Falloff (probabilistic) oder harte Auswahl
-                        local applyThis = true
-                        if State.brushFalloff then
-                            local dx = px - tx
-                            local dy = py - ty
-                            local dist = math.sqrt(dx*dx + dy*dy)
-                            local dnorm = dist / (math.max(1, r))
-                            if dnorm > 1 then applyThis = false end
+                        if useTile then
+                            -- Falloff (probabilistic) oder harte Auswahl
+                            local applyThis = true
+                            if State.brushFalloff then
+                                local dx = px - tx
+                                local dy = py - ty
+                                local dist = math.sqrt(dx*dx + dy*dy)
+                                local dnorm = dist / (math.max(1, r))
+                                if dnorm > 1 then applyThis = false end
+                                if applyThis then
+                                    local strength = math.pow(math.max(0, 1 - dnorm), (State.brushFalloffExp or 1.0))
+                                    applyThis = (math.random() < strength)
+                                end
+                            end
+
                             if applyThis then
-                                local strength = math.pow(math.max(0, 1 - dnorm), (State.brushFalloffExp or 1.0))
-                                applyThis = (math.random() < strength)
-                            end
-                        end
-
-                        if not applyThis then goto continue_tile end
-
-                        if love.mouse.isDown(1) then
-                            local before = State.currentRoom[py][px]
-                            local after = State.currentTileType
-                            if before ~= after then
-                                if State.strokeActive then
-                                    local found = false
-                                    for _, e in ipairs(State.strokeBuffer) do
-                                        if e.x == px and e.y == py then e.after = after; found = true; break end
+                                if love.mouse.isDown(1) then
+                                    local before = State.currentRoom[py][px]
+                                    local after = State.currentTileType
+                                    if before ~= after then
+                                        if State.strokeActive then
+                                            local found = false
+                                            for _, e in ipairs(State.strokeBuffer) do
+                                                if e.x == px and e.y == py then e.after = after; found = true; break end
+                                            end
+                                            if not found then table.insert(State.strokeBuffer, {x = px, y = py, before = before, after = after}) end
+                                        else
+                                            Actions.recordTileChange(px, py, before, after)
+                                        end
+                                        State.currentRoom[py][px] = after
                                     end
-                                    if not found then table.insert(State.strokeBuffer, {x = px, y = py, before = before, after = after}) end
-                                else
-                                    Actions.recordTileChange(px, py, before, after)
                                 end
-                                State.currentRoom[py][px] = after
-                            end
-                        end
 
-                        if love.mouse.isDown(2) then
-                            local before = State.currentRoom[py][px]
-                            local after = 0
-                            if before ~= after then
-                                if State.strokeActive then
-                                    local found = false
-                                    for _, e in ipairs(State.strokeBuffer) do
-                                        if e.x == px and e.y == py then e.after = after; found = true; break end
+                                if love.mouse.isDown(2) then
+                                    local before = State.currentRoom[py][px]
+                                    local after = 0
+                                    if before ~= after then
+                                        if State.strokeActive then
+                                            local found = false
+                                            for _, e in ipairs(State.strokeBuffer) do
+                                                if e.x == px and e.y == py then e.after = after; found = true; break end
+                                            end
+                                            if not found then table.insert(State.strokeBuffer, {x = px, y = py, before = before, after = after}) end
+                                        else
+                                            Actions.recordTileChange(px, py, before, after)
+                                        end
+                                        State.currentRoom[py][px] = after
                                     end
-                                    if not found then table.insert(State.strokeBuffer, {x = px, y = py, before = before, after = after}) end
-                                else
-                                    Actions.recordTileChange(px, py, before, after)
                                 end
-                                State.currentRoom[py][px] = after
                             end
                         end
                     end
-                    ::continue_tile::
                 end
             end
         end

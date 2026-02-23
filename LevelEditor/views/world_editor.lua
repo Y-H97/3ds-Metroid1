@@ -1,4 +1,5 @@
 local State = require "state"
+local Constants = require "constants"
 local UI = require "ui_components"
 local Actions = require "editor_actions"
 
@@ -6,18 +7,24 @@ local M = {}
 
 function M.drawWorldEditor()
     local sw, sh = love.graphics.getDimensions()
-    -- Toolbar
-    if UI.drawButton("💾", 10, 10, 34, 28) then
+    -- Toolbar (ASCII labels replace emojis for better font compatibility)
+    -- Back button oben rechts neben die Toolbar-Icons
+    local backW, backH = 100, 28
+    if UI.drawButton("Zurück", sw - backW - 10, 10, backW, backH) then
+        State.currentState = Constants.STATE.MENU
+    end
+
+    if UI.drawButton("S", 52, 10, 34, 28) then
         Actions.saveWorld()
     end
-    if UI.drawButton("📂", 52, 10, 34, 28) then
+    if UI.drawButton("L", 94, 10, 34, 28) then
         Actions.loadWorld()
     end
-    if UI.drawButton("🔄", 94, 10, 34, 28) then
+    if UI.drawButton("R", 136, 10, 34, 28) then
         Actions.refreshWorldFileList()
         Actions.setMessage("Liste aktualisiert!", 1.5)
     end
-    if UI.drawButton("?", 136, 10, 28, 28) then
+    if UI.drawButton("?", 178, 10, 28, 28) then
         State.showHelp = not State.showHelp
     end
 

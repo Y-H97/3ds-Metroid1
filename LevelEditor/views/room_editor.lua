@@ -38,19 +38,30 @@ function M.drawRoomEditor()
     local uiW = 200
     local sw, sh = love.graphics.getDimensions()
 
+    -- Sidebar Hintergrund
+    love.graphics.setColor(0.15, 0.15, 0.15)
+    love.graphics.rectangle("fill", 0, 0, uiW, sh)
+
+    -- Zurück-Button oben rechts statt links
+    local backW, backH = 100, 28
+    if UI.drawButton("Zurück", sw - backW - 10, 10, backW, backH) then
+        State.currentState = Constants.STATE.MENU
+    end
+
     -- Header / Toolbar
     love.graphics.setColor(1, 1, 1)
     -- Toolbar (Icons) bleibt oben, Header wird unterhalb gezeichnet und bei Bedarf gekürzt
-    if UI.drawButton("💾", rightPanelX + 10, 10, 34, 28) then
+    -- Glyphs replaced with simple ASCII letters for compatibility
+    if UI.drawButton("S", rightPanelX + 10, 10, 34, 28) then
         State.showSaveModal = true
         State.saveModalFilename = State.currentFilename or "level"
     end
-    if UI.drawButton("↶", rightPanelX + 50, 10, 34, 28) then Actions.undo() end
-    if UI.drawButton("↷", rightPanelX + 90, 10, 34, 28) then Actions.redo() end
-    if UI.drawButton("📂", rightPanelX + 130, 10, 34, 28) then Actions.refreshWorldFileList(); State.showLoadModal = true end
-    if UI.drawButton("📜", rightPanelX + 170, 10, 34, 28) then State.showHistoryModal = true; State.historySelected = #State.undoStack end
-    if UI.drawButton("＋", rightPanelX + 210, 10, 28, 28) then State.zoom = math.min(3, State.zoom + 0.1) end
-    if UI.drawButton("－", rightPanelX + 248, 10, 28, 28) then State.zoom = math.max(0.25, State.zoom - 0.1) end
+    if UI.drawButton("U", rightPanelX + 50, 10, 34, 28) then Actions.undo() end
+    if UI.drawButton("R", rightPanelX + 90, 10, 34, 28) then Actions.redo() end
+    if UI.drawButton("L", rightPanelX + 130, 10, 34, 28) then Actions.refreshWorldFileList(); State.showLoadModal = true end
+    if UI.drawButton("H", rightPanelX + 170, 10, 34, 28) then State.showHistoryModal = true; State.historySelected = #State.undoStack end
+    if UI.drawButton("+", rightPanelX + 210, 10, 28, 28) then State.zoom = math.min(3, State.zoom + 0.1) end
+    if UI.drawButton("-", rightPanelX + 248, 10, 28, 28) then State.zoom = math.max(0.25, State.zoom - 0.1) end
     if UI.drawButton("?", rightPanelX + 286, 10, 28, 28) then State.showHelp = not State.showHelp end
 
     -- Kleine Labels unter den Icons
