@@ -407,28 +407,61 @@ function love.mousepressed(x, y, button)
             return
         end
 
-        -- Klick in die Tile-Liste (außerhalb Suchfeld) => Auswahl
+        -- Klick in die Block-/Item-Liste (außerhalb Suchfeld) => Auswahl
         if button == 1 and x < UI_WIDTH and y > 100 then
             State.tileSearchFocus = false
             local displayed = {}
             local filter = (State.tileSearch or ""):lower()
-            for i, block in ipairs(Constants.BLOCK_TYPES) do
-                if filter == "" or (block.name and block.name:lower():find(filter, 1, true)) then
-                    table.insert(displayed, block)
+            local list = (State.currentTool == "item") and Constants.ITEM_TYPES or Constants.BLOCK_TYPES
+            for i, entry in ipairs(list) do
+                local name = entry.name or ""
+                if filter == "" or name:lower():find(filter, 1, true) then
+                    table.insert(displayed, entry)
                 end
             end
 
             local relativeY = y - 105 + State.listScroll
             local idx = math.floor(relativeY / 40) + 1
             if displayed[idx] then
-                State.currentTileType = displayed[idx].id
+                if State.currentTool == "item" then
+                    -- ITEM_TYPES stores by index in table
+                    -- need to find matching index in original table
+                    for i, entry in ipairs(Constants.ITEM_TYPES) do
+                        if entry.id == displayed[idx].id then
+                            State.currentItemType = i
+                            break
+                        end
+                    end
+                else
+                    State.currentTileType = displayed[idx].id
+                end
             end
         end
 
-        -- Start einer Mal-Aktion (Stroke) wenn in der Map geklickt wurde
+        -- Start einer Mal-Aktion (Stroke) oder Item-Setzen, abhängig vom Tool
         if (button == 1 or button == 2) and x >= PANEL_X and y >= 80 then
-            State.strokeActive = true
-            State.strokeBuffer = {}
+            if State.currentTool == "item" then
+                -- Kachelkoordinaten berechnen
+                local localX = (x - PANEL_X) / State.zoom + State.camX - 50
+                local localY = (y - 80) / State.zoom + State.camY - 50
+                local tx = math.floor(localX / Constants.TILE_SIZE) + 1
+                local ty = math.floor(localY / Constants.TILE_SIZE) + 1
+                -- bestehendes Item an derselben Stelle löschen
+                local removed = false
+                for idx, it in ipairs(State.currentRoomItems) do
+                    if it.x == tx and it.y == ty then
+                        table.remove(State.currentRoomItems, idx)
+                        removed = true
+                        break
+                    end
+                end
+                if not removed and button == 1 then
+                    table.insert(State.currentRoomItems, {x = tx, y = ty, type = Constants.ITEM_TYPES[State.currentItemType].id})
+                end
+            else
+                State.strokeActive = true
+                State.strokeBuffer = {}
+            end
         end
 
     elseif State.currentState == Constants.STATE.WORLD_EDIT then
@@ -556,26 +589,52 @@ function love.keypressed(key)
     end
 
     if State.currentState == Constants.STATE.ROOM_EDIT then
+        -- Werkzeug wechseln (Tiles vs Items)
+        if key == "i" then
+            if State.currentTool == "tile" then
+                State.currentTool = "item"
+                Actions.setMessage("Tool: Item platzieren", 1.5)
+            else
+                State.currentTool = "tile"
+                Actions.setMessage("Tool: Tiles malen", 1.5)
+            end
+            return
+        end
         if key == "1" then State.currentTileType = 1 end
         if key == "2" then State.currentTileType = 2 end
         if key == "3" then State.currentTileType = 3 end
 
-        -- Tile-Liste: Tastatur-Navigation (Up/Down) — respektiert aktiven Filter
+        -- Liste (Tiles oder Items) als Tastatur-Navigation (Up/Down) — respektiert aktiven Filter
         if key == "up" or key == "down" or key == "pageup" or key == "pagedown" or key == "home" or key == "end" then
             local displayed = {}
             local filter = (State.tileSearch or ""):lower()
-            for i, b in ipairs(Constants.BLOCK_TYPES) do
-                if filter == "" or (b.name and b.name:lower():find(filter, 1, true)) then
-                    table.insert(displayed, b)
+            local list = (State.currentTool == "item") and Constants.ITEM_TYPES or Constants.BLOCK_TYPES
+            for i, entry in ipairs(list) do
+                local name = entry.name or ""
+                if filter == "" or name:lower():find(filter, 1, true) then
+                    table.insert(displayed, entry)
                 end
             end
             if #displayed > 0 then
                 -- Navigation (Up/Down) oder Scroll (Page/Home/End)
                 if key == "up" or key == "down" then
                     local curIdx = 1
-                    for i, b in ipairs(displayed) do if b.id == State.currentTileType then curIdx = i; break end end
+                    if State.currentTool == "item" then
+                        for i, e in ipairs(displayed) do if e.id == Constants.ITEM_TYPES[State.currentItemType].id then curIdx = i; break end end
+                    else
+                        for i, e in ipairs(displayed) do if e.id == State.currentTileType then curIdx = i; break end end
+                    end
                     if key == "up" then curIdx = math.max(1, curIdx - 1) else curIdx = math.min(#displayed, curIdx + 1) end
-                    State.currentTileType = displayed[curIdx].id
+                    if State.currentTool == "item" then
+                        for i, e in ipairs(Constants.ITEM_TYPES) do
+                            if e.id == displayed[curIdx].id then
+                                State.currentItemType = i
+                                break
+                            end
+                        end
+                    else
+                        State.currentTileType = displayed[curIdx].id
+                    end
                     State.listScroll = math.max(0, (curIdx - 4) * 40)
                 else
                     local sh = love.graphics.getHeight()

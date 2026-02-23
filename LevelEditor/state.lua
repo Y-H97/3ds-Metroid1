@@ -52,6 +52,8 @@ local State = {
     -- Werkzeug-Einstellungen
     currentTool = "tile",
     currentTileType = 1, -- ID des aktuell gewählten Tiles
+    currentItemType = 1, -- Index in Constants.ITEM_TYPES, wenn tool == "item"
+    currentRoomItems = {}, -- Liste von {x=...,y=...,type="..."}
 
     -- Pinsel / Brush
     brushRadius = 0,          -- 0 = 1x1, 1 = 3x3, 2 = 5x5

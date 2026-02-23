@@ -62,8 +62,28 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
         }
     }
 
-    // Tab-spezifische Eingabe: Settings/Debug haben Sonderlogik.
-    if (bottomMode == TAB_SETTINGS) {
+    // Tab-spezifische Eingabe: Inventory, Settings und Debug haben Sonderlogik.
+    if (bottomMode == TAB_INVENTORY) {
+        // einfache Liste basierend auf gesammelten Items
+        int count = 0;
+        if (collectedItems & ITEM_DOUBLE_JUMP) count++;
+        if (count > 0) {
+            if (kDown & bottomUp) inventorySelection = std::max(0, inventorySelection - 1);
+            if (kDown & bottomDown) inventorySelection = std::min(count - 1, inventorySelection + 1);
+            if (kDown & KEY_Y) {
+                // Toggle ON/OFF
+                if (inventorySelection == 0 && (collectedItems & ITEM_DOUBLE_JUMP)) {
+                    if (activeItems & ITEM_DOUBLE_JUMP) {
+                        activeItems &= ~ITEM_DOUBLE_JUMP;
+                        core.getPlayer().hasDoubleJump = false;
+                    } else {
+                        activeItems |= ITEM_DOUBLE_JUMP;
+                        grantDoubleJump();
+                    }
+                }
+            }
+        }
+    } else if (bottomMode == TAB_SETTINGS) {
         if (kDown & bottomUp) settingsSelection = (settingsSelection + 1) % 2;
         if (kDown & bottomDown) settingsSelection = (settingsSelection + 1) % 2;
         if (kDown & KEY_Y) {

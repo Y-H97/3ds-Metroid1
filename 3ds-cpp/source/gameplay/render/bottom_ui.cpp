@@ -10,6 +10,9 @@ void renderGameplayBottomUI(
     const WorldMap& world,
     const std::unordered_set<std::string>& visitedCells,
     const GameCore& core,
+    uint32_t collectedItems,
+    uint32_t activeItems,
+    int inventorySelection,
     int bottomMode,
     int settingsSelection,
     bool showFpsEnabled,
@@ -41,7 +44,7 @@ void renderGameplayBottomUI(
     if (bottomMode == 0) {
         drawBottomMapTab(text, world, visitedCells, currentGridX, currentGridY);
     } else if (bottomMode == 1) {
-        drawBottomInventoryTab(text);
+        drawBottomInventoryTab(text, collectedItems, activeItems, inventorySelection);
     } else if (bottomMode == 2) {
         drawBottomSettingsTab(text, settingsSelection, showFpsEnabled);
     } else {

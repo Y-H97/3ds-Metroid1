@@ -101,7 +101,8 @@ function M.drawRoomEditor()
     love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle("line", 0, 0, uiW, sh)
 
-        love.graphics.print("Tiles:", 10, 45)
+        local toolLabel = (State.currentTool == "item") and "Items:" or "Tiles:"
+    love.graphics.print(toolLabel, 10, 45)
 
     -- Suchfeld für Tile-Liste
     local searchX, searchY, searchW, searchH = 10, 70, uiW - 20, 24
@@ -143,8 +144,10 @@ function M.drawRoomEditor()
         local displayed = {}
         local filter = (State.tileSearch or ""):lower()
 
-        for i, block in ipairs(Constants.BLOCK_TYPES) do
-            if filter == "" or (block.name and block.name:lower():find(filter, 1, true)) then
+        local list = (State.currentTool == "item") and Constants.ITEM_TYPES or Constants.BLOCK_TYPES
+        for i, block in ipairs(list) do
+            local name = block.name or ""
+            if filter == "" or name:lower():find(filter, 1, true) then
                 table.insert(displayed, block)
             end
         end
@@ -152,8 +155,9 @@ function M.drawRoomEditor()
         for i, block in ipairs(displayed) do
             local y = startY + (i-1) * 40
 
-            -- Ausgewählt Highlight
-            if State.currentTileType == block.id then
+            -- Ausgewählt Highlight (abhängig vom aktuellen Tool)
+            local selId = State.currentTool == "item" and Constants.ITEM_TYPES[State.currentItemType].id or State.currentTileType
+            if selId == block.id then
                 love.graphics.setColor(0.4, 0.4, 0.4)
                 love.graphics.rectangle("fill", 5, y-5, uiW-10, 35)
                 love.graphics.setColor(1, 1, 0)
@@ -271,6 +275,14 @@ function M.drawRoomEditor()
                 end
             end
         end
+    end
+
+    -- Items rendern (blaue Platzhalter)
+    love.graphics.setColor(0,0,1)
+    for _, it in ipairs(State.currentRoomItems) do
+        local drawX = mapOffsetX + (it.x-1) * Constants.TILE_SIZE
+        local drawY = mapOffsetY + (it.y-1) * Constants.TILE_SIZE
+        love.graphics.rectangle("fill", drawX, drawY, Constants.TILE_SIZE, Constants.TILE_SIZE)
     end
 
     love.graphics.setColor(1,1,1)

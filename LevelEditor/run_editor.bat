@@ -28,3 +28,4 @@ if %errorlevel% neq 0 (
     echo LÖVE wurde beendet (Fehlercode: %errorlevel%)
     pause
 )
+?

@@ -53,6 +53,20 @@ Constants.BLOCK_TYPES = {
     {id=21, name="HG Ziegel D.", color={0.35, 0.15, 0.1}},
 }
 
+-- Item-Typen, die im Raum platziert werden können. Als Platzhalterfarbe wird Blau
+-- verwendet. Einträge hier korrespondieren später mit den exportierten Item-Objekten.
+Constants.ITEM_TYPES = {
+    {id="double_jump", name="Doppelsprung", color={0.0, 0.0, 1.0}},
+}
+
+-- Spezieller Tile für Editorsicht; beim Export wird er automatisch zu einem
+-- Item des entsprechenden Typs umgewandelt und aus der Tilemap entfernt.
+-- Dieser Block dient nur als visueller Platzhalter im Editor.
+Constants.PLACEHOLDER_TILES = {
+    double_jump = 99,
+}
+
+
 -- Vorlagen für Kartengrößen (in Bildschirmen/Screens)
 Constants.MAP_TEMPLATES = {
     {name = "1x1 (Standard)", w=1, h=1},

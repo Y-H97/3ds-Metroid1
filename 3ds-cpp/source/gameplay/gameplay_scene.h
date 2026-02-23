@@ -47,6 +47,13 @@ public:
     // Setzt nur den Kartenfortschritt eines Slots zurück.
     bool resetVisitedProgress(int slot);
 
+    // Frage oder verändere den Zustand spezieller Upgrades/Items
+    // (aktuell nur Doppelsprung). Diese Methoden fassen Operationen zusammen,
+    // welche von externen Modulen wie item-spezifischen Klassen aufgerufen
+    // werden können.
+    void grantDoubleJump();
+    bool playerHasDoubleJump() const;
+
     void renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled);
     void renderBottom(C3D_RenderTarget* bottom, TextRenderer& text, bool debugInfoEnabled);
 
@@ -72,6 +79,9 @@ private:
         int gridY = 0;
         float x = 0.0f;
         float y = 0.0f;
+        // Gesammelte und aktivierte Items (Bitmasken).
+        uint32_t collectedItems = 0;
+        uint32_t activeItems = 0;
     };
 
     enum BottomTab {
@@ -98,6 +108,22 @@ private:
     int gridY = 0;
     int currentGridX = 0;
     int currentGridY = 0;
+
+    // Items, die sich in der aktuell geladenen Karte befinden.
+    struct MapItem {
+        std::string type;
+        float x = 0.0f;
+        float y = 0.0f;
+        bool collected = false;
+    };
+    std::vector<MapItem> mapItems;
+
+    // Runtime-Zustand für Items
+    uint32_t collectedItems = 0; // welche Items wurden eingesammelt
+    uint32_t activeItems = 0;    // welche Items sind aktuell aktiviert (ON/OFF)
+    int inventorySelection = 0;  // Index des ausgewählten Eintrags im Inventar
+    std::string pickupMessage;   // Text, der angezeigt werden soll sobald ein Item eingesammelt wird
+    float pickupMessageTimer = 0.0f; // verbleibende Zeit für die Anzeige
 
     int bottomMode = TAB_MAP;
     int settingsSelection = 0;

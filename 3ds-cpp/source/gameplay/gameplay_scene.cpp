@@ -4,6 +4,10 @@
 #include <cmath>
 #include <cstdio>
 
+// Item-spezifische Logik an zentraler Stelle einbinden
+#include "items/double_jump/double_jump.h"
+
+
 #include "../ui/text_renderer.h"
 #include "render/bottom_ui.h"
 
@@ -49,6 +53,27 @@ static void computeCamera(const Player& p, const TileMap& map, float tileSize, f
 
 static std::string pickFirstLevelFromWorld(const char* path) {
     // Fallback-Helfer: nimmt den ersten "level"-Eintrag aus world.json.
+}
+
+// Helper: erneuert die MapItem-Liste basierend auf der gerade geladenen TileMap
+void GameplayScene::refreshMapItems() {
+    mapItems.clear();
+    const TileMap& map = core.getMap();
+    const float tileSize = 16.0f;
+    for (const auto& d : map.items) {
+        // bereits eingesammelte Exemplare überspringen
+        if (d.type == items::double_jump::id() && (collectedItems & ITEM_DOUBLE_JUMP)) {
+            continue;
+        }
+        MapItem mi;
+        mi.type = d.type;
+        mi.x = d.x * tileSize;
+        mi.y = d.y * tileSize;
+        mi.collected = false;
+        mapItems.push_back(mi);
+    }
+}
+
     FILE* f = fopen(path, "r");
     if (!f) return {};
     std::string s;
@@ -119,6 +144,8 @@ bool GameplayScene::loadInitialMap() {
     if (!core.setPlayerStartToFirstEmpty(16.0f)) {
         core.setPlayerStart(40.0f, 40.0f);
     }
+    // Neue Karte geladen – Itemliste auffrischen
+    refreshMapItems();
 
     checkpoint.valid = true;
     checkpoint.level = levelName;
@@ -172,6 +199,17 @@ void GameplayScene::shutdown() {
     renderer.shutdown();
 }
 
+
+
+void GameplayScene::grantDoubleJump() {
+    // Setzt ein Flag im Python-Spieler, das im GameCore-Update genutzt werden kann.
+    core.getPlayer().hasDoubleJump = true;
+}
+
+bool GameplayScene::playerHasDoubleJump() const {
+    return core.getPlayer().hasDoubleJump;
+}
+
 void GameplayScene::update(float dt) {
     // Haupt-Update: Eingabe anwenden, Raumwechsel prüfen, Tod/Respawn, FPS zählen.
     InputState input;
@@ -193,6 +231,22 @@ void GameplayScene::update(float dt) {
     playerTileX = static_cast<int>(std::floor(currentPlayer.x / 16.0f));
     playerTileY = static_cast<int>(std::floor(currentPlayer.y / 16.0f));
     playerTileId = core.getMap().getTile(playerTileX, playerTileY);
+
+    // Prüfe Kollision mit nicht eingesammelten Items
+    const Player& p = core.getPlayer();
+    const float itemSize = 16.0f;
+    for (auto& it : mapItems) {
+        if (it.collected) continue;
+        if (p.x < it.x + itemSize && p.x + p.w > it.x && p.y < it.y + itemSize && p.y + p.h > it.y) {
+            it.collected = true;
+            // Effekt anwenden und Flag setzen
+            if (it.type == items::double_jump::id()) {
+                collectedItems |= ITEM_DOUBLE_JUMP;
+                activeItems |= ITEM_DOUBLE_JUMP;
+                items::double_jump::onCollect(*this);
+            }
+        }
+    }
 
     // Prüfen, ob der Spieler einen Übergangstrigger berührt.
     const auto& transitions = core.getMap().getTransitions();
@@ -236,8 +290,8 @@ void GameplayScene::update(float dt) {
                 if (core.loadMapJson(levelPath.c_str())) {
                     gridX = nextCell->originX;
                     gridY = nextCell->originY;
-                    currentLevelName = nextCell->level;
-
+                    currentLevelName = nextCell->level;                    // Karte gewechselt, Items aktualisieren
+                    refreshMapItems();
                     float offset = 24.0f;
                     float localTargetX = 0.0f;
                     float localTargetY = 0.0f;
@@ -301,6 +355,12 @@ void GameplayScene::update(float dt) {
         fpsFrameCounter = 0;
         fpsTimerMs = nowMs;
     }
+
+    // Pickup-Nachricht zeitlich abklingen lassen
+    if (pickupMessageTimer > 0.0f) {
+        pickupMessageTimer -= dt;
+        if (pickupMessageTimer < 0.0f) pickupMessageTimer = 0.0f;
+    }
 }
 
 void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled) {
@@ -322,6 +382,10 @@ void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool de
     if (showFpsEnabled) {
         text.draw(6.0f, 6.0f, 0.36f, C2D_Color32(120, 255, 140, 255), "FPS: %d", fpsValue);
     }
+    // Falls eine Item-Meldung aktiv ist, zeige sie zentral oben an
+    if (pickupMessageTimer > 0.0f && !pickupMessage.empty()) {
+        text.draw(200.0f, 20.0f, 0.52f, C2D_Color32(240, 220, 120, 255), "%s", pickupMessage.c_str());
+    }
     if (debugInfoEnabled) {
         const Player& p = core.getPlayer();
         text.draw(6.0f, 22.0f, 0.30f, C2D_Color32(180, 210, 255, 255), "Lvl:%s Grid:%d,%d O:%d,%d", currentLevelName.c_str(), currentGridX, currentGridY, gridX, gridY);
@@ -339,6 +403,9 @@ void GameplayScene::renderBottom(C3D_RenderTarget* bottom, TextRenderer& text, b
         world,
         visitedCells,
         core,
+        collectedItems,
+        activeItems,
+        inventorySelection,
         bottomMode,
         settingsSelection,
         showFpsEnabled,

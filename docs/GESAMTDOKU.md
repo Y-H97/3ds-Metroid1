@@ -22,6 +22,7 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/game/ARCHITECTURE|Game-Architektur]] – Modulaufbau und Verantwortlichkeiten.
 - [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]] – Main-Loop, Zustände, Renderpfad.
 - [[docs/game/SAVE_AND_SETTINGS|Save & Settings]] – Slots, Checkpoints, Fog‑of‑War, Einstellungen.
+- [[docs/game/ITEMS|Item-System]] – Beschreibung der neuen Items und Inventar.
 - [[docs/game/SETUP|Game Setup]] – Build‑Voraussetzungen und Build‑Abläufe.
 
 ### Simulator

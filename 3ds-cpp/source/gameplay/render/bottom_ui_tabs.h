@@ -17,8 +17,12 @@ void drawBottomMapTab(
     int currentGridY
 );
 
-// Tab 1: Platzhalter für Inventar.
-void drawBottomInventoryTab(TextRenderer& text);
+// Tab 1: Inventaranzeige mit gesammelten Items und aktiven Flags.
+void drawBottomInventoryTab(TextRenderer& text,
+    uint32_t collectedItems,
+    uint32_t activeItems,
+    int selectionIndex
+);
 
 // Tab 2: Laufzeit-Einstellungen (z. B. FPS-Anzeige).
 void drawBottomSettingsTab(

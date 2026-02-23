@@ -118,6 +118,32 @@ local function exportRoom(levelPath, outPath, levelName)
         tiles = tiles,
     }
 
+    -- Items aus Editor-Daten übernehmen
+    if data.items and type(data.items) == "table" and #data.items > 0 then
+        payload.items = {}
+        for _, it in ipairs(data.items) do
+            table.insert(payload.items, { x = it.x, y = it.y, type = it.type })
+        end
+    end
+
+    -- Zusatz: bestimmte Spezial-Tiles automatisch in Items übersetzen.
+    -- Colors/IDs orientieren sich an Constants.PLACEHOLDER_TILES.
+    -- zugrunde liegende tiles[] werden auf 0 gesetzt (Luft).
+    local placeholderId = Constants.PLACEHOLDER_TILES and Constants.PLACEHOLDER_TILES.double_jump
+    if placeholderId then
+        for y = 1, height do
+            for x = 1, width do
+                local idx = (y-1) * width + x
+                if payload.tiles[idx] == placeholderId then
+                    -- Item record hinzufügen
+                    payload.items = payload.items or {}
+                    table.insert(payload.items, { x = x, y = y, type = "double_jump" })
+                    payload.tiles[idx] = 0
+                end
+            end
+        end
+    end
+
     local ok, writeErr = writeText(outPath, jsonEncode(payload))
     if not ok then return false, "Write failed: " .. tostring(writeErr) end
     return true

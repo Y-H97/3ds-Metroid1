@@ -21,6 +21,11 @@ struct Player {
     float h = 30.0f;
     bool grounded = false;
     float coyoteTimer = 0.0f;
+
+    // Zusatz für Doppelsprung: besitzt der Spieler das Upgrade?
+    bool hasDoubleJump = false;
+    // Zählt verbleibende Sprünge (0 = nur normaler Boden-Sprung möglich).
+    int jumpsRemaining = 0;
 };
 
 struct Rect {
@@ -38,6 +43,14 @@ public:
     int height = 0;
     // Lineares Feld aller Tiles (Index: y * width + x).
     std::vector<uint8_t> tiles;
+
+    // Items, die beim Export aus dem Editor mitgeliefert werden.
+    struct ItemData {
+        std::string type;
+        int x = 0;
+        int y = 0;
+    };
+    std::vector<ItemData> items;
 
     // Lädt eine alte Text-Kartenrepräsentation.
     bool loadText(const char* path);

@@ -17,6 +17,8 @@
 #include "compat/desktop_3ds_compat.h"
 #include "../3ds-cpp/source/core/game_core.h"
 #include "../3ds-cpp/source/core/world_map.h"
+#include "../3ds-cpp/source/gameplay/gameplay_scene.h" // für ITEM_DOUBLE_JUMP und strukturelle Deklarationen
+#include "../3ds-cpp/source/gameplay/items/double_jump/double_jump.h" // Zugriff auf item-ID
 #include "../3ds-cpp/source/menu/controllers/main_menu_controller.h"
 #include "../3ds-cpp/source/menu/views/manual_content.h"
 
@@ -51,6 +53,8 @@ struct PersistentSave {
     int gridY = 0;
     float x = 0.0f;
     float y = 0.0f;
+    uint32_t collectedItems = 0;
+    uint32_t activeItems = 0;
 };
 
 struct RectI {
@@ -81,6 +85,21 @@ struct App {
     int lastCheckpointGridY = 0;
     bool lastCheckpointGridValid = false;
     std::string currentLevelName;
+
+    // item state
+    uint32_t collectedItems = 0;
+    uint32_t activeItems = 0;
+    int inventorySelection = 0;
+    std::string pickupMessage;
+    float pickupMessageTimer = 0.0f;
+
+    struct MapItem {
+        std::string type;
+        float x = 0.0f;
+        float y = 0.0f;
+        bool collected = false;
+    };
+    std::vector<MapItem> mapItems;
 
     Checkpoint checkpoint;
     PersistentSave persistentSave;
@@ -303,6 +322,18 @@ bool loadPersistentSaveFromDisk(int slot, PersistentSave& outSave) {
         }
     }
 
+    // wenn noch eine dritte Zeile mit Items existiert, einlesen
+    if (ok) {
+        char itemsBuf[256] = {0};
+        if (std::fgets(itemsBuf, sizeof(itemsBuf), f)) {
+            uint32_t col=0, act=0;
+            if (std::sscanf(itemsBuf, " items %u %u", &col, &act) == 2) {
+                outSave.collectedItems = col;
+                outSave.activeItems = act;
+            }
+        }
+    }
+
     std::fclose(f);
     if (!ok) return false;
 
@@ -323,6 +354,8 @@ bool writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
     FILE* f = std::fopen(savePathForSlot(slot).c_str(), "wb");
     if (!f) return false;
     std::fprintf(f, "%s\n%d %d %.3f %.3f\n", cp.level.c_str(), cp.gridX, cp.gridY, cp.x, cp.y);
+    // Item-Flags aus globalem Zustand hinzufügen
+    std::fprintf(f, "items %u %u\n", g.collectedItems, g.activeItems);
     std::fclose(f);
     return true;
 }
@@ -593,6 +626,12 @@ bool rebuildMapCache() {
             }
         }
     }
+    // Items ebenfalls in Cache zeichnen (blaue Quadrate)
+    for (const auto& it : map.items) {
+        // überspringen, wenn bereits persistent gesammelt
+        if (it.type == items::double_jump::id() && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) continue;
+        fillRect(g.mapDc, it.x * 16, it.y * 16, 16, 16, RGB(0,0,255));
+    }
 
     return true;
 }
@@ -628,6 +667,23 @@ bool loadLevel(const std::string& level, int originGX, int originGY, float spawn
 
     g.currentGridX = g.gridX + static_cast<int>(std::floor(g.core.getPlayer().x / 400.0f));
     g.currentGridY = g.gridY + static_cast<int>(std::floor(g.core.getPlayer().y / 240.0f));
+
+    // Items der gerade geladenen Karte aufbereiten
+    g.mapItems.clear();
+    const float tileSize = 16.0f;
+    for (const auto& d : g.core.getMap().items) {
+        // Falls bereits gesammelt, überspringen
+        if (d.type == items::double_jump::id() && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) {
+            continue;
+        }
+        MapItem mi;
+        mi.type = d.type;
+        mi.x = d.x * tileSize;
+        mi.y = d.y * tileSize;
+        mi.collected = false;
+        g.mapItems.push_back(mi);
+    }
+
     rebuildMapCache();
     g.visitedCells.insert(makeCellKey(g.currentGridX, g.currentGridY));
     writeVisitedToDisk(g.activeSaveSlot);
@@ -694,6 +750,12 @@ bool startNewGame(int slot) {
     g.requestMenu = false;
     g.inTransition = false;
     g.lastCheckpointGridValid = false;
+    // Itemzustand zurücksetzen
+    g.collectedItems = 0;
+    g.activeItems = 0;
+    g.inventorySelection = 0;
+    g.pickupMessage.clear();
+    g.pickupMessageTimer = 0.0f;
 
     std::remove(savePathForSlot(g.activeSaveSlot).c_str());
     resetVisitedProgress(g.activeSaveSlot);
@@ -710,6 +772,15 @@ bool loadFromCheckpoint(int slot) {
     PersistentSave loaded{};
     if (!loadPersistentSaveFromDisk(g.activeSaveSlot, loaded)) return false;
     if (!loaded.valid || loaded.level.empty()) return false;
+
+    // übernehme Itemflags
+    g.collectedItems = loaded.collectedItems;
+    g.activeItems = loaded.activeItems;
+    if (g.activeItems & GameplayScene::ITEM_DOUBLE_JUMP) {
+        g.core.getPlayer().hasDoubleJump = true;
+    } else {
+        g.core.getPlayer().hasDoubleJump = false;
+    }
 
     if (!loadLevel(loaded.level, loaded.gridX, loaded.gridY, loaded.x, loaded.y, false)) {
         return false;
@@ -780,6 +851,18 @@ void handleTransitionIfNeeded() {
 
     std::string levelPath = g.mapsRoot + "/" + nextCell->level + ".json";
     if (!g.core.loadMapJson(levelPath.c_str())) return;
+    // mapItems auffrischen (gleiche Logik wie in loadLevel)
+    g.mapItems.clear();
+    const float tileSize = 16.0f;
+    for (const auto& d : g.core.getMap().items) {
+        if (d.type == items::double_jump::id() && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) continue;
+        MapItem mi;
+        mi.type = d.type;
+        mi.x = d.x * tileSize;
+        mi.y = d.y * tileSize;
+        mi.collected = false;
+        g.mapItems.push_back(mi);
+    }
     rebuildMapCache();
 
     g.gridX = nextCell->originX;
@@ -848,6 +931,24 @@ void updateGameplay(float dt) {
     g.currentGridX = g.gridX + static_cast<int>(std::floor(p.x / 400.0f));
     g.currentGridY = g.gridY + static_cast<int>(std::floor(p.y / 240.0f));
 
+    // Item-Kollision prüfen
+    const float itemSize = 16.0f;
+    for (auto& it : g.mapItems) {
+        if (it.collected) continue;
+        if (p.x < it.x + itemSize && p.x + p.w > it.x && p.y < it.y + itemSize && p.y + p.h > it.y) {
+            it.collected = true;
+            if (it.type == items::double_jump::id()) {
+                g.collectedItems |= GameplayScene::ITEM_DOUBLE_JUMP;
+                g.activeItems |= GameplayScene::ITEM_DOUBLE_JUMP;
+                g.core.getPlayer().hasDoubleJump = true;
+                g.pickupMessage = "Doppelsprung erhalten";
+                g.pickupMessageTimer = 2.0f;
+            }
+            // cartesische Darstellung aktualisieren (Cache neu bauen)
+            rebuildMapCache();
+        }
+    }
+
     updateCheckpointFromCurrentCell();
 
     if (g.world.getCell(g.currentGridX, g.currentGridY)) {
@@ -872,6 +973,11 @@ void updateGameplay(float dt) {
         g.fpsValue = g.fpsFrameCounter;
         g.fpsFrameCounter = 0;
         g.fpsTimerMs = t;
+    }
+    // Message-Timer für Items verringern
+    if (g.pickupMessageTimer > 0.0f) {
+        g.pickupMessageTimer -= dt;
+        if (g.pickupMessageTimer < 0.0f) g.pickupMessageTimer = 0.0f;
     }
 }
 
@@ -975,7 +1081,26 @@ void handleGameplayInput() {
         }
     }
 
-    if (g.bottomMode == TAB_SETTINGS) {
+    if (g.bottomMode == TAB_INVENTORY) {
+        // Navigation durch gesammelte Items
+        int count = 0;
+        if (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP) count++;
+        if (count > 0) {
+            if (kDown & bottomUp) g.inventorySelection = std::max(0, g.inventorySelection - 1);
+            if (kDown & bottomDown) g.inventorySelection = std::min(count - 1, g.inventorySelection + 1);
+            if (kDown & KEY_Y) {
+                if (g.inventorySelection == 0 && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) {
+                    if (g.activeItems & GameplayScene::ITEM_DOUBLE_JUMP) {
+                        g.activeItems &= ~GameplayScene::ITEM_DOUBLE_JUMP;
+                        g.core.getPlayer().hasDoubleJump = false;
+                    } else {
+                        g.activeItems |= GameplayScene::ITEM_DOUBLE_JUMP;
+                        g.core.getPlayer().hasDoubleJump = true;
+                    }
+                }
+            }
+        }
+    } else if (g.bottomMode == TAB_SETTINGS) {
         if (kDown & bottomUp) g.settingsSelection = (g.settingsSelection + 1) % 2;
         if (kDown & bottomDown) g.settingsSelection = (g.settingsSelection + 1) % 2;
         if (kDown & KEY_Y) {
@@ -1122,6 +1247,9 @@ void drawTopGameplay(HDC hdc) {
         char fpsText[64] = {0};
         std::snprintf(fpsText, sizeof(fpsText), "FPS: %d", g.fpsValue);
         drawText(hdc, g.topView.x + 6, g.topView.y + 6, RGB(130, 255, 150), fpsText);
+        if (g.pickupMessageTimer > 0.0f && !g.pickupMessage.empty()) {
+            drawText(hdc, g.topView.x + 200, g.topView.y + 20, RGB(240, 220, 120), g.pickupMessage.c_str());
+        }
     }
 
     if (g.menu.getDebugEnabled()) {
@@ -1199,7 +1327,24 @@ void drawBottomGameplay(HDC hdc) {
     } else if (g.bottomMode == TAB_INVENTORY) {
         drawText(hdc, g.bottomView.x + 12, g.bottomView.y + 12, RGB(230, 230, 240), "Inventar");
         fillRect(hdc, g.bottomView.x + 16, g.bottomView.y + 44, 288, 144, RGB(28, 34, 46));
-        drawText(hdc, g.bottomView.x + 44, g.bottomView.y + 108, RGB(170, 180, 205), "(Aktuell leer)");
+        // Liste der gesammelten Items zeichnen
+        int drawY = g.bottomView.y + 54;
+        int idx = 0;
+        if (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP) {
+            bool active = (g.activeItems & GameplayScene::ITEM_DOUBLE_JUMP) != 0;
+            bool sel = (g.inventorySelection == idx);
+            if (sel) {
+                fillRect(hdc, g.bottomView.x + 16, drawY - 2, 288, 20, RGB(50,50,70));
+            }
+            char buf[64];
+            std::snprintf(buf, sizeof(buf), "Doppelsprung: %s", active ? "ON" : "OFF");
+            drawText(hdc, g.bottomView.x + 24, drawY, RGB(235, 235, 245), buf);
+            drawY += 24;
+            idx++;
+        }
+        if (idx == 0) {
+            drawText(hdc, g.bottomView.x + 44, g.bottomView.y + 108, RGB(170, 180, 205), "(Aktuell leer)");
+        }
     } else if (g.bottomMode == TAB_SETTINGS) {
         drawText(hdc, g.bottomView.x + 12, g.bottomView.y + 12, RGB(230, 230, 240), "Einstellungen");
         COLORREF c0 = (g.settingsSelection == 0) ? RGB(76, 112, 182) : RGB(46, 62, 92);

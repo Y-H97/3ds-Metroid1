@@ -28,6 +28,7 @@ function Actions.createMap(w, h)
     State.mapScreensW = w
     State.mapScreensH = h
     State.currentRoom = {}
+    State.currentRoomItems = {} -- neu: keine Items beim Anlegen
 
     local totalTilesX = w * Constants.TILES_X
     local totalTilesY = h * Constants.TILES_Y
@@ -60,6 +61,15 @@ function Actions.saveRoom(filename)
         content = content .. "},\n"
     end
     content = content .. "  }\n"
+
+    -- Items speichern (optional)
+    if State.currentRoomItems and #State.currentRoomItems > 0 then
+        content = content .. ",\n  items = {\n"
+        for _, it in ipairs(State.currentRoomItems) do
+            content = content .. string.format("    {x=%d,y=%d,type=%q},\n", it.x, it.y, it.type)
+        end
+        content = content .. "  }\n"
+    end
 
     content = content .. "}"
 
@@ -304,7 +314,13 @@ function Actions.loadRoomFromPath(path)
     if not chunk then return false, err end
     local result = chunk()
     if result then
-        if result.grid then State.currentRoom = result.grid else State.currentRoom = result end
+        if result.grid then
+            State.currentRoom = result.grid
+        else
+            State.currentRoom = result
+        end
+        -- Items aus Datei übernehmen (ältere Räume haben ggf. keine)
+        State.currentRoomItems = result.items or {}
         State.currentFilename = path:match("([^\\]+)$") or path
         Actions.setMessage("Geladen!", 2)
         return true

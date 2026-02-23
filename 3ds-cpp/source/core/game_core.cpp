@@ -78,7 +78,64 @@ bool TileMap::loadJson(const char* path) {
         }
     }
     bool ok = idx == tiles.size();
-    if (ok) buildTransitions(16);
+    if (ok) {
+        buildTransitions(16);
+        // Zusatz: Items parsen, falls vorhanden
+        items.clear();
+        size_t itemsPos = s.find("\"items\"");
+        if (itemsPos != std::string::npos) {
+            size_t arrStart = s.find('[', itemsPos);
+            if (arrStart != std::string::npos) {
+                size_t i = arrStart + 1;
+                while (i < s.size()) {
+                    // Suche nächstes Objekt
+                    while (i < s.size() && s[i] != '{' && s[i] != ']') ++i;
+                    if (i >= s.size() || s[i] == ']') break;
+                    size_t objStart = i;
+                    int brace = 1;
+                    ++i;
+                    while (i < s.size() && brace > 0) {
+                        if (s[i] == '{') brace++;
+                        else if (s[i] == '}') brace--;
+                        ++i;
+                    }
+                    size_t objEnd = i;
+                    std::string obj = s.substr(objStart, objEnd - objStart);
+                    // Werte extrahieren
+                    std::string type;
+                    int ix = 0, iy = 0;
+                    size_t posType = obj.find("\"type\"");
+                    if (posType != std::string::npos) {
+                        size_t colon = obj.find(':', posType);
+                        if (colon != std::string::npos) {
+                            size_t q1 = obj.find('"', colon+1);
+                            if (q1 != std::string::npos) {
+                                size_t q2 = obj.find('"', q1+1);
+                                if (q2 != std::string::npos) {
+                                    type = obj.substr(q1+1, q2-q1-1);
+                                }
+                            }
+                        }
+                    }
+                    size_t posX = obj.find("\"x\"");
+                    if (posX != std::string::npos) {
+                        std::sscanf(obj.c_str()+posX, "\"x\"%*[^0-9-]%d", &ix);
+                    }
+                    size_t posY = obj.find("\"y\"");
+                    if (posY != std::string::npos) {
+                        std::sscanf(obj.c_str()+posY, "\"y\"%*[^0-9-]%d", &iy);
+                    }
+                    if (!type.empty()) {
+                        ItemData id;
+                        id.type = type;
+                        id.x = ix;
+                        id.y = iy;
+                        items.push_back(id);
+                    }
+                }
+            }
+        }
+    }
     return ok;
 }
 
@@ -181,10 +238,24 @@ void GameCore::update(const InputState& input, float dt) {
     player.vx = inputX * speed;
 
     // 2) Springen erlaubt bei Bodenkontakt oder kurzer "Coyote-Time".
-    if (input.jumpPressed && (player.grounded || player.coyoteTimer > 0.0f)) {
-        player.vy = jumpVel;
-        player.grounded = false;
-        player.coyoteTimer = 0.0f;
+    if (input.jumpPressed) {
+        if (player.grounded || player.coyoteTimer > 0.0f) {
+            // normaler erster Sprung
+            player.vy = jumpVel;
+            player.grounded = false;
+            player.coyoteTimer = 0.0f;
+            // nach dem Absprung kann ggf. ein zusätzlicher Sprung erfolgen
+            player.jumpsRemaining = player.hasDoubleJump ? 1 : 0;
+        } else if (player.hasDoubleJump && player.jumpsRemaining > 0) {
+            // freier Doppelsprung in der Luft
+            player.vy = jumpVel;
+            player.jumpsRemaining -= 1;
+        }
+    }
+
+    // wenn der Spieler wieder den Boden berührt, Reset der Zusatzsprünge
+    if (player.grounded) {
+        player.jumpsRemaining = player.hasDoubleJump ? 1 : 0;
     }
 
     // 3) Gravitation beschleunigt den Spieler nach unten.
@@ -284,6 +355,8 @@ void GameCore::update(const InputState& input, float dt) {
     if (hitY) player.vy = 0.0f;
 
     if (player.grounded) {
+        // Spieler berührt den Boden – Zusatzsprung zurücksetzen
+        player.jumpsRemaining = player.hasDoubleJump ? 1 : 0;
         player.coyoteTimer = 0.1f;
     } else if (wasGrounded && !player.grounded && player.vy >= 0.0f) {
         // 6) Slope-Snap: verhindert, dass man beim Laufen über Schräge kurz "schwebt".

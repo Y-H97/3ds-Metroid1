@@ -66,6 +66,7 @@ bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave
 
     char levelBuf[128] = {0};
     char lineBuf[256] = {0};
+    char itemsBuf[256] = {0};
     int gx = 0;
     int gy = 0;
     float x = 0.0f;
@@ -91,6 +92,17 @@ bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave
 
     fclose(f);
     if (!parsed) return false;
+
+    // Optional: dritte Zeile mit Item-Flags einlesen
+    if (std::fgets(itemsBuf, sizeof(itemsBuf), f)) {
+        uint32_t col = 0;
+        uint32_t act = 0;
+        // Format: "items <collected> <active>"
+        if (std::sscanf(itemsBuf, " items %u %u", &col, &act) == 2) {
+            loaded.collectedItems = col;
+            loaded.activeItems = act;
+        }
+    }
 
     loaded.valid = true;
     loaded.level = levelBuf;
@@ -119,6 +131,8 @@ bool GameplayScene::writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
     if (!f) return false;
 
     std::fprintf(f, "%s\n%d %d %.3f %.3f\n", cp.level.c_str(), cp.gridX, cp.gridY, cp.x, cp.y);
+    // schreibe aktuelle Item-Flags (aus dem Szene-Zustand)
+    std::fprintf(f, "items %u %u\n", collectedItems, activeItems);
     fclose(f);
 
     persistentSave.valid = true;
@@ -189,6 +203,13 @@ bool GameplayScene::startNewGame(int slot) {
     inTransition = false;
     checkpoint = {};
     persistentSave = {};
+    // Reset der Item-Zustände
+    collectedItems = 0;
+    activeItems = 0;
+    inventorySelection = 0;
+    pickupMessage = "";
+    pickupMessageTimer = 0.0f;
+
     std::string savePath = makeSavePath(activeSaveSlot);
     std::remove(savePath.c_str());
     if (activeSaveSlot == 1) {
@@ -207,6 +228,15 @@ bool GameplayScene::loadFromCheckpoint(int slot) {
     persistentSave = {};
     if (!loadPersistentSaveFromDisk(activeSaveSlot)) return false;
     if (!persistentSave.valid || persistentSave.level.empty()) return false;
+
+    // Übernehme Item-Flags aus gespeicherten Daten
+    collectedItems = persistentSave.collectedItems;
+    activeItems = persistentSave.activeItems;
+    // aktive Effekte anwenden
+    if (activeItems & ITEM_DOUBLE_JUMP) grantDoubleJump();
+    else core.getPlayer().hasDoubleJump = false;
+    // Auswahl ggf. zurücksetzen (gilt nur zur Navigation im Inventar)
+    inventorySelection = 0;
 
     std::string cpPath = std::string("romfs:/maps/") + persistentSave.level + ".json";
     if (!core.loadMapJson(cpPath.c_str())) return false;
