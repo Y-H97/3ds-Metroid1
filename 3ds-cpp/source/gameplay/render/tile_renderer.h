@@ -1,6 +1,11 @@
 #pragma once
 
+#ifndef DESKTOP_SIMULATOR
 #include <citro2d.h>
+#else
+// stub definitions for desktop build
+using C2D_SpriteSheet = void*;
+#endif
 
 class TileRenderer {
 public:

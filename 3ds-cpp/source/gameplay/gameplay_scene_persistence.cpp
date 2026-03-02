@@ -209,6 +209,9 @@ bool GameplayScene::startNewGame(int slot) {
     inventorySelection = 0;
     pickupMessage = "";
     pickupMessageTimer = 0.0f;
+    // Spielerstatus ebenfalls säubern (z.B. Doppelsprung-Flag)
+    core.getPlayer().hasDoubleJump = false;
+    core.getPlayer().jumpsRemaining = 0;
 
     std::string savePath = makeSavePath(activeSaveSlot);
     std::remove(savePath.c_str());

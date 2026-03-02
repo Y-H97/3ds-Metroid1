@@ -676,7 +676,7 @@ bool loadLevel(const std::string& level, int originGX, int originGY, float spawn
         if (d.type == items::double_jump::id() && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) {
             continue;
         }
-        MapItem mi;
+        App::MapItem mi;
         mi.type = d.type;
         mi.x = d.x * tileSize;
         mi.y = d.y * tileSize;
@@ -856,7 +856,7 @@ void handleTransitionIfNeeded() {
     const float tileSize = 16.0f;
     for (const auto& d : g.core.getMap().items) {
         if (d.type == items::double_jump::id() && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) continue;
-        MapItem mi;
+        App::MapItem mi;
         mi.type = d.type;
         mi.x = d.x * tileSize;
         mi.y = d.y * tileSize;
@@ -872,6 +872,35 @@ void handleTransitionIfNeeded() {
     float offset = 24.0f;
     float localTargetX = 0.0f;
     float localTargetY = 0.0f;
+
+    if (dir == "right") {
+        localTargetX = offset;
+        float screenRelY = std::fmod(player.y, 240.0f);
+        localTargetY = (std::floor(targetGY / 240.0f) - g.gridY) * 240.0f + screenRelY;
+    } else if (dir == "left") {
+        float segmentLocalX = (nextGX - g.gridX) * 400.0f;
+        localTargetX = segmentLocalX + 400.0f - player.w - offset;
+        float screenRelY = std::fmod(player.y, 240.0f);
+        localTargetY = (std::floor(targetGY / 240.0f) - g.gridY) * 240.0f + screenRelY;
+    } else if (dir == "down") {
+        localTargetY = offset;
+        float screenRelX = std::fmod(player.x, 400.0f);
+        localTargetX = (std::floor(targetGX / 400.0f) - g.gridX) * 400.0f + screenRelX;
+    } else {
+        float segmentLocalY = (nextGY - g.gridY) * 240.0f;
+        localTargetY = segmentLocalY + 240.0f - player.h - offset;
+        float screenRelX = std::fmod(player.x, 400.0f);
+        localTargetX = (std::floor(targetGX / 400.0f) - g.gridX) * 400.0f + screenRelX;
+    }
+
+    // clamp the localTargetX/Y to map bounds before updating state
+    {
+        const TileMap& m = g.core.getMap();
+        float maxX = m.width * 16.0f - g.core.getPlayer().w;
+        float maxY = m.height * 16.0f - g.core.getPlayer().h;
+        localTargetX = clampf(localTargetX, 0.0f, std::max(0.0f, maxX));
+        localTargetY = clampf(localTargetY, 0.0f, std::max(0.0f, maxY));
+    }
 
     if (dir == "right") {
         localTargetX = offset;
@@ -1078,6 +1107,30 @@ void handleGameplayInput() {
                 g.requestMenu = true;
             }
             g.touchPending = false;
+        } else if (g.bottomMode == TAB_INVENTORY) {
+            // handle tap on item row
+            int count = 0;
+            if (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP) count++;
+            if (count > 0) {
+                if (tp.px >= 16 && tp.px < 304 && tp.py >= 54) {
+                    int row = (tp.py - 54) / 24;
+                    if (row == g.inventorySelection) {
+                        // toggle current entry
+                        if (g.inventorySelection == 0 && (g.collectedItems & GameplayScene::ITEM_DOUBLE_JUMP)) {
+                            if (g.activeItems & GameplayScene::ITEM_DOUBLE_JUMP) {
+                                g.activeItems &= ~GameplayScene::ITEM_DOUBLE_JUMP;
+                                g.core.getPlayer().hasDoubleJump = false;
+                            } else {
+                                g.activeItems |= GameplayScene::ITEM_DOUBLE_JUMP;
+                                g.core.getPlayer().hasDoubleJump = true;
+                            }
+                        }
+                    } else if (row >= 0 && row < count) {
+                        g.inventorySelection = row;
+                    }
+                }
+            }
+            g.touchPending = false;
         }
     }
 
@@ -1172,6 +1225,7 @@ void mapVKeyToKeys(UINT vk, bool down) {
         case 'I': bits = KEY_DUP; break;
         case 'K': bits = KEY_DDOWN; break;
         case 'R': bits = KEY_R; break;
+        case 'Y': bits = KEY_Y; break; // allow Y key to toggle inventory
         default: break;
     }
 

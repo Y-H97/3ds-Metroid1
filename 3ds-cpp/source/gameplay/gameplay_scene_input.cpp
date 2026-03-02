@@ -70,7 +70,21 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
         if (count > 0) {
             if (kDown & bottomUp) inventorySelection = std::max(0, inventorySelection - 1);
             if (kDown & bottomDown) inventorySelection = std::min(count - 1, inventorySelection + 1);
-            if (kDown & KEY_Y) {
+
+            // toggle via button or touch tap
+            bool doToggle = false;
+            if (kDown & KEY_Y) doToggle = true;
+            if (kDown & KEY_TOUCH) {
+                touchPosition tp;
+                hidTouchRead(&tp);
+                // region of inventory entries: x in [16,304), y start 54 height 24 per entry
+                if (tp.px >= 16 && tp.px < 304 && tp.py >= 54) {
+                    int row = (tp.py - 54) / 24;
+                    if (row == inventorySelection) doToggle = true;
+                    else if (row >= 0 && row < count) inventorySelection = row;
+                }
+            }
+            if (doToggle) {
                 // Toggle ON/OFF
                 if (inventorySelection == 0 && (collectedItems & ITEM_DOUBLE_JUMP)) {
                     if (activeItems & ITEM_DOUBLE_JUMP) {

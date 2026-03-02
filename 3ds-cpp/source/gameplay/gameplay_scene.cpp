@@ -1,6 +1,8 @@
 #include "gameplay_scene.h"
 
+#ifndef DESKTOP_SIMULATOR
 #include <citro2d.h>
+#endif
 #include <cmath>
 #include <cstdio>
 
@@ -146,6 +148,21 @@ bool GameplayScene::loadInitialMap() {
     }
     // Neue Karte geladen – Itemliste auffrischen
     refreshMapItems();
+    // Falls der Startpunkt genau auf einem Item liegt (z.B. durch Leveldesign),
+    // behalten wir das Item als "bereits gesammelt" ohne Effekt – so startet
+    // ein neues Spiel stets ohne sofortigen Power‑Up-Gewinn.
+    {
+        const Player& p = core.getPlayer();
+        const float itemSize = 16.0f;
+        for (auto& mi : mapItems) {
+            if (!mi.collected) {
+                if (p.x < mi.x + itemSize && p.x + p.w > mi.x &&
+                    p.y < mi.y + itemSize && p.y + p.h > mi.y) {
+                    mi.collected = true;
+                }
+            }
+        }
+    }
 
     checkpoint.valid = true;
     checkpoint.level = levelName;
@@ -317,6 +334,14 @@ void GameplayScene::update(float dt) {
                     }
 
                     // Checkpoint-Räume aktualisieren Spawnpunkt und speichern sofort.
+                    // clamp spawn inside map bounds so we don't fall out
+                    {
+                        const TileMap& m = core.getMap();
+                        float maxX = m.width * 16.0f - core.getPlayer().w;
+                        float maxY = m.height * 16.0f - core.getPlayer().h;
+                        localTargetX = clampf(localTargetX, 0.0f, std::max(0.0f, maxX));
+                        localTargetY = clampf(localTargetY, 0.0f, std::max(0.0f, maxY));
+                    }
                     if (world.isCheckpoint(nextGX, nextGY)) {
                         checkpoint.valid = true;
                         checkpoint.level = nextCell->level;

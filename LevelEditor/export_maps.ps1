@@ -78,6 +78,34 @@ function Convert-RoomLuaToJson {
         tiles = $tiles
     }
 
+    # items section (optional) – ähnlich wie das Grid parsen
+    $items = @()
+    $inItems = $false
+    foreach ($line in $lines) {
+        if (-not $inItems -and $line -match '^\s*items\s*=\s*\{') {
+            $inItems = $true
+            continue
+        }
+        if ($inItems) {
+            if ($line -match '^\s*\}') { break }
+            if ($line -match '\{[^}]*\}') {
+                $entry = $matches[0]
+                $xm = [regex]::Match($entry, 'x\s*=\s*(-?\d+)')
+                $ym = [regex]::Match($entry, 'y\s*=\s*(-?\d+)')
+                $tm = [regex]::Match($entry, 'type\s*=\s*"([^"]+)"')
+                if ($xm.Success -and $ym.Success) {
+                    $xi = [int]$xm.Groups[1].Value
+                    $yi = [int]$ym.Groups[1].Value
+                    $ti = if ($tm.Success) { $tm.Groups[1].Value } else { '' }
+                    $items += [ordered]@{ x=$xi; y=$yi; type=$ti }
+                }
+            }
+        }
+    }
+    if ($items.Count -gt 0) {
+        $obj.items = $items
+    }
+
     $json = $obj | ConvertTo-Json -Depth 4 -Compress
     Set-Content -Path $OutPath -Value $json -Encoding UTF8
 }

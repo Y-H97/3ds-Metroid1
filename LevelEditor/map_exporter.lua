@@ -119,6 +119,9 @@ local function exportRoom(levelPath, outPath, levelName)
     }
 
     -- Items aus Editor-Daten übernehmen
+    if data.items and type(data.items) == "table" then
+        print("DEBUG: map " .. levelName .. " has item count " .. #data.items)
+    end
     if data.items and type(data.items) == "table" and #data.items > 0 then
         payload.items = {}
         for _, it in ipairs(data.items) do

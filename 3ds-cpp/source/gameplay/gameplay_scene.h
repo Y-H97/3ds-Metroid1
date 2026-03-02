@@ -1,7 +1,9 @@
 #pragma once
 
+#ifndef DESKTOP_SIMULATOR
 #include <3ds.h>
 #include <citro2d.h>
+#endif
 #include <string>
 #include <unordered_set>
 
@@ -20,6 +22,8 @@ class TextRenderer;
 class GameplayScene {
 public:
     static constexpr int SAVE_SLOT_COUNT = 3;
+    // Item flag bits (bitmask) – Desktop build also needs this constant.
+    static constexpr uint32_t ITEM_DOUBLE_JUMP = 1u << 0;
 
     // Initialisiert Renderer, Welt und Startzustände.
     bool init();

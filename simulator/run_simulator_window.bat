@@ -1,5 +1,12 @@
 @echo off
 REM Baut und startet den grafischen Win32-Simulator (Windows).
+REM Hinweis: Wenn beim Anklicken dieser Datei ein "Welches Programm soll zum
+REM Öffnen verwendet werden?"-Dialog erscheint, dann ist die Zuordnung von
+REM .bat-Dateien zu cmd.exe beschädigt. Siehe ../scripts/fix_bat_assoc.ps1.
+REM
+REM Hinweis für PowerShell: rufe die Datei mit vorangestelltem .\ aus,
+REM z.B.  ".\run_simulator_window.bat". Ansonsten meldet PowerShell, dass
+REM der Name nicht gefunden wurde (CommandNotFoundException).
 setlocal EnableExtensions
 
 set "SIM_ROOT=%~dp0"
@@ -15,6 +22,11 @@ if /I "%~1"=="--build-only" (
 
 pushd "%CPP_ROOT%"
 
+rem diagnostic: show PATH and try locating compilers
+ echo [debug] PATH=%PATH%
+ where g++ 2>nul || echo [debug] g++ not found
+ where cl 2>nul || echo [debug] cl not found
+
 set "CXX="
 set "CXX_MODE="
 
@@ -28,6 +40,23 @@ if not defined CXX (
   if exist "C:\msys64\ucrt64\bin\g++.exe" (
     set "CXX=C:\msys64\ucrt64\bin\g++.exe"
     set "CXX_MODE=gcc_like"
+  )
+)
+
+rem If still no compiler, try to automatically detect a WinLibs download
+rem sitting in the user Downloads folder (filename starts with "winlibs-").
+if not defined CXX (
+  for /d %%D in ("%USERPROFILE%\Downloads\winlibs-*" ) do (
+    if exist "%%~fD\mingw64\bin\g++.exe" (
+      set "CXX=%%~fD\mingw64\bin\g++.exe"
+      set "CXX_MODE=gcc_like"
+      goto :compiler_found
+    )
+    if exist "%%~fD\mingw32\bin\g++.exe" (
+      set "CXX=%%~fD\mingw32\bin\g++.exe"
+      set "CXX_MODE=gcc_like"
+      goto :compiler_found
+    )
   )
 )
 
@@ -59,7 +88,12 @@ if not defined CXX (
 if not defined CXX (
   echo FEHLER: Kein C++-Compiler gefunden.
   echo Erwartet wird einer von: g++, cl.exe
-  echo Installiere z. B. WinLibs/MSYS2 oder Visual Studio Build Tools.
+  echo \n  echo Bitte installiere einen geeigneten Compiler und stelle sicher,
+  echo dass er im PATH liegt. Beispiele:
+  echo   - MSYS2/MinGW (pacman -S mingw-w64-x86_64-toolchain)
+  echo   - WinLibs GCC-Build
+  echo   - Visual Studio Build Tools (cl.exe)
+  echo \n  echo Lies auch die Dokumentation: docs\simulator\SETUP.md
   popd
   exit /b 1
 )

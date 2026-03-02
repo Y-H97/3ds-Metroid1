@@ -207,7 +207,9 @@ function handleRoomEditorInput()
         local worldMY = unscaledY + State.camY - 50 -- minus mapOffsetY (50) aus View
 
         -- Mapping/Painting (Tile-only)
-        if love.mouse.isDown(1) or love.mouse.isDown(2) then
+        -- Only paint when the tile tool is active; item tool should not
+        -- modify the grid even if the mouse button is held.
+        if State.currentTool == "tile" and (love.mouse.isDown(1) or love.mouse.isDown(2)) then
             local tx = math.floor(worldMX / Constants.TILE_SIZE) + 1
             local ty = math.floor(worldMY / Constants.TILE_SIZE) + 1
 
@@ -457,6 +459,10 @@ function love.mousepressed(x, y, button)
                 end
                 if not removed and button == 1 then
                     table.insert(State.currentRoomItems, {x = tx, y = ty, type = Constants.ITEM_TYPES[State.currentItemType].id})
+                    -- ensure the underlying tile is empty so export won't confuse
+                    if State.currentRoom[ty] then
+                        State.currentRoom[ty][tx] = 0
+                    end
                 end
             else
                 State.strokeActive = true

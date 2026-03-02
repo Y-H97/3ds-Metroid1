@@ -1,7 +1,13 @@
 #pragma once
 
+#ifndef DESKTOP_SIMULATOR
 #include <3ds.h>
 #include <citro2d.h>
+#else
+// minimal stubs for desktop
+using u32 = unsigned int;
+using C2D_TextBuf = void*;
+#endif
 #include <cstddef>
 
 class TextRenderer {

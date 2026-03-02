@@ -35,3 +35,24 @@ constexpr u32 KEY_RIGHT = KEY_DRIGHT;
 constexpr u32 KEY_LEFT = KEY_DLEFT;
 constexpr u32 KEY_UP = KEY_DUP;
 constexpr u32 KEY_DOWN = KEY_DDOWN;
+
+// --- citro2d stubs ----------------------------------------------------------
+// Certain simulator sources include citro2d types or call simple helper
+// macros. Provide minimal stand-ins so the desktop build compiles.
+using C2D_SpriteSheet = void*;
+using C2D_TextBuf = void*;
+
+// Color helper: pack four bytes into a 32-bit value.
+static inline u32 C2D_Color32(int r, int g, int b, int a) {
+    return ((u32)r << 24) | ((u32)g << 16) | ((u32)b << 8) | ((u32)a);
+}
+
+// Placeholders for render targets used in gameplay and world rendering.
+using C3D_RenderTarget = void*;
+
+// Macros used by code but irrelevant for rendering on desktop.
+#define C2D_CreateScreenTarget(x,y) nullptr
+#define C2D_TextBufNew(cap) nullptr
+#define C2D_TextBufClear(buf) do {} while (0)
+
+// You can expand this file with further stubs when new compiler errors arise.

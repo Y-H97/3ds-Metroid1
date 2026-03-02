@@ -8,8 +8,10 @@ In dieser Version wurde ein rudimentäres Item-/Inventarsystem ergänzt. Schritt
    * Zur Zeit gibt es nur einen Typ (`Doppelsprung`) – weitere Typen können
      in `LevelEditor/constants.lua` ergänzt werden.
    * Beim Speichern des Raumes werden sämtliche Items in `items` exportiert.
-   * Der Map-Exporter (`LevelEditor/map_exporter.lua`) schreibt die Items
-     automatisch in das JSON-Format.
+   * Der Map-Exporter (`LevelEditor/map_exporter.lua` und das PowerShell-Skript
+     `LevelEditor/export_maps.ps1`) schreibt die Items automatisch in das
+     JSON-Format – der Batch‑Export (`run_export_maps.bat`) ist somit ebenfalls
+     kompatibel.
 
 2. **Engine (3DS + Simulator)**
    * Neue Daten in `gameplay_scene` und Simulator: `collectedItems`, `activeItems`.
@@ -19,9 +21,15 @@ In dieser Version wurde ein rudimentäres Item-/Inventarsystem ergänzt. Schritt
    * Das `double_jump`-Item ist in `source/gameplay/items/double_jump` gekapselt.
      Weitere Items können analog in eigenen Unterverzeichnissen implementiert
      werden.
+* Beim Laden einer Karte konvertiert die Engine inzwischen automatisch
+     Editor-Platzhalterkacheln (z.B. Tile-ID 99 für Doppelsprung) in echte
+     Items, falls beim Export das `items`-Array fehlt. Dadurch tauchen die
+     blauen Quadrate im Simulator nicht mehr als unerreichbare Wände auf.
    * Beim Einsammeln wird der Status persistiert und eine Nachricht angezeigt.
    * Bottom-Screen der Engine zeigt Inventar mit ON/OFF-Schalter für jedes
-     gesammelte Item (mit Richtungs-Tasten und `Y` toggeln).
+     gesammelte Item (mit Richtungs-Tasten und `Y` toggeln). In der Simulation
+     und auf dem 3DS kann der Schalter jetzt auch per Touch angeklickt werden
+     – einfach auf den Eintrag im unteren Bildschirm tippen, um ihn ein-/auszuschalten.
    * Persistente Speicherdateien (`savegame_slotX.dat`) enthalten jetzt eine
      zusätzliche Zeile `items <collected> <active>`.
    * Simulator spiegelt das Verhalten inklusive Inventar-UI und Map-Cache-Ausgabe.

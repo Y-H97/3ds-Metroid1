@@ -136,6 +136,33 @@ bool TileMap::loadJson(const char* path) {
             }
         }
     }
+
+    // Wenn der Editor noch einen Platzhalter-Tile (z.B. 99 für Doppelsprung)
+    // in der Tilemap gelassen hat, wandeln wir ihn hier ebenfalls in ein Item
+    // um. Das verhindert, dass der Simulator/3DS-Spiel eine tote Wand anzeigt
+    // falls jemand beim Export die "Items"-Liste vergessen hat.
+    const uint8_t PLACEHOLDER_DOUBLE_JUMP = 99;
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            size_t idxTile = static_cast<size_t>(y * width + x);
+            if (tiles[idxTile] == PLACEHOLDER_DOUBLE_JUMP) {
+                // Nur hinzufügen, wenn dort noch kein Item existiert.
+                bool exists = false;
+                for (const auto& id : items) {
+                    if (id.x == x && id.y == y) { exists = true; break; }
+                }
+                if (!exists) {
+                    ItemData id;
+                    id.type = "double_jump";
+                    id.x = x;
+                    id.y = y;
+                    items.push_back(id);
+                }
+                tiles[idxTile] = 0; // leere Luft
+            }
+        }
+    }
+
     return ok;
 }
 
@@ -303,11 +330,25 @@ void GameCore::update(const InputState& input, float dt) {
 
     // 5) Y-Kollisionen gegen volle Blöcke und schräge Flächen.
     float newY = player.y + player.vy * dt;
+    bool hitY = false; // ensure declared before potential use in clamp below
+    // clamp vertical position to map bounds to avoid huge falling
+    {
+        float maxYpos = map.height * tileSize - player.h;
+        if (newY > maxYpos) {
+            newY = maxYpos;
+            hitY = true;
+            player.grounded = true;
+            player.vy = 0.0f;
+        }
+        if (newY < 0.0f) {
+            newY = 0.0f;
+            player.vy = 0.0f;
+        }
+    }
     x0 = std::floor(player.x / tileSize);
     x1 = std::floor((player.x + player.w - 1.0f) / tileSize);
     y0 = std::floor((std::min(player.y, newY)) / tileSize);
     y1 = std::floor((std::max(player.y + player.h, newY + player.h)) / tileSize);
-    bool hitY = false;
     bool wasGrounded = player.grounded;
     player.grounded = false;
     for (int ty = static_cast<int>(y0); ty <= static_cast<int>(y1); ++ty) {
