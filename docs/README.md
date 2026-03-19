@@ -5,6 +5,7 @@ Zentraler Einstieg:
 
 ## Bereiche
 - [[docs/workspace/README|Workspace]]
+- [[docs/workspace/ORDNERSTRUKTUR_GESAMTPROJEKT|Ordnerstruktur Gesamtprojekt]]
 - [[docs/game/README|Game (3DS Runtime)]]
 - [[docs/simulator/README|Simulator]]
 - [[docs/level-editor/README|LevelEditor]]

@@ -15,6 +15,7 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/workspace/README|Workspace-Struktur]] – zeigt Top-Level-Ordner und Datenfluss.
 - [[docs/workspace/EINSTEIGER_GUIDE|Einsteiger-Guide]] – erklärt, was welcher Bereich macht.
 - [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur-Übersicht]] – Gesamtfluss Editor → Export → Runtime/Simulator.
+- [[docs/workspace/ORDNERSTRUKTUR_GESAMTPROJEKT|Ordnerstruktur Gesamtprojekt]] – erklärt Ordner, Zweck und Abhängigkeiten.
 
 ### Game (3DS Runtime)
 - [`3ds-cpp/README.md`](../3ds-cpp/README.md) – `3ds-cpp` Projekt‑README (Build, Simulator, Start‑Anweisungen).
@@ -25,6 +26,8 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/game/ITEMS|Item-System]] – Beschreibung der neuen Items und Inventar.
 - [[docs/game/SETUP|Game Setup]] – Build‑Voraussetzungen und Build‑Abläufe.
 - [[docs/game/DEVKITARM_INSTALLATION|devkitARM Installation]] – Fehlerbehebung bei Installation (PGP-Schlüssel etc.).
+- [[docs/game/DEVKITARM_QUICK_INSTALL|devkitARM Quick Install]] – schnellster Installationsweg mit MSYS2.
+- [[docs/game/DEVKITARM_MANUAL_INSTALL|devkitARM Manual Install]] – detaillierte Schritt-für-Schritt-Installation.
 - [[docs/game/DEPLOYMENT_3DS|Deployment auf 3DS]] – Installation auf echtem Nintendo 3DS.
 
 ### Simulator
@@ -41,7 +44,9 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/tooling/CHANGELOG_UND_VERSIONIERUNG|Changelog und Versionierung]] – Versionierungsregeln und Release-Workflow.
 - [[docs/PROGRAMS|Programme und Startskripte]] – ausführbare Programme und typische Workflows.
 - [[docs/REFACTORING_ASSESSMENT|Refactoring-Bewertung]] – Architekturstand und nächste Refactor-Schritte.
-- [[docs/AI_REGELN|AI-Regeln]] – Projektregeln für Sprache, Doku-Fortführung und Linkstandard.- [CHANGELOG](../CHANGELOG.md) – Übersicht über Versions‑Änderungen (verlinkt zu `changelog/`).
+- [[docs/AI_REGELN|AI-Regeln]] – Projektregeln für Sprache, Doku-Fortführung und Linkstandard.
+- [CHANGELOG](../CHANGELOG.md) – Übersicht über Versions‑Änderungen (verlinkt zu `changelog/`).
+
 ### Rollenbasierte Quickstarts
 - [[docs/quickstart/README|Quickstart Überblick]] – Einstieg nach Rolle.
 - [[docs/quickstart/developer|Quick Start – Entwickler]] – Code ändern, testen, builden.

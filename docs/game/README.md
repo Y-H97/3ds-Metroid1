@@ -9,6 +9,8 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - `ITEMS.md` – Item-System und Inventar.
 - `SETUP.md` – Build-Setup für Windows und Linux.
 - `DEVKITARM_INSTALLATION.md` – Fehlerbehebung bei devkitARM-Installation (PGP-Schlüssel etc.).
+- `DEVKITARM_QUICK_INSTALL.md` – schnellster Installationsweg für devkitARM.
+- `DEVKITARM_MANUAL_INSTALL.md` – detaillierte, manuelle Installationsschritte.
 - `DEPLOYMENT_3DS.md` – Installation auf echtem Nintendo 3DS.
 
 ## Relevante Quellpfade
@@ -34,4 +36,6 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - [[docs/game/ITEMS|Item-System]]
 - [[docs/game/SETUP|Game Setup]]
 - [[docs/game/DEVKITARM_INSTALLATION|devkitARM Installation & Troubleshooting]]
+- [[docs/game/DEVKITARM_QUICK_INSTALL|devkitARM Quick Install]]
+- [[docs/game/DEVKITARM_MANUAL_INSTALL|devkitARM Manual Install]]
 - [[docs/game/DEPLOYMENT_3DS|Deployment auf Nintendo 3DS]]

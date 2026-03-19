@@ -15,6 +15,7 @@
 ## Einstieg ohne Vorwissen
 - `EINSTEIGER_GUIDE.md` – einfache Modulübersicht, Datenfluss und typische Abläufe.
 - `ARCHITEKTUR_UEBERSICHT.md` – visuelle Gesamtarchitektur mit Diagramm.
+- `ORDNERSTRUKTUR_GESAMTPROJEKT.md` – erklärt jeden Projektordner, seinen Zweck und seine Abhängigkeiten.
 
 ## Muss-Checkliste vor Abschluss
 - [ ] Antworten/Änderungstexte auf Deutsch
@@ -27,4 +28,5 @@
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/workspace/EINSTEIGER_GUIDE|Einsteiger-Guide]]
 - [[docs/workspace/ARCHITEKTUR_UEBERSICHT|Architektur-Übersicht]]
+- [[docs/workspace/ORDNERSTRUKTUR_GESAMTPROJEKT|Ordnerstruktur Gesamtprojekt]]
 - [[docs/quickstart/README|Quick Start nach Rolle]]
