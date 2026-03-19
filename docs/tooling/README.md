@@ -50,6 +50,7 @@
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/PROGRAMS|Programme und Startskripte]]
+- [[docs/tooling/CHANGELOG_UND_VERSIONIERUNG|Changelog und Versionierung]]
 - [[docs/game/SETUP|Game Setup]]
 - [[docs/simulator/SETUP|Simulator Setup]]
 - [[docs/level-editor/SETUP|LevelEditor Setup]]

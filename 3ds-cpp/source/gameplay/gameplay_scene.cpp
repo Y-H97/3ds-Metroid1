@@ -6,9 +6,8 @@
 #include <cmath>
 #include <cstdio>
 
-// Item-spezifische Logik an zentraler Stelle einbinden
-#include "items/double_jump/double_jump.h"
-
+// Item-spezifische Logik
+#include "items.h"
 
 #include "../ui/text_renderer.h"
 #include "render/bottom_ui.h"
@@ -55,6 +54,20 @@ static void computeCamera(const Player& p, const TileMap& map, float tileSize, f
 
 static std::string pickFirstLevelFromWorld(const char* path) {
     // Fallback-Helfer: nimmt den ersten "level"-Eintrag aus world.json.
+    FILE* f = fopen(path, "r");
+    if (!f) return {};
+    std::string s;
+    char buf[512];
+    while (size_t n = fread(buf, 1, sizeof(buf), f)) s.append(buf, n);
+    fclose(f);
+
+    size_t pos = s.find("\"level\"");
+    if (pos == std::string::npos) return {};
+    pos = s.find('"', pos + 7);
+    if (pos == std::string::npos) return {};
+    size_t end = s.find('"', pos + 1);
+    if (end == std::string::npos) return {};
+    return s.substr(pos + 1, end - pos - 1);
 }
 
 // Helper: erneuert die MapItem-Liste basierend auf der gerade geladenen TileMap
@@ -74,22 +87,6 @@ void GameplayScene::refreshMapItems() {
         mi.collected = false;
         mapItems.push_back(mi);
     }
-}
-
-    FILE* f = fopen(path, "r");
-    if (!f) return {};
-    std::string s;
-    char buf[512];
-    while (size_t n = fread(buf, 1, sizeof(buf), f)) s.append(buf, n);
-    fclose(f);
-
-    size_t pos = s.find("\"level\"");
-    if (pos == std::string::npos) return {};
-    pos = s.find('"', pos + 7);
-    if (pos == std::string::npos) return {};
-    size_t end = s.find('"', pos + 1);
-    if (end == std::string::npos) return {};
-    return s.substr(pos + 1, end - pos - 1);
 }
 
 static void renderMap(C3D_RenderTarget* target, float originX, float originY, float tileSize, const TileRenderer& renderer, const TileMap& map) {

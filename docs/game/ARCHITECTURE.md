@@ -60,6 +60,11 @@ flowchart TD
 - Controller und View sind getrennt.
 - Gameplay-Logik ist vom Menü getrennt.
 - Persistenz liegt im Gameplay/Settings-Bereich, nicht in UI-Code.
+- Erweiterungen wie das Item-/Inventarsystem sind als eigene Module unter
+  `gameplay/items` gekapselt und kommunizieren über bitweise Flags, sodass
+  neue Effekte leicht hinzufügbar sind.
+- Beim Raumwechsel werden Spawnkoordinaten geclamped, um Abstürze in sehr
+  schmalen oder niedrigen Räumen (z.B. SafeRoom) zu vermeiden.
 
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]

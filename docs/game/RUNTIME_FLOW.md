@@ -16,6 +16,8 @@
     - Kartenfortschritt zurücksetzen
 - Wenn `APP_GAME`:
   - Gameplay Input/Update.
+  - Items einsammeln und Bottom-UI (Inventar) verarbeiten. Das Inventar kann
+    per Richtungs-Tasten oder `Y`/Touch umgeschaltet werden.
   - Rückkehr ins Menü oder Exit prüfen.
 
 ## Render

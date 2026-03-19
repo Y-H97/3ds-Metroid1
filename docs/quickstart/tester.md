@@ -14,6 +14,9 @@
    - Slot wechseln, Neues Spiel, Fortsetzen, Optionen.
 4. Gameplay prüfen:
    - Bewegung/Sprung, Raumwechsel, Rückkehr ins Menü (`ESC`).
+   - Items aufsammeln (z.B. Doppelsprung) und Bottom-UI öffnen, Status umschalten
+     (`Y` oder Touch). Experimente im SafeRoom ausführen, um Spawn-Clamp zu
+     prüfen.
 5. Persistenz prüfen:
    - Checkpoint erreichen, schließen, neu starten, `Fortsetzen` testen.
 

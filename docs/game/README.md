@@ -6,7 +6,10 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - `ARCHITECTURE.md` – Modulaufbau und Verantwortlichkeiten.
 - `RUNTIME_FLOW.md` – Main-Loop, State-Wechsel und Renderfluss.
 - `SAVE_AND_SETTINGS.md` – Save-Slots, Checkpoints, Fog-of-War und Settings.
+- `ITEMS.md` – Item-System und Inventar.
 - `SETUP.md` – Build-Setup für Windows und Linux.
+- `DEVKITARM_INSTALLATION.md` – Fehlerbehebung bei devkitARM-Installation (PGP-Schlüssel etc.).
+- `DEPLOYMENT_3DS.md` – Installation auf echtem Nintendo 3DS.
 
 ## Relevante Quellpfade
 - `3ds-cpp/README.md` — Projekt‑README für den 3DS‑Core (Build/Run‑Hinweise, Simulator)
@@ -28,4 +31,7 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 - [[docs/game/ARCHITECTURE|Game-Architektur]]
 - [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
 - [[docs/game/SAVE_AND_SETTINGS|Save-, Slot- und Settings-System]]
+- [[docs/game/ITEMS|Item-System]]
 - [[docs/game/SETUP|Game Setup]]
+- [[docs/game/DEVKITARM_INSTALLATION|devkitARM Installation & Troubleshooting]]
+- [[docs/game/DEPLOYMENT_3DS|Deployment auf Nintendo 3DS]]

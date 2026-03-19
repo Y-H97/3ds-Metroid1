@@ -24,6 +24,8 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/game/SAVE_AND_SETTINGS|Save & Settings]] – Slots, Checkpoints, Fog‑of‑War, Einstellungen.
 - [[docs/game/ITEMS|Item-System]] – Beschreibung der neuen Items und Inventar.
 - [[docs/game/SETUP|Game Setup]] – Build‑Voraussetzungen und Build‑Abläufe.
+- [[docs/game/DEVKITARM_INSTALLATION|devkitARM Installation]] – Fehlerbehebung bei Installation (PGP-Schlüssel etc.).
+- [[docs/game/DEPLOYMENT_3DS|Deployment auf 3DS]] – Installation auf echtem Nintendo 3DS.
 
 ### Simulator
 - [[docs/simulator/README|Simulator Überblick]] – Komponenten und Startpunkte.
@@ -36,6 +38,7 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 
 ### Tooling & Prozesse
 - [[docs/tooling/README|Tooling, Build und Skripte]] – alle Build-/Run- und Export-Pfade.
+- [[docs/tooling/CHANGELOG_UND_VERSIONIERUNG|Changelog und Versionierung]] – Versionierungsregeln und Release-Workflow.
 - [[docs/PROGRAMS|Programme und Startskripte]] – ausführbare Programme und typische Workflows.
 - [[docs/REFACTORING_ASSESSMENT|Refactoring-Bewertung]] – Architekturstand und nächste Refactor-Schritte.
 - [[docs/AI_REGELN|AI-Regeln]] – Projektregeln für Sprache, Doku-Fortführung und Linkstandard.- [CHANGELOG](../CHANGELOG.md) – Übersicht über Versions‑Änderungen (verlinkt zu `changelog/`).

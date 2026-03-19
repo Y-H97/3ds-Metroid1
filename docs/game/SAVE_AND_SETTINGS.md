@@ -19,6 +19,12 @@
   - `visited_slot1.dat`, `visited_slot2.dat`, `visited_slot3.dat`
 - Kartenfortschritt kann im Hauptmenü pro aktivem Slot zurückgesetzt werden.
 
+## Inventar-Persistenz
+- Save-Dateien enthalten jetzt zusätzlich eine Zeile
+  `items <collected> <active>`
+  (zwei 32-bit Bitmasken). Dadurch werden eingesammelte Gegenstände und ihr
+  aktueller ON/OFF-Status über Neustarts beibehalten.
+
 ## Settings
 - Datei: `sdmc:/3ds/3ds-cpp/settings.dat`
 - Gespeicherte Werte:

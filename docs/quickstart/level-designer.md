@@ -17,6 +17,9 @@
 
 ## Hinweise
 - `world.lua` steuert Raumplatzierung/Verbindungen.
+- Neuer Editor-Modus `Item` (Taste `i`) erlaubt das Platzieren von Gegenständen
+  wie Doppelsprung. Rechtsklick entfernt wieder das Tile.
+- Beim Export generiert das Powershell-Skript automatisch das `items`-Array.
 - Wenn Export fehlschlägt, zuerst Konsole auf Validierungsfehler prüfen.
 - Der Simulator lädt Karten aus `3ds-cpp/romfs/maps`.
 

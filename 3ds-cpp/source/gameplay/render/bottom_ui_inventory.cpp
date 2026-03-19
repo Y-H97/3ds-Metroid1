@@ -1,4 +1,5 @@
 #include "bottom_ui_tabs.h"
+#include "../gameplay_scene.h"
 
 #include <citro2d.h>
 

@@ -20,7 +20,8 @@
 
 ### Bottom-Tabs im Gameplay
 - Wechsel: `A/D`, `Q/E` oder Klick auf Tab-Leiste
-
+- `Y` toggelt im Inventar den ausgewählten Eintrag (alternativ Klick/Tap auf
+  einen Gegenstand).
 ## Console-Simulator (Windows/Linux)
 
 ### Start

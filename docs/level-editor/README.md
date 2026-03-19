@@ -24,6 +24,7 @@ Dieser Bereich dokumentiert den Lua/LÖVE-basierten Level-Editor in `LevelEditor
 
 ## Interne Module
 - `constants.lua` – zentrale Konstanten.
+  * Enthält auch `ITEM_TYPES` und Tile-IDs für Items (z.B. Doppelsprung).
 - `state.lua` – Editorzustand.
 - `views.lua` – Rendering/Views.
 - `ui_components.lua` – UI-Bausteine.
@@ -42,7 +43,8 @@ Dieser Bereich dokumentiert den Lua/LÖVE-basierten Level-Editor in `LevelEditor
 ## Hinweis
 - `run_editor.bat` enthält aktuell einen festen LÖVE-Pfad (`C:\Program Files\LOVE\love.exe`).
   Bei abweichender Installation muss dieser Pfad angepasst werden.
-
+- Exporter erkennt jetzt automatisch Items und schreibt diese ins JSON; alte Karten
+  mit Platzhaltern (Tile 99) werden beim Laden zur Laufzeit konvertiert.
 ## Muss-Checkliste vor Abschluss
 - [ ] Antworten/Änderungstexte auf Deutsch
 - [ ] Neuer/geänderter Code ausführlich auf Deutsch kommentiert
