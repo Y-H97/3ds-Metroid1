@@ -8,10 +8,10 @@ In dieser Version wurde ein rudimentäres Item-/Inventarsystem ergänzt. Schritt
    * Zur Zeit gibt es nur einen Typ (`Doppelsprung`) – weitere Typen können
      in `LevelEditor/constants.lua` ergänzt werden.
    * Beim Speichern des Raumes werden sämtliche Items in `items` exportiert.
-   * Der Map-Exporter (`LevelEditor/map_exporter.lua` und das PowerShell-Skript
-     `LevelEditor/export_maps.ps1`) schreibt die Items automatisch in das
-     JSON-Format – der Batch‑Export (`run_export_maps.bat`) ist somit ebenfalls
-     kompatibel.
+  * Der Map-Exporter (`LevelEditor/map_exporter.lua`, `LevelEditor/export_maps.py`
+    und das PowerShell-Skript `LevelEditor/export_maps.ps1`) schreibt die Items
+    automatisch in das JSON-Format – der Batch‑Export (`run_export_maps.bat`)
+    ist somit ebenfalls kompatibel.
 
 2. **Engine (3DS + Simulator)**
    * Neue Daten in `gameplay_scene` und Simulator: `collectedItems`, `activeItems`.

@@ -7,6 +7,9 @@ import sys
 from pathlib import Path
 
 
+PLACEHOLDER_DOUBLE_JUMP = 99
+
+
 def parse_room_lua(path: Path):
     # Liest Raum-Lua-Datei und extrahiert ein rechteckiges Tile-Grid.
     content = path.read_text(encoding="utf-8")
@@ -59,6 +62,65 @@ def parse_room_lua(path: Path):
         "height": height,
         "tiles": tiles,
     }
+
+
+def parse_room_items(content: str):
+    # Liest optionale Item-Einträge aus dem Lua-Raumformat.
+    # Das Format ist aktuell bewusst einfach gehalten:
+    # items = {
+    #   {x=33,y=5,type="double_jump"},
+    # }
+    items = []
+    in_items = False
+
+    for line in content.splitlines():
+        if not in_items and re.match(r"^\s*items\s*=\s*\{", line):
+            in_items = True
+            continue
+
+        if in_items and re.match(r"^\s*\}\s*,?\s*$", line):
+            break
+
+        if not in_items:
+            continue
+
+        match = re.search(
+            r'\{\s*x\s*=\s*(-?\d+)\s*,\s*y\s*=\s*(-?\d+)\s*,\s*type\s*=\s*"([^"]+)"\s*\}\s*,?\s*$',
+            line,
+        )
+        if not match:
+            continue
+
+        items.append(
+            {
+                "x": int(match.group(1)),
+                "y": int(match.group(2)),
+                "type": match.group(3),
+            }
+        )
+
+    return items
+
+
+def append_placeholder_items(room_obj: dict):
+    # Wandelt Editor-Platzhalter in echte Item-Daten um und räumt die Tilemap auf.
+    items = room_obj.setdefault("items", [])
+    seen_positions = {(int(item["x"]), int(item["y"]), str(item["type"])) for item in items}
+
+    width = int(room_obj["width"])
+    tiles = room_obj["tiles"]
+    for index, tile in enumerate(tiles):
+        if tile != PLACEHOLDER_DOUBLE_JUMP:
+            continue
+
+        x = index % width
+        y = index // width
+        key = (x, y, "double_jump")
+        if key not in seen_positions:
+            items.append({"x": x, "y": y, "type": "double_jump"})
+            seen_positions.add(key)
+
+        tiles[index] = 0
 
 
 def parse_world_lua(path: Path):
@@ -123,6 +185,10 @@ def main():
 
     for room_file in room_files:
         room_obj = parse_room_lua(room_file)
+        room_items = parse_room_items(room_file.read_text(encoding="utf-8"))
+        if room_items:
+            room_obj["items"] = room_items
+        append_placeholder_items(room_obj)
         validate_room_json(room_obj, room_file)
         out_path = maps_dir / f"{room_file.stem}.json"
         write_json(out_path, room_obj)

@@ -255,6 +255,7 @@ void GameCore::update(const InputState& input, float dt) {
     // Zentrale Physik: Eingaben, Gravitation, Kollisionen (X/Y), Sonderflächen, Tod.
     const float speed = 150.0f;
     const float jumpVel = -420.0f;
+    const float jumpCutVel = -190.0f;
     const float gravity = 900.0f;
     const float tileSize = 16.0f;
 
@@ -283,6 +284,13 @@ void GameCore::update(const InputState& input, float dt) {
     // wenn der Spieler wieder den Boden berührt, Reset der Zusatzsprünge
     if (player.grounded) {
         player.jumpsRemaining = player.hasDoubleJump ? 1 : 0;
+    }
+
+    // Variabler Sprung: Wird die Taste frueh losgelassen, kuerzen wir
+    // nur den aufwaerts gerichteten Teil des Sprungs. Dadurch bleiben
+    // maximale Sprunghoehe und Sprungstart bei gehaltenem Knopf unveraendert.
+    if (!input.jump && player.vy < jumpCutVel) {
+        player.vy = jumpCutVel;
     }
 
     // 3) Gravitation beschleunigt den Spieler nach unten.

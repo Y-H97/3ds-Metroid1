@@ -12,11 +12,13 @@ echo.
 REM Setze Umgebungsvariablen
 set DEVKITPRO=C:\devkitPro
 set DEVKITARM=C:\devkitPro\devkitARM
+set CTRULIB=C:\devkitPro\libctru
 set PATH=%DEVKITARM%\bin;%PATH%
 
 echo [1/4] Umgebungsvariablen prüfen...
 echo   DEVKITPRO: %DEVKITPRO%
 echo   DEVKITARM: %DEVKITARM%
+echo   CTRULIB: %CTRULIB%
 
 REM Compiler testen
 echo [2/4] Compiler testen...
