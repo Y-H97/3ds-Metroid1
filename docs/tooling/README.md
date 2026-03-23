@@ -34,6 +34,11 @@
   - `3ds-cpp/build/simulator/metroid_sim_window.exe`
   - `3ds-cpp/build/simulator/metroid_sim_console.exe`
 
+Diese Artefakte sind generierte Build-Ausgaben und sollen nicht als gepflegte
+Quellstände im Repository liegen. Für lokale Builds werden sie durch die
+`.gitignore` ausgeblendet. Das gleiche gilt für lokale Simulator-Speicherstände
+unter `3ds-cpp/sim_saves/`.
+
 ## Typischer End-to-End-Workflow
 1. `LevelEditor/run_editor.bat`
 2. `LevelEditor/run_export_maps.bat`

@@ -1,0 +1,11 @@
+# Generierte 3DS-Build-Artefakte
+/3ds-cpp/build/
+/3ds-cpp/*.3dsx
+/3ds-cpp/*.elf
+/3ds-cpp/*.smdh
+
+# Lokale Simulator-Laufzeitdaten
+/3ds-cpp/sim_saves/
+
+# Editor-/Tooling-Zwischenstände
+/.obsidian/workspace.json
