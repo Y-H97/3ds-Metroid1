@@ -5,6 +5,9 @@
 
 namespace playerlogic {
 
+// Bewegt den Spieler horizontal und stoppt ihn an massiven Kacheln.
+// Die Funktion erlaubt kleine Stufen, damit der Spieler bei flachen Kanten
+// nicht haengen bleibt, sondern sauber aufsteigen kann.
 void resolveHorizontalCollisions(Player& player, const TileMap& map, float dt, float tileSize, float stepHeight) {
     float newX = player.x + player.vx * dt;
     float x0 = std::floor((std::min(player.x, newX)) / tileSize);
@@ -24,6 +27,9 @@ void resolveHorizontalCollisions(Player& player, const TileMap& map, float dt, f
             float tileRight = tileLeft + tileSize;
             float tileTop = ty * tileSize;
 
+            // Beim Laufen nach rechts pruefen wir, ob die Spielerbox die linke
+            // Kante der Kachel kreuzt. Kleine Hoehenunterschiede behandeln wir
+            // als Stufe statt als harte Wand.
             if (player.vx > 0.0f && player.x + player.w <= tileLeft && newX + player.w > tileLeft) {
                 float feetY = player.y + player.h;
                 float penetrationY = feetY - tileTop;
@@ -33,6 +39,7 @@ void resolveHorizontalCollisions(Player& player, const TileMap& map, float dt, f
                     newX = tileLeft - player.w;
                     hitX = true;
                 }
+            // Dasselbe Prinzip gilt gespiegelt fuer die Bewegung nach links.
             } else if (player.vx < 0.0f && player.x >= tileRight && newX < tileRight) {
                 float feetY = player.y + player.h;
                 float penetrationY = feetY - tileTop;
@@ -52,11 +59,16 @@ void resolveHorizontalCollisions(Player& player, const TileMap& map, float dt, f
     }
 }
 
+// Bewegt den Spieler vertikal, behandelt Boden-/Deckenkontakte und wertet
+// zusaetzlich Schraegkacheln aus. Diese Funktion entscheidet ausserdem,
+// ob der Spieler aktuell als "grounded" gilt.
 void resolveVerticalCollisions(Player& player, const TileMap& map, float dt, float tileSize) {
     float newY = player.y + player.vy * dt;
     bool hitY = false;
 
     {
+        // Die Welt hat harte Ober- und Untergrenzen, damit der Spieler nie
+        // ausserhalb der Map landet.
         float maxYpos = map.height * tileSize - player.h;
         if (newY > maxYpos) {
             newY = maxYpos;
@@ -83,11 +95,15 @@ void resolveVerticalCollisions(Player& player, const TileMap& map, float dt, flo
             float tileTop = ty * tileSize;
             float tileBottom = tileTop + tileSize;
 
+            // Die Tile-IDs 30-33 repraesentieren Schraegflaechen. Statt einer
+            // rechteckigen Kollision berechnen wir die Zielhoehe innerhalb der
+            // Kachel anhand der horizontalen Spielerposition.
             if (tile == 30 || tile == 31 || tile == 32 || tile == 33) {
                 float relX = (player.x + player.w * 0.5f) - tileLeft;
                 if (relX < 0.0f) relX = 0.0f;
                 if (relX > tileSize) relX = tileSize;
 
+                // Untere Schraegkacheln tragen den Spieler beim Fallen.
                 if ((tile == 30 || tile == 31) && player.vy >= 0.0f) {
                     float targetY = (tile == 30) ? (tileTop + (tileSize - relX)) : (tileTop + relX);
                     float penetration = (newY + player.h) - targetY;
@@ -96,6 +112,7 @@ void resolveVerticalCollisions(Player& player, const TileMap& map, float dt, flo
                         hitY = true;
                         player.grounded = true;
                     }
+                // Obere Schraegkacheln blockieren den Spieler beim Sprung nach oben.
                 } else if ((tile == 32 || tile == 33) && player.vy < 0.0f) {
                     float targetY = (tile == 32) ? (tileTop + (tileSize - relX)) : (tileTop + relX);
                     if (newY < targetY) {
@@ -110,6 +127,7 @@ void resolveVerticalCollisions(Player& player, const TileMap& map, float dt, flo
                 continue;
             }
 
+            // Normale Vollkacheln behandeln wir klassisch als Boden oder Decke.
             if (player.vy > 0.0f && player.y + player.h <= tileTop && newY + player.h > tileTop) {
                 newY = tileTop - player.h;
                 hitY = true;

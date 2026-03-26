@@ -1,3 +1,5 @@
+-- Raum 3 ist ein einfacher Test- und Verbindungsraum mit klaren Strukturen,
+-- damit Traversal, Kollisionsformen und Uebergaenge leicht pruefbar bleiben.
 return {
   grid = {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},

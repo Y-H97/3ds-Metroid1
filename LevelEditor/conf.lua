@@ -1,4 +1,5 @@
--- Level Editor Konfiguration
+-- Konfiguriert das LÖVE-Fenster fuer den LevelEditor.
+-- Die Einstellungen sorgen fuer einen grossen Vollbild-Arbeitsbereich auf dem PC.
 function love.conf(t)
     t.window.title = "Metroidvania Level Editor (PC)"
     t.window.width = 1280

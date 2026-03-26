@@ -1,3 +1,5 @@
+-- Raum 1 ist ein groesserer Gameplay-Testbereich mit Plattformen, Leitern,
+-- Gefahren und platzierten Items fuer den Export in die Runtime.
 return {
   grid = {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},

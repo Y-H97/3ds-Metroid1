@@ -4,6 +4,8 @@
 
 namespace playerlogic {
 
+// Prueft, ob die aktuelle Spielerbox eine Gefahrenkachel beruehrt.
+// Tile-ID 2 steht hier fuer schadende oder toedliche Felder.
 bool detectDangerCollision(const Player& player, const TileMap& map, float tileSize) {
     int tx0 = static_cast<int>(std::floor(player.x / tileSize));
     int tx1 = static_cast<int>(std::floor((player.x + player.w - 1.0f) / tileSize));
@@ -12,6 +14,8 @@ bool detectDangerCollision(const Player& player, const TileMap& map, float tileS
 
     for (int ty = ty0; ty <= ty1; ++ty) {
         for (int tx = tx0; tx <= tx1; ++tx) {
+            // Sobald eine einzige Gefahrenkachel getroffen wird, koennen wir
+            // sofort abbrechen. Mehr Details braucht die Aufruferseite nicht.
             if (map.getTile(tx, ty) == 2) {
                 return true;
             }
