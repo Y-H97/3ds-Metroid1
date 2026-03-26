@@ -42,14 +42,22 @@
         "-Command",
         "& { python '${workspaceFolder}\\LevelEditor\\export_maps.py' }"
       ],
-      "group": "build",
+      "group": { "kind": "build", "isDefault": false },
       "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
       "problemMatcher": []
     },
     {
       "label": "Run: LevelEditor (Windows)",
       "type": "shell",
-      "command": "${workspaceFolder}\\LevelEditor\\run_editor.bat",
+      "command": "${workspaceFolder}\\programme\\run_level_editor.bat",
+      "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: Build 3DS from Editor",
+      "type": "shell",
+      "command": "${workspaceFolder}\\programme\\build_game_from_editor.bat",
+      "group": { "kind": "build", "isDefault": true },
       "presentation": { "echo": true, "reveal": "always", "panel": "shared" },
       "problemMatcher": []
     }

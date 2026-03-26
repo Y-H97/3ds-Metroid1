@@ -12,6 +12,7 @@ Diese Seite beschreibt die Ordnerstruktur des Projekts und beantwortet pro Berei
 | `.github/` | CI-Workflows, PR-Templates, Copilot-Regeln | Qualitaetssicherung und Projektprozesse | GitHub Actions, Python fuer Pruefskripte |
 | `.vscode/` | Workspace-Settings und Tasks | Einheitliche lokale Workflows in VS Code | PowerShell, lokale Toolchains |
 | `.obsidian/` | Obsidian-Workspace-Metadaten | Navigierbarkeit der Doku in Obsidian | Obsidian (optional) |
+| `programme/` | Zentraler Einstieg fuer alle Startskripte | Gebuendelte Programme fuer Editor, Export, Simulator und 3DS-Build | Wrapper auf `LevelEditor/`, `simulator/`, `3ds-cpp/` |
 | `3ds-cpp/` | 3DS-Runtime, C/C++-Quellen, ROMFS-Inhalte | Hauptspiel fuer Nintendo 3DS, zentrale Core-Logik | devkitARM, libctru, citro2d/citro3d, make |
 | `LevelEditor/` | Lua/Love2D-Editor, Leveldaten, Exportskripte | Erstellen/Bearbeiten von Raeumen und Weltlayout | LÖVE (love2d), PowerShell, optional Python 3 |
 | `simulator/` | Desktop-Simulatoren (Window + Console) | Schnelles Testen der Spiel-Logik am PC | C++17-Compiler (`g++` oder `cl.exe`) |
@@ -23,6 +24,18 @@ Diese Seite beschreibt die Ordnerstruktur des Projekts und beantwortet pro Berei
 | `requirements-dev.txt` | Dev-Tooling-Pakete | Lokale Entwicklungspruefungen (z. B. pre-commit) | Python + pip |
 
 ## 2) Technische Kernordner im Detail
+
+### `programme/` (zentraler Programmeinstieg)
+- `README.md`: Uebersicht ueber alle Startpunkte und deren Aufgabe.
+- `run_level_editor.bat`: Leitet den Start des Editors weiter.
+- `export_level_maps.bat`: Leitet den Kartenexport weiter.
+- `run_simulator_window.bat`: Leitet den Simulatorstart weiter.
+- `build_3ds.bat`: Leitet den 3DS-Build weiter.
+- `build_game_from_editor.bat`: Fuehrt Export und 3DS-Build in einem Schritt aus.
+
+Abhaengigkeiten:
+- Nutzt die bestehenden fachlichen Skripte in `LevelEditor/`, `simulator/` und `3ds-cpp/`.
+- Dient bewusst als stabile Einstiegsschicht, damit die interne Projektstruktur getrennt vom Nutzereinstieg bleiben kann.
 
 ### `3ds-cpp/` (3DS-Runtime + Core)
 - `source/`: Code der Runtime.
@@ -104,9 +117,10 @@ Abhaengigkeiten:
 ## 3) Daten- und Abhaengigkeitsfluss (Kurzform)
 
 1. `LevelEditor/level/*.lua` wird gepflegt.
-2. Export erzeugt `3ds-cpp/romfs/maps/*.json`.
-3. Runtime (`3ds-cpp/source`) und Simulator (`simulator/`) lesen dieselben JSON-Maps.
-4. Skripte unter `scripts/` validieren Kommentare und Doku-Links lokal/CI.
+2. Einstieg ueber `programme/export_level_maps.bat` oder `programme/build_game_from_editor.bat`.
+3. Export erzeugt `3ds-cpp/romfs/maps/*.json`.
+4. Runtime (`3ds-cpp/source`) und Simulator (`simulator/`) lesen dieselben JSON-Maps.
+5. Skripte unter `scripts/` validieren Kommentare und Doku-Links lokal/CI.
 
 ## 4) Externe Workspace-Ordner (ausserhalb des Repos)
 

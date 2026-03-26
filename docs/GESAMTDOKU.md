@@ -44,6 +44,7 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [[docs/tooling/README|Tooling, Build und Skripte]] – alle Build-/Run- und Export-Pfade.
 - [[docs/tooling/CHANGELOG_UND_VERSIONIERUNG|Changelog und Versionierung]] – Versionierungsregeln und Release-Workflow.
 - [[docs/PROGRAMS|Programme und Startskripte]] – ausführbare Programme und typische Workflows.
+- [`programme/README.md`](../programme/README.md) – zentraler Einstieg fuer alle Programme und Wrapper-Skripte.
 - [[docs/REFACTORING_ASSESSMENT|Refactoring-Bewertung]] – Architekturstand und nächste Refactor-Schritte.
 - [[docs/AI_REGELN|AI-Regeln]] – Projektregeln für Sprache, Doku-Fortführung und Linkstandard.
 - [CHANGELOG](../CHANGELOG.md) – Übersicht über Versions‑Änderungen (verlinkt zu `changelog/`).

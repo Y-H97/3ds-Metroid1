@@ -1,6 +1,22 @@
 # Programme und Startskripte
 
 Dieses Dokument listet die ausführbaren Programme/Skripte im Workspace und deren Zweck.
+Der bevorzugte Einstieg liegt jetzt im zentralen Ordner `programme/`.
+
+## 0) Zentraler Programmordner (`programme/`)
+
+- `programme/README.md`
+  - Beschreibt alle gebuendelten Programme und den Zweck des Ordners.
+- `programme/run_level_editor.bat`
+  - Startet den LevelEditor ueber einen zentralen Einstiegspunkt.
+- `programme/export_level_maps.bat`
+  - Exportiert die Level in das JSON-Format fuer Runtime und Simulator.
+- `programme/run_simulator_window.bat`
+  - Startet den grafischen Windows-Simulator.
+- `programme/build_3ds.bat`
+  - Baut die 3DS-Version mit vorhandenen exportierten Karten.
+- `programme/build_game_from_editor.bat`
+  - Kombiniert Level-Export und 3DS-Build in einem einzigen Skript.
 
 ## 1) 3DS Runtime (`3ds-cpp/`)
 
@@ -53,9 +69,9 @@ Dieses Dokument listet die ausführbaren Programme/Skripte im Workspace und dere
 ## 5) Typischer Workflow
 
 1. Level im `LevelEditor` bearbeiten.
-2. Mit `run_export_maps.bat` in `3ds-cpp/romfs/maps` exportieren.
-3. Testen im `simulator/run_simulator_window.bat`.
-4. 3DS-Build über `3ds-cpp/Makefile`.
+2. Mit `programme/export_level_maps.bat` in `3ds-cpp/romfs/maps` exportieren.
+3. Testen mit `programme/run_simulator_window.bat`.
+4. Komplettbuild ueber `programme/build_game_from_editor.bat` oder alternativ direkt ueber `programme/build_3ds.bat`.
 
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]

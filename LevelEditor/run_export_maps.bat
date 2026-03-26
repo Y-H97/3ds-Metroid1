@@ -1,5 +1,6 @@
 @echo off
 REM Exportiert alle LevelEditor-Lua-Dateien nach 3ds-cpp/romfs/maps (Windows).
+REM LEGACY-HINWEIS: Bevorzugter Einstieg ist jetzt ..\programme\export_level_maps.bat.
 setlocal EnableExtensions
 
 set "NO_PAUSE="

@@ -1,6 +1,8 @@
 @echo off
 REM 3DS Build Script mit korrekten Umgebungsvariablen
 REM Setzt devkitPro-Pfade und führt make durch
+REM LEGACY-HINWEIS: Bevorzugter Einstieg ist jetzt ..\programme\build_3ds.bat
+REM oder fuer den Komplettablauf ..\programme\build_game_from_editor.bat.
 
 setlocal enabledelayedexpansion
 

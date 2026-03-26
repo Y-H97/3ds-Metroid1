@@ -1,6 +1,8 @@
 @echo off
 REM Lokaler Build-Workflow: exportiert Maps, spiegelt Projekt in Temp,
 REM baut dort und kopiert Artefakte zurück ins Workspace.
+REM LEGACY-HINWEIS: Fuer den gebuendelten Standardablauf nutze
+REM bevorzugt ..\programme\build_game_from_editor.bat.
 setlocal EnableExtensions
 
 set "SRC=%~dp0"

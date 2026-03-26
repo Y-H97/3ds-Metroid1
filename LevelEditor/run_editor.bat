@@ -1,5 +1,6 @@
 @echo off
 REM Startet den LevelEditor mit lokaler LÖVE-Installation unter Windows.
+REM LEGACY-HINWEIS: Bevorzugter Einstieg ist jetzt ..\programme\run_level_editor.bat.
 echo Starte Level Editor...
 
 REM Nutze den absoluten Pfad zur LÖVE Installation

@@ -1,5 +1,19 @@
 # Tooling, Build und Skripte
 
+## Zentraler Einstieg
+- `programme/README.md`
+  - Beschreibt den zentralen Programme-Ordner und die bevorzugten Startpunkte.
+- `programme/build_game_from_editor.bat`
+  - Standardablauf fuer den Nintendo-3DS-Build: exportiert zuerst die Level und startet danach den Build.
+- `programme/build_3ds.bat`
+  - Zentraler Einstieg fuer den reinen 3DS-Build.
+- `programme/export_level_maps.bat`
+  - Zentraler Einstieg fuer den Kartenexport.
+- `programme/run_level_editor.bat`
+  - Zentraler Einstieg fuer den Windows-LevelEditor.
+- `programme/run_simulator_window.bat`
+  - Zentraler Einstieg fuer den grafischen Windows-Simulator.
+
 ## 3DS-Build
 - `3ds-cpp/Makefile`
   - devkitARM/libctru-basierter Build (`.3dsx`, `.smdh`, RomFS, gfx conversion).
@@ -40,10 +54,14 @@ Quellstände im Repository liegen. Für lokale Builds werden sie durch die
 unter `3ds-cpp/sim_saves/`.
 
 ## Typischer End-to-End-Workflow
-1. `LevelEditor/run_editor.bat`
-2. `LevelEditor/run_export_maps.bat`
-3. `simulator/run_simulator_window.bat`
-4. `3ds-cpp/build_local.bat` oder direkt `make` in `3ds-cpp`
+1. `programme/run_level_editor.bat`
+2. `programme/export_level_maps.bat`
+3. `programme/run_simulator_window.bat`
+4. `programme/build_game_from_editor.bat`
+
+## Legacy-Einstiege
+- Die Skripte in `LevelEditor/`, `simulator/` und `3ds-cpp/` bleiben aus Kompatibilitaetsgruenden erhalten.
+- Neue Dokumentation und neue Workflows sollen jedoch immer den Ordner `programme/` referenzieren.
 
 ## Muss-Checkliste vor Abschluss
 - [ ] Antworten/Änderungstexte auf Deutsch

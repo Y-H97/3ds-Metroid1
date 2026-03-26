@@ -1,5 +1,6 @@
 @echo off
 REM Baut und startet den grafischen Win32-Simulator (Windows).
+REM LEGACY-HINWEIS: Bevorzugter Einstieg ist jetzt ..\programme\run_simulator_window.bat.
 REM Hinweis: Wenn beim Anklicken dieser Datei ein "Welches Programm soll zum
 REM Öffnen verwendet werden?"-Dialog erscheint, dann ist die Zuordnung von
 REM .bat-Dateien zu cmd.exe beschädigt. Siehe ../scripts/fix_bat_assoc.ps1.
