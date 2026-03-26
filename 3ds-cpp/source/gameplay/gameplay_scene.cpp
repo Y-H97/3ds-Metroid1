@@ -3,22 +3,13 @@
 #ifndef DESKTOP_SIMULATOR
 #include <citro2d.h>
 #endif
-#include <cmath>
 #include <cstdio>
-
-// Item-spezifische Logik
-#include "items.h"
 
 #include "../ui/text_renderer.h"
 #include "render/bottom_ui.h"
 
 constexpr u32 CLEAR_COLOR = C2D_Color32(16, 20, 32, 255);
 constexpr u32 BG_COLOR    = C2D_Color32(10, 14, 20, 255);
-
-static std::string makeVisitedKey(int x, int y) {
-    // Eindeutiger Schlüssel für besuchte Weltzellen.
-    return std::to_string(x) + "," + std::to_string(y);
-}
 
 static float clampf(float v, float lo, float hi) {
     // Begrenzt einen Wert auf ein Intervall [lo, hi].
@@ -68,25 +59,6 @@ static std::string pickFirstLevelFromWorld(const char* path) {
     size_t end = s.find('"', pos + 1);
     if (end == std::string::npos) return {};
     return s.substr(pos + 1, end - pos - 1);
-}
-
-// Helper: erneuert die MapItem-Liste basierend auf der gerade geladenen TileMap
-void GameplayScene::refreshMapItems() {
-    mapItems.clear();
-    const TileMap& map = core.getMap();
-    const float tileSize = 16.0f;
-    for (const auto& d : map.items) {
-        // bereits eingesammelte Exemplare überspringen
-        if (d.type == items::double_jump::id() && (collectedItems & ITEM_DOUBLE_JUMP)) {
-            continue;
-        }
-        MapItem mi;
-        mi.type = d.type;
-        mi.x = d.x * tileSize;
-        mi.y = d.y * tileSize;
-        mi.collected = false;
-        mapItems.push_back(mi);
-    }
 }
 
 static void renderMap(C3D_RenderTarget* target, float originX, float originY, float tileSize, const TileRenderer& renderer, const TileMap& map) {
@@ -143,23 +115,9 @@ bool GameplayScene::loadInitialMap() {
     if (!core.setPlayerStartToFirstEmpty(16.0f)) {
         core.setPlayerStart(40.0f, 40.0f);
     }
-    // Neue Karte geladen – Itemliste auffrischen
+    // Neue Karte geladen – Itemliste auffrischen und Startkollisionen neutralisieren.
     refreshMapItems();
-    // Falls der Startpunkt genau auf einem Item liegt (z.B. durch Leveldesign),
-    // behalten wir das Item als "bereits gesammelt" ohne Effekt – so startet
-    // ein neues Spiel stets ohne sofortigen Power‑Up-Gewinn.
-    {
-        const Player& p = core.getPlayer();
-        const float itemSize = 16.0f;
-        for (auto& mi : mapItems) {
-            if (!mi.collected) {
-                if (p.x < mi.x + itemSize && p.x + p.w > mi.x &&
-                    p.y < mi.y + itemSize && p.y + p.h > mi.y) {
-                    mi.collected = true;
-                }
-            }
-        }
-    }
+    markItemsOverlappingPlayerAsCollected();
 
     checkpoint.valid = true;
     checkpoint.level = levelName;
@@ -168,7 +126,12 @@ bool GameplayScene::loadInitialMap() {
     checkpoint.x = core.getPlayer().x;
     checkpoint.y = core.getPlayer().y;
     visitedCells.clear();
-    visitedCells.insert(makeVisitedKey(gridX, gridY));
+    currentGridX = gridX + static_cast<int>(core.getPlayer().x / 400.0f);
+    currentGridY = gridY + static_cast<int>(core.getPlayer().y / 240.0f);
+    visitedCells.insert(std::to_string(currentGridX) + "," + std::to_string(currentGridY));
+    playerTileX = static_cast<int>(core.getPlayer().x / 16.0f);
+    playerTileY = static_cast<int>(core.getPlayer().y / 16.0f);
+    playerTileId = core.getMap().getTile(playerTileX, playerTileY);
 
     return true;
 }
@@ -211,178 +174,6 @@ void GameplayScene::shutdown() {
         writeVisitedToDisk(activeSaveSlot);
     }
     renderer.shutdown();
-}
-
-
-
-void GameplayScene::grantDoubleJump() {
-    // Setzt ein Flag im Python-Spieler, das im GameCore-Update genutzt werden kann.
-    core.getPlayer().hasDoubleJump = true;
-}
-
-bool GameplayScene::playerHasDoubleJump() const {
-    return core.getPlayer().hasDoubleJump;
-}
-
-void GameplayScene::update(float dt) {
-    // Haupt-Update: Eingabe anwenden, Raumwechsel prüfen, Tod/Respawn, FPS zählen.
-    InputState input;
-    input.left = moveLeftHeld;
-    input.right = moveRightHeld;
-    input.jump = jumpHeld;
-    input.jumpPressed = jumpPressed;
-    core.update(input, dt);
-    jumpPressed = false;
-
-    const Player& currentPlayer = core.getPlayer();
-    currentGridX = gridX + static_cast<int>(std::floor(currentPlayer.x / 400.0f));
-    currentGridY = gridY + static_cast<int>(std::floor(currentPlayer.y / 240.0f));
-    if (world.getCell(currentGridX, currentGridY)) {
-        if (visitedCells.insert(makeVisitedKey(currentGridX, currentGridY)).second) {
-            writeVisitedToDisk(activeSaveSlot);
-        }
-    }
-    playerTileX = static_cast<int>(std::floor(currentPlayer.x / 16.0f));
-    playerTileY = static_cast<int>(std::floor(currentPlayer.y / 16.0f));
-    playerTileId = core.getMap().getTile(playerTileX, playerTileY);
-
-    // Prüfe Kollision mit nicht eingesammelten Items
-    const Player& p = core.getPlayer();
-    const float itemSize = 16.0f;
-    for (auto& it : mapItems) {
-        if (it.collected) continue;
-        if (p.x < it.x + itemSize && p.x + p.w > it.x && p.y < it.y + itemSize && p.y + p.h > it.y) {
-            it.collected = true;
-            // Effekt anwenden und Flag setzen
-            if (it.type == items::double_jump::id()) {
-                collectedItems |= ITEM_DOUBLE_JUMP;
-                activeItems |= ITEM_DOUBLE_JUMP;
-                items::double_jump::onCollect(*this);
-            }
-        }
-    }
-
-    // Prüfen, ob der Spieler einen Übergangstrigger berührt.
-    const auto& transitions = core.getMap().getTransitions();
-    bool triggered = false;
-    Rect hit{};
-    const Player& player = core.getPlayer();
-    for (const auto& tr : transitions) {
-        if (player.x < tr.x + tr.w && player.x + player.w > tr.x && player.y < tr.y + tr.h && player.y + player.h > tr.y) {
-            triggered = true;
-            hit = tr;
-            break;
-        }
-    }
-    if (!triggered) inTransition = false;
-    // Bei neuem Übergang Zielraum bestimmen und ggf. laden.
-    if (triggered && !inTransition && world.getCell(gridX, gridY)) {
-        inTransition = true;
-        float txCenter = hit.x + hit.w * 0.5f;
-        float tyCenter = hit.y + hit.h * 0.5f;
-        std::string dir;
-        if (txCenter > core.getMap().width * 16 - 32) dir = "right";
-        else if (txCenter < 32) dir = "left";
-        else if (tyCenter > core.getMap().height * 16 - 32) dir = "down";
-        else if (tyCenter < 32) dir = "up";
-
-        if (!dir.empty()) {
-            float globalX = gridX * 400 + player.x;
-            float globalY = gridY * 240 + player.y;
-            float targetGX = globalX;
-            float targetGY = globalY;
-            if (dir == "right") targetGX = (gridX * 400) + core.getMap().width * 16 + 16;
-            else if (dir == "left") targetGX = (gridX * 400) - 16;
-            else if (dir == "down") targetGY = (gridY * 240) + core.getMap().height * 16 + 16;
-            else if (dir == "up") targetGY = (gridY * 240) - 16;
-
-            int nextGX = static_cast<int>(std::floor(targetGX / 400.0f));
-            int nextGY = static_cast<int>(std::floor(targetGY / 240.0f));
-            const SpatialCell* nextCell = world.getCell(nextGX, nextGY);
-            if (nextCell) {
-                std::string levelPath = std::string("romfs:/maps/") + nextCell->level + ".json";
-                if (core.loadMapJson(levelPath.c_str())) {
-                    gridX = nextCell->originX;
-                    gridY = nextCell->originY;
-                    currentLevelName = nextCell->level;                    // Karte gewechselt, Items aktualisieren
-                    refreshMapItems();
-                    float offset = 24.0f;
-                    float localTargetX = 0.0f;
-                    float localTargetY = 0.0f;
-
-                    if (dir == "right") {
-                        localTargetX = offset;
-                        float screenRelY = std::fmod(player.y, 240.0f);
-                        localTargetY = (std::floor(targetGY / 240.0f) - gridY) * 240.0f + screenRelY;
-                    } else if (dir == "left") {
-                        float segmentLocalX = (nextGX - gridX) * 400.0f;
-                        localTargetX = segmentLocalX + 400.0f - player.w - offset;
-                        float screenRelY = std::fmod(player.y, 240.0f);
-                        localTargetY = (std::floor(targetGY / 240.0f) - gridY) * 240.0f + screenRelY;
-                    } else if (dir == "down") {
-                        localTargetY = offset;
-                        float screenRelX = std::fmod(player.x, 400.0f);
-                        localTargetX = (std::floor(targetGX / 400.0f) - gridX) * 400.0f + screenRelX;
-                    } else if (dir == "up") {
-                        float segmentLocalY = (nextGY - gridY) * 240.0f;
-                        localTargetY = segmentLocalY + 240.0f - player.h - offset;
-                        float screenRelX = std::fmod(player.x, 400.0f);
-                        localTargetX = (std::floor(targetGX / 400.0f) - gridX) * 400.0f + screenRelX;
-                    }
-
-                    // Checkpoint-Räume aktualisieren Spawnpunkt und speichern sofort.
-                    // clamp spawn inside map bounds so we don't fall out
-                    {
-                        const TileMap& m = core.getMap();
-                        float maxX = m.width * 16.0f - core.getPlayer().w;
-                        float maxY = m.height * 16.0f - core.getPlayer().h;
-                        localTargetX = clampf(localTargetX, 0.0f, std::max(0.0f, maxX));
-                        localTargetY = clampf(localTargetY, 0.0f, std::max(0.0f, maxY));
-                    }
-                    if (world.isCheckpoint(nextGX, nextGY)) {
-                        checkpoint.valid = true;
-                        checkpoint.level = nextCell->level;
-                        checkpoint.gridX = nextCell->originX;
-                        checkpoint.gridY = nextCell->originY;
-                        checkpoint.x = localTargetX;
-                        checkpoint.y = localTargetY;
-                        core.setPlayerStart(localTargetX, localTargetY);
-                        writePersistentSaveToDisk(checkpoint, activeSaveSlot);
-                    } else {
-                        core.setPlayerPosition(localTargetX, localTargetY);
-                    }
-                }
-            }
-        }
-    }
-
-    // Tod führt zum Respawn am letzten gültigen Checkpoint.
-    if (core.consumeDeath()) {
-        if (checkpoint.valid && !checkpoint.level.empty()) {
-            std::string cpPath = std::string("romfs:/maps/") + checkpoint.level + ".json";
-            if (core.loadMapJson(cpPath.c_str())) {
-                gridX = checkpoint.gridX;
-                gridY = checkpoint.gridY;
-                core.setPlayerPosition(checkpoint.x, checkpoint.y);
-            }
-        } else {
-            core.setPlayerPosition(core.getPlayer().x, core.getPlayer().y);
-        }
-    }
-
-    fpsFrameCounter++;
-    u64 nowMs = osGetTime();
-    if (nowMs - fpsTimerMs >= 1000) {
-        fpsValue = fpsFrameCounter;
-        fpsFrameCounter = 0;
-        fpsTimerMs = nowMs;
-    }
-
-    // Pickup-Nachricht zeitlich abklingen lassen
-    if (pickupMessageTimer > 0.0f) {
-        pickupMessageTimer -= dt;
-        if (pickupMessageTimer < 0.0f) pickupMessageTimer = 0.0f;
-    }
 }
 
 void GameplayScene::renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled) {

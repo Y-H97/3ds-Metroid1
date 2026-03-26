@@ -90,10 +90,6 @@ bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave
         if (gotLegacy == 5) parsed = true;
     }
 
-    fclose(f);
-    if (!parsed) return false;
-
-    // Optional: dritte Zeile mit Item-Flags einlesen
     if (std::fgets(itemsBuf, sizeof(itemsBuf), f)) {
         uint32_t col = 0;
         uint32_t act = 0;
@@ -103,6 +99,9 @@ bool GameplayScene::loadPersistentSaveFromDisk(int slot, PersistentSave* outSave
             loaded.activeItems = act;
         }
     }
+
+    fclose(f);
+    if (!parsed) return false;
 
     loaded.valid = true;
     loaded.level = levelBuf;
@@ -141,6 +140,8 @@ bool GameplayScene::writePersistentSaveToDisk(const Checkpoint& cp, int slot) {
     persistentSave.gridY = cp.gridY;
     persistentSave.x = cp.x;
     persistentSave.y = cp.y;
+    persistentSave.collectedItems = collectedItems;
+    persistentSave.activeItems = activeItems;
     return true;
 }
 
@@ -210,8 +211,7 @@ bool GameplayScene::startNewGame(int slot) {
     pickupMessage = "";
     pickupMessageTimer = 0.0f;
     // Spielerstatus ebenfalls säubern (z.B. Doppelsprung-Flag)
-    core.getPlayer().hasDoubleJump = false;
-    core.getPlayer().jumpsRemaining = 0;
+    setDoubleJumpEnabled(false);
 
     std::string savePath = makeSavePath(activeSaveSlot);
     std::remove(savePath.c_str());
@@ -236,8 +236,7 @@ bool GameplayScene::loadFromCheckpoint(int slot) {
     collectedItems = persistentSave.collectedItems;
     activeItems = persistentSave.activeItems;
     // aktive Effekte anwenden
-    if (activeItems & ITEM_DOUBLE_JUMP) grantDoubleJump();
-    else core.getPlayer().hasDoubleJump = false;
+    setDoubleJumpEnabled((activeItems & ITEM_DOUBLE_JUMP) != 0);
     // Auswahl ggf. zurücksetzen (gilt nur zur Navigation im Inventar)
     inventorySelection = 0;
 
@@ -247,6 +246,7 @@ bool GameplayScene::loadFromCheckpoint(int slot) {
     gridX = persistentSave.gridX;
     gridY = persistentSave.gridY;
     currentLevelName = persistentSave.level;
+    refreshMapItems();
     core.setPlayerPosition(persistentSave.x, persistentSave.y);
 
     checkpoint.valid = true;
@@ -256,16 +256,8 @@ bool GameplayScene::loadFromCheckpoint(int slot) {
     checkpoint.x = persistentSave.x;
     checkpoint.y = persistentSave.y;
 
-    const Player& p = core.getPlayer();
-    currentGridX = gridX + static_cast<int>(std::floor(p.x / 400.0f));
-    currentGridY = gridY + static_cast<int>(std::floor(p.y / 240.0f));
-    playerTileX = static_cast<int>(std::floor(p.x / 16.0f));
-    playerTileY = static_cast<int>(std::floor(p.y / 16.0f));
-    playerTileId = core.getMap().getTile(playerTileX, playerTileY);
     inTransition = false;
-    if (visitedCells.insert(makeVisitedKey(currentGridX, currentGridY)).second) {
-        writeVisitedToDisk(activeSaveSlot);
-    }
+    updatePlayerWorldState();
 
     return true;
 }

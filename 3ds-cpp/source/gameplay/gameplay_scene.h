@@ -57,6 +57,7 @@ public:
     // werden können.
     void grantDoubleJump();
     bool playerHasDoubleJump() const;
+    void showPickupMessage(const char* message, float durationSeconds);
 
     void renderTop(C3D_RenderTarget* top, TextRenderer& text, bool debugInfoEnabled);
     void renderBottom(C3D_RenderTarget* bottom, TextRenderer& text, bool debugInfoEnabled);
@@ -101,7 +102,15 @@ private:
     bool writePersistentSaveToDisk(const Checkpoint& cp, int slot);
     bool loadVisitedFromDisk(int slot);
     bool writeVisitedToDisk(int slot) const;
-    void refreshMapItems(); // erneuert die Liste der Items der aktuellen Karte
+    void refreshMapItems();
+    void markItemsOverlappingPlayerAsCollected();
+    void collectOverlappingItems();
+    void setDoubleJumpEnabled(bool enabled);
+    void updatePickupMessageTimer(float dt);
+    void updatePlayerWorldState();
+    void handleMapTransition();
+    void respawnFromCheckpoint();
+    void updateFpsCounter();
 
     GameCore core;
     WorldMap world;

@@ -4,6 +4,7 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 
 ## Inhalte
 - `ARCHITECTURE.md` – Modulaufbau und Verantwortlichkeiten.
+- `PLAYER_LOGIK.md` – Aufteilung von Spielerbewegung und Sprunglogik.
 - `RUNTIME_FLOW.md` – Main-Loop, State-Wechsel und Renderfluss.
 - `SAVE_AND_SETTINGS.md` – Save-Slots, Checkpoints, Fog-of-War und Settings.
 - `ITEMS.md` – Item-System und Inventar.
@@ -31,6 +32,7 @@ Dieser Bereich dokumentiert die eigentliche Spielruntime in `3ds-cpp`.
 ## Verwandte Dokus (Obsidian)
 - [[docs/GESAMTDOKU|Gesamtdokumentation (Hub)]]
 - [[docs/game/ARCHITECTURE|Game-Architektur]]
+- [[docs/game/PLAYER_LOGIK|Player- und Sprunglogik]]
 - [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]]
 - [[docs/game/SAVE_AND_SETTINGS|Save-, Slot- und Settings-System]]
 - [[docs/game/ITEMS|Item-System]]

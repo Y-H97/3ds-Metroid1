@@ -35,7 +35,7 @@ CTRULIB ?= $(DEVKITPRO)/libctru
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source source/core source/menu/controllers source/menu/views source/gameplay source/gameplay/render source/ui
+SOURCES		:=	source source/core source/menu/controllers source/menu/views source/gameplay source/gameplay/items/double_jump source/gameplay/player source/gameplay/render source/ui
 DATA		:=	data
 INCLUDES	:=	include
 GRAPHICS	:=	gfx

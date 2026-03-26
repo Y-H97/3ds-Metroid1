@@ -4,6 +4,7 @@
 #include "../../ui/text_renderer.h"
 #include "../views/main_menu_view.h"
 #endif
+#include "../main_menu_layout.h"
 #include "../views/manual_content.h"
 
 int MainMenuController::getManualMaxScroll() const {
@@ -150,20 +151,20 @@ void MainMenuController::handleManualPageKeys(u32 kDown) {
 
 void MainMenuController::handleHomeTouch(const touchPosition& tp) {
     // Touch-Hotspots im Hauptmenü.
-    if (tp.py >= 48 && tp.py <= 85) {
+    if (mainmenu::layout::contains(mainmenu::layout::homeButtonRect(0), tp.px, tp.py)) {
         homeSelection = 0;
         state = MENU_PLAY;
         playSelection = 0;
-    } else if (tp.py >= 94 && tp.py <= 131) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::homeButtonRect(1), tp.px, tp.py)) {
         homeSelection = 1;
         state = MENU_MANUAL_LIST;
         manualSelection = 0;
         manualScroll = 0;
-    } else if (tp.py >= 140 && tp.py <= 177) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::homeButtonRect(2), tp.px, tp.py)) {
         homeSelection = 2;
         state = MENU_OPTIONS;
         optionsSelection = 0;
-    } else if (tp.py >= 186 && tp.py <= 223) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::homeButtonRect(3), tp.px, tp.py)) {
         homeSelection = 3;
         pendingAction.exitGame = true;
     }
@@ -171,26 +172,24 @@ void MainMenuController::handleHomeTouch(const touchPosition& tp) {
 
 void MainMenuController::handlePlayTouch(const touchPosition& tp) {
     // Touch-Hotspots im Spiel-Untermenü inkl. Slot-Pfeile.
-    if (tp.py >= 10 && tp.py <= 38) {
-        if (tp.px >= 44 && tp.px <= 84) {
+    if (mainmenu::layout::contains(mainmenu::layout::playSlotLeftRect(), tp.px, tp.py)) {
             selectedSaveSlot--;
             if (selectedSaveSlot < 1) selectedSaveSlot = SAVE_SLOT_COUNT;
             return;
-        }
-        if (tp.px >= 236 && tp.px <= 276) {
+    }
+    if (mainmenu::layout::contains(mainmenu::layout::playSlotRightRect(), tp.px, tp.py)) {
             selectedSaveSlot++;
             if (selectedSaveSlot > SAVE_SLOT_COUNT) selectedSaveSlot = 1;
             return;
-        }
     }
 
-    if (tp.py >= 48 && tp.py <= 85) {
+    if (mainmenu::layout::contains(mainmenu::layout::playButtonRect(0), tp.px, tp.py)) {
         playSelection = 0;
         if (hasContinue) pendingAction.loadCheckpoint = true;
-    } else if (tp.py >= 94 && tp.py <= 131) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::playButtonRect(1), tp.px, tp.py)) {
         playSelection = 1;
         pendingAction.startGame = true;
-    } else if (tp.py >= 140 && tp.py <= 177) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::playButtonRect(2), tp.px, tp.py)) {
         playSelection = 2;
         state = MENU_HOME;
     }
@@ -198,16 +197,16 @@ void MainMenuController::handlePlayTouch(const touchPosition& tp) {
 
 void MainMenuController::handleOptionsTouch(const touchPosition& tp) {
     // Touch-Hotspots in den Optionen.
-    if (tp.py >= 40 && tp.py <= 80) {
+    if (mainmenu::layout::contains(mainmenu::layout::optionsButtonRect(0), tp.px, tp.py)) {
         optionsSelection = 0;
         debugEnabled = !debugEnabled;
-    } else if (tp.py >= 88 && tp.py <= 128) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::optionsButtonRect(1), tp.px, tp.py)) {
         optionsSelection = 1;
         controlsSwapped = !controlsSwapped;
-    } else if (tp.py >= 136 && tp.py <= 176) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::optionsButtonRect(2), tp.px, tp.py)) {
         optionsSelection = 2;
         pendingAction.resetMapProgress = true;
-    } else if (tp.py >= 184 && tp.py <= 224) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::optionsButtonRect(3), tp.px, tp.py)) {
         optionsSelection = 3;
         state = MENU_HOME;
     }
@@ -215,27 +214,27 @@ void MainMenuController::handleOptionsTouch(const touchPosition& tp) {
 
 void MainMenuController::handleManualListTouch(const touchPosition& tp) {
     // Touch-Hotspots in der Themenliste.
-    if (tp.py >= 40 && tp.py <= 72) {
+    if (mainmenu::layout::contains(mainmenu::layout::manualTopicRect(0), tp.px, tp.py)) {
         manualSelection = 0;
         state = MENU_MANUAL_PAGE;
         manualScroll = 0;
-    } else if (tp.py >= 76 && tp.py <= 108) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualTopicRect(1), tp.px, tp.py)) {
         manualSelection = 1;
         state = MENU_MANUAL_PAGE;
         manualScroll = 0;
-    } else if (tp.py >= 112 && tp.py <= 144) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualTopicRect(2), tp.px, tp.py)) {
         manualSelection = 2;
         state = MENU_MANUAL_PAGE;
         manualScroll = 0;
-    } else if (tp.py >= 148 && tp.py <= 180) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualTopicRect(3), tp.px, tp.py)) {
         manualSelection = 3;
         state = MENU_MANUAL_PAGE;
         manualScroll = 0;
-    } else if (tp.py >= 184 && tp.py <= 216) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualTopicRect(4), tp.px, tp.py)) {
         manualSelection = 4;
         state = MENU_MANUAL_PAGE;
         manualScroll = 0;
-    } else if (tp.py >= 220) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualBackRect(), tp.px, tp.py)) {
         manualSelection = manualTopicCount();
         state = MENU_HOME;
     }
@@ -243,12 +242,12 @@ void MainMenuController::handleManualListTouch(const touchPosition& tp) {
 
 void MainMenuController::handleManualPageTouch(const touchPosition& tp) {
     // Touch-Hotspots für Scroll-Zonen und Zurück.
-    if (tp.py <= 48) {
+    if (mainmenu::layout::contains(mainmenu::layout::manualPageScrollUpRect(), tp.px, tp.py)) {
         manualScroll -= 1;
         if (manualScroll < 0) manualScroll = 0;
-    } else if (tp.py >= 220) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualBackRect(), tp.px, tp.py)) {
         state = MENU_MANUAL_LIST;
-    } else if (tp.py >= 192) {
+    } else if (mainmenu::layout::contains(mainmenu::layout::manualPageScrollDownRect(), tp.px, tp.py)) {
         manualScroll += 1;
         int maxScroll = getManualMaxScroll();
         if (manualScroll > maxScroll) manualScroll = maxScroll;

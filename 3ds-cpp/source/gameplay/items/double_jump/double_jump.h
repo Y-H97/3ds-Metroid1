@@ -2,6 +2,8 @@
 
 #include <string>
 
+class GameplayScene;
+
 // Dieses Modul kapselt das Verhalten des Doppelsprung-Upgrades.
 // Es lebt in einem eigenen Verzeichnis, damit weitere Items analog
 // hinzugefügt und unabhängig bearbeitet werden können.
@@ -18,7 +20,7 @@ inline const std::string& id() {
 // Wird aufgerufen, sobald der Spieler das Item eingesammelt hat.
 // Die mitgelieferte Szene kann benutzt werden, um dem Spieler die
 // doppelte Sprungfähigkeit zu geben und eine Nachricht anzuzeigen.
-void onCollect(class GameplayScene& scene);
+void onCollect(GameplayScene& scene);
 
 } // namespace double_jump
 } // namespace items

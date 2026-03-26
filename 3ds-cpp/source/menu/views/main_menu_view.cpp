@@ -1,5 +1,6 @@
 #include "main_menu_view.h"
 #include "manual_content.h"
+#include "../main_menu_layout.h"
 
 #include <citro2d.h>
 #include <cstring>
@@ -196,7 +197,8 @@ void drawMainMenuHomeView(TextRenderer& text, int selection) {
     const char* labels[4] = {"Spielen", "Handbuch", "Optionen", "Spiel beenden"};
     for (int i = 0; i < 4; ++i) {
         u32 c = selection == i ? C2D_Color32(84, 140, 220, 255) : (i == 3 ? C2D_Color32(96, 50, 50, 255) : C2D_Color32(56, 72, 104, 255));
-        C2D_DrawRectSolid(50, 48 + i * 48, 0.0f, 220, 32, c);
+        const auto rect = mainmenu::layout::homeButtonRect(i);
+        C2D_DrawRectSolid(rect.x, rect.y, 0.0f, rect.w, rect.h, c);
         text.draw(78.0f, 58.0f + i * 48, 0.44f, C2D_Color32(245, 245, 255, 255), "%s", labels[i]);
     }
 }
@@ -205,8 +207,10 @@ void drawMainMenuPlayView(TextRenderer& text, int selection, int selectedSaveSlo
     C2D_DrawRectSolid(0, 0, 0.0f, 320, 240, C2D_Color32(26, 28, 38, 255));
         // Play-Menü mit Slot-Wechsel und Start-/Continue-Aktionen.
 
-    C2D_DrawRectSolid(44, 8, 0.0f, 40, 28, C2D_Color32(56, 72, 104, 255));
-    C2D_DrawRectSolid(236, 8, 0.0f, 40, 28, C2D_Color32(56, 72, 104, 255));
+    const auto slotLeft = mainmenu::layout::playSlotLeftRect();
+    const auto slotRight = mainmenu::layout::playSlotRightRect();
+    C2D_DrawRectSolid(slotLeft.x, slotLeft.y, 0.0f, slotLeft.w, slotLeft.h, C2D_Color32(56, 72, 104, 255));
+    C2D_DrawRectSolid(slotRight.x, slotRight.y, 0.0f, slotRight.w, slotRight.h, C2D_Color32(56, 72, 104, 255));
     text.draw(58.0f, 16.0f, 0.40f, C2D_Color32(245, 245, 255, 255), "<");
     text.draw(250.0f, 16.0f, 0.40f, C2D_Color32(245, 245, 255, 255), ">");
     text.draw(120.0f, 18.0f, 0.38f, C2D_Color32(192, 205, 235, 255), "Slot %d", selectedSaveSlot);
@@ -215,9 +219,12 @@ void drawMainMenuPlayView(TextRenderer& text, int selection, int selectedSaveSlo
     u32 c1 = selection == 1 ? C2D_Color32(84, 140, 220, 255) : C2D_Color32(56, 72, 104, 255);
     u32 c2 = selection == 2 ? C2D_Color32(124, 96, 186, 255) : C2D_Color32(70, 58, 102, 255);
 
-    C2D_DrawRectSolid(50, 48, 0.0f, 220, 32, c0);
-    C2D_DrawRectSolid(50, 96, 0.0f, 220, 32, c1);
-    C2D_DrawRectSolid(50, 144, 0.0f, 220, 32, c2);
+    const auto playContinue = mainmenu::layout::playButtonRect(0);
+    const auto playNew = mainmenu::layout::playButtonRect(1);
+    const auto playBack = mainmenu::layout::playButtonRect(2);
+    C2D_DrawRectSolid(playContinue.x, playContinue.y, 0.0f, playContinue.w, playContinue.h, c0);
+    C2D_DrawRectSolid(playNew.x, playNew.y, 0.0f, playNew.w, playNew.h, c1);
+    C2D_DrawRectSolid(playBack.x, playBack.y, 0.0f, playBack.w, playBack.h, c2);
 
     text.draw(72.0f, 58.0f, 0.42f, hasContinue ? C2D_Color32(245, 245, 255, 255) : C2D_Color32(170, 170, 182, 255), hasContinue ? "Fortsetzen" : "Fortsetzen (kein Save)");
     text.draw(86.0f, 106.0f, 0.44f, C2D_Color32(245, 245, 255, 255), "Neues Spiel");
@@ -231,12 +238,14 @@ void drawMainMenuManualListView(TextRenderer& text, int selection) {
 
     for (int i = 0; i < manualTopicCount(); ++i) {
         u32 c = selection == i ? C2D_Color32(84, 140, 220, 255) : C2D_Color32(56, 72, 104, 255);
-        C2D_DrawRectSolid(20, 40 + i * 36, 0.0f, 280, 32, c);
+        const auto rect = mainmenu::layout::manualTopicRect(i);
+        C2D_DrawRectSolid(rect.x, rect.y, 0.0f, rect.w, rect.h, c);
         text.draw(28.0f, 50.0f + i * 36, 0.34f, C2D_Color32(245, 245, 255, 255), "%s", manualTopicName(i));
     }
 
     u32 backCol = selection == manualTopicCount() ? C2D_Color32(124, 96, 186, 255) : C2D_Color32(70, 58, 102, 255);
-    C2D_DrawRectSolid(20, 220, 0.0f, 280, 18, backCol);
+    const auto manualBack = mainmenu::layout::manualBackRect();
+    C2D_DrawRectSolid(manualBack.x, manualBack.y, 0.0f, manualBack.w, manualBack.h, backCol);
     text.draw(126.0f, 222.0f, 0.30f, C2D_Color32(245, 245, 255, 255), "Zurueck");
 }
 
@@ -256,7 +265,8 @@ void drawMainMenuManualPageControlsView(TextRenderer& text, int topicSelection, 
     text.draw(22.0f, 108.0f, 0.32f, C2D_Color32(182, 198, 230, 255), "A/Y oder B: Zur Themenliste");
     text.draw(22.0f, 132.0f, 0.32f, C2D_Color32(182, 198, 230, 255), "Scroll: %d / %d", scroll, maxScroll);
 
-    C2D_DrawRectSolid(20, 192, 0.0f, 280, 20, C2D_Color32(70, 58, 102, 255));
+    const auto manualPageBack = mainmenu::layout::manualPageBackRect();
+    C2D_DrawRectSolid(manualPageBack.x, manualPageBack.y, 0.0f, manualPageBack.w, manualPageBack.h, C2D_Color32(70, 58, 102, 255));
     text.draw(114.0f, 196.0f, 0.32f, C2D_Color32(245, 245, 255, 255), "Zurueck");
 
     C2D_DrawRectSolid(20, 218, 0.0f, 132, 18, C2D_Color32(56, 72, 104, 255));
@@ -273,10 +283,14 @@ void drawMainMenuOptionsView(TextRenderer& text, int selection, bool debugEnable
     u32 c2 = selection == 2 ? C2D_Color32(186, 116, 74, 255) : C2D_Color32(108, 72, 48, 255);
     u32 c3 = selection == 3 ? C2D_Color32(124, 96, 186, 255) : C2D_Color32(70, 58, 102, 255);
 
-    C2D_DrawRectSolid(40, 42, 0.0f, 240, 32, c0);
-    C2D_DrawRectSolid(40, 90, 0.0f, 240, 32, c1);
-    C2D_DrawRectSolid(40, 138, 0.0f, 240, 32, c2);
-    C2D_DrawRectSolid(40, 186, 0.0f, 240, 32, c3);
+    const auto option0 = mainmenu::layout::optionsButtonRect(0);
+    const auto option1 = mainmenu::layout::optionsButtonRect(1);
+    const auto option2 = mainmenu::layout::optionsButtonRect(2);
+    const auto option3 = mainmenu::layout::optionsButtonRect(3);
+    C2D_DrawRectSolid(option0.x, option0.y, 0.0f, option0.w, option0.h, c0);
+    C2D_DrawRectSolid(option1.x, option1.y, 0.0f, option1.w, option1.h, c1);
+    C2D_DrawRectSolid(option2.x, option2.y, 0.0f, option2.w, option2.h, c2);
+    C2D_DrawRectSolid(option3.x, option3.y, 0.0f, option3.w, option3.h, c3);
 
     text.draw(52.0f, 50.0f, 0.38f, C2D_Color32(245, 245, 255, 255), "Ingame Debug Info");
     text.draw(226.0f, 50.0f, 0.40f, debugEnabled ? C2D_Color32(120, 250, 160, 255) : C2D_Color32(255, 180, 180, 255), debugEnabled ? "AN" : "AUS");

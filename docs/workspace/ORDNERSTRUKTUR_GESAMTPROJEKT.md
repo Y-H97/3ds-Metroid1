@@ -27,8 +27,25 @@ Diese Seite beschreibt die Ordnerstruktur des Projekts und beantwortet pro Berei
 ### `3ds-cpp/` (3DS-Runtime + Core)
 - `source/`: Code der Runtime.
   - `core/`: Plattformunabhaengige Kernlogik (z. B. Spielzustand, Weltlogik).
+    - `game_core.*`: Runtime-Fassade fuer Spielzustand und Player-Delegation.
+    - `tile_map_io.cpp`: Laedt Kartenformate und extrahiert exportierte Items.
+    - `world_map.*`: Welt-/Raumverknuepfung und Spatial-Map.
   - `gameplay/`: Gameplay-spezifische Ablaufe und Rendering-Helfer.
+    - `gameplay_scene.cpp`: Init, Render und gemeinsamer Szenen-Grundzustand.
+    - `gameplay_scene_runtime.cpp`: Frame-Update-Orchestrierung.
+    - `gameplay_scene_transition.cpp`: Raumwechsel, Respawn und Grid-Aktualisierung.
+    - `gameplay_scene_items.cpp`: Map-Items, Pickup-Kollisionen und Meldungen.
+    - `gameplay_scene_input.cpp`: Rohinput und Bottom-UI-Interaktion.
+    - `gameplay_scene_persistence.cpp`: Save-Slots, Checkpoints und Fog-of-War.
+    - `items/`: Item-spezifische Module wie `double_jump`.
+    - `player/`: Entkoppelte Player-Submodule.
+      - `player_logic.*`: Orchestriert das Frame-Update.
+      - `movement_input.*`: Input -> horizontale Geschwindigkeit.
+      - `jump_logic.*`: Sprung/Coyote-Time/Doppelsprung.
+      - `collision_logic.*`: X/Y-Kollisionen inkl. Schraegkacheln.
+      - `danger_logic.*`: Gefahrenkachelpruefung.
   - `menu/`: Menuesystem (Controller und Views).
+    - `main_menu_layout.h`: Gemeinsame Geometrie fuer Touchbereiche und gezeichnete Buttons.
   - `ui/`: UI-nahe Komponenten.
   - `main.c`, `main.cpp`: Einstiege fuer Build/Runtime.
 - `romfs/maps/`: Exportierte JSON-Maps aus dem LevelEditor; werden von Runtime und Simulator gelesen.

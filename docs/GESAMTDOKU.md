@@ -21,6 +21,7 @@ Alle Links sind als **Obsidian-Wiki-Links** angelegt und untereinander vernetzt.
 - [`3ds-cpp/README.md`](../3ds-cpp/README.md) – `3ds-cpp` Projekt‑README (Build, Simulator, Start‑Anweisungen).
 - [[docs/game/README|Game Überblick]] – Einstieg in die Runtime‑Dokumente.
 - [[docs/game/ARCHITECTURE|Game-Architektur]] – Modulaufbau und Verantwortlichkeiten.
+- [[docs/game/PLAYER_LOGIK|Player- und Sprunglogik]] – Unterteilung von Bewegung, Sprunglogik und GameCore.
 - [[docs/game/RUNTIME_FLOW|Game-Laufzeitfluss]] – Main-Loop, Zustände, Renderpfad.
 - [[docs/game/SAVE_AND_SETTINGS|Save & Settings]] – Slots, Checkpoints, Fog‑of‑War, Einstellungen.
 - [[docs/game/ITEMS|Item-System]] – Beschreibung der neuen Items und Inventar.

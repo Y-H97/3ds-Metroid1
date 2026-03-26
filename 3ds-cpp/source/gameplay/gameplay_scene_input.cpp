@@ -89,10 +89,10 @@ void GameplayScene::handleInput(u32 kDown, u32 kHeld) {
                 if (inventorySelection == 0 && (collectedItems & ITEM_DOUBLE_JUMP)) {
                     if (activeItems & ITEM_DOUBLE_JUMP) {
                         activeItems &= ~ITEM_DOUBLE_JUMP;
-                        core.getPlayer().hasDoubleJump = false;
+                        setDoubleJumpEnabled(false);
                     } else {
                         activeItems |= ITEM_DOUBLE_JUMP;
-                        grantDoubleJump();
+                        setDoubleJumpEnabled(true);
                     }
                 }
             }
